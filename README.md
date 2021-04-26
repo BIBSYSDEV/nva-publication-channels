@@ -1,3 +1,3 @@
 # nva-publication-channels
 
-![Structure](docs/AWS web app structural flow.png)
+![Structure](docs/nva-publication-channels.png)
