@@ -1,5 +1,6 @@
 
 # Created by https://www.gitignore.io/api/osx,node,linux,windows
+.aws-sam
 
 ### Linux ###
 *~
@@ -15,6 +16,17 @@
 
 # .nfs files are created when an open file is removed but is still being accessed
 .nfs*
+
+ dependencies
+/node_modules
+/.pnp
+.pnp.js
+
+# testing
+/coverage
+
+# production
+/build
 
 ### Node ###
 # Logs
