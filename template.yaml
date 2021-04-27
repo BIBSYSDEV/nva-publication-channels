@@ -10,30 +10,84 @@ Globals:
   Function:
     Timeout: 3
 
+Parameters:
+  CognitoAuthorizerArn:
+    Type: 'AWS::SSM::Parameter::Value<String>'
+    Description: Reference to Cognito UserPool for the stage
+    Default: CognitoAuthorizerArn
+  CustomDomain:
+    Type: 'AWS::SSM::Parameter::Value<String>'
+    Description: Custom API to connect this lambda to
+    Default: CustomDomain
+  CustomDomainBasePath:
+    Type: String
+    Description: Base path mapping in CustomDomain
+    Default: publication-channels
+
 Resources:
+  ApiAccessLogGroup:
+    Type: AWS::Logs::LogGroup
+  PublicationChannelsApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      AccessLogSetting:
+        DestinationArn: !GetAtt ApiAccessLogGroup.Arn
+        Format: '{ "apiId": "$context.apiId", "requestId": "$context.requestId", "requestTime": "$context.requestTime", "requestTimeEpoch": "$context.requestTimeEpoch", "httpMethod": "$context.httpMethod", "path": "$context.path", "status": "$context.status",  "error.message": "$context.error.message" }'
+      StageName: Prod
+      Cors:
+        AllowMethods: "'GET,OPTIONS'"
+        AllowHeaders: "'Content-Type'"
+        AllowOrigin: "'*'"
+      Auth:
+        DefaultAuthorizer: CognitoAuthorizer
+        Authorizers:
+          CognitoAuthorizer:
+            UserPoolArn: !Ref CognitoAuthorizerArn
+      EndpointConfiguration: REGIONAL
+      Models:
+        Search:
+          type: object
+          required:
+            - tableId
+            - searchTerm
+          properties:
+            tableId:
+              type: integer
+            searchTerm:
+              type: string
   JournalFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
       CodeUri: publication-channels/
       Handler: journal.lambdaHandler
-      Runtime: nodejs10.x
+      Runtime: nodejs12.x
       Events:
-        HelloWorld:
+        GetJournalEvent:
           Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
           Properties:
             Path: /journal
             Method: get
-
+            RestApiId:
+              Ref: PublicationChannelsApi
   PublisherFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
       CodeUri: publication-channels/
       Handler: publication.lambdaHandler
-      Runtime: nodejs10.x
+      Runtime: nodejs12.x
       Events:
-        HelloWorld:
+        GetPublicationEvent:
           Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
           Properties:
             Path: /publication
             Method: get
+            RestApiId:
+              Ref: PublicationChannelsApi
 
+  ChannelsBasePathMapping:
+    Type: AWS::ApiGateway::BasePathMapping
+    Properties:
+      BasePath: !Ref CustomDomainBasePath
+      DomainName: !Ref CustomDomain
+      RestApiId: !Ref PublicationChannelsApi
+      Stage: !Ref PublicationChannelsApi.Stage

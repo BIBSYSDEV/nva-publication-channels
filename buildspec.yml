@@ -1,11 +1,10 @@
-version: 0.1
+version: 0.2
 
 phases:
   install:
     runtime-versions:
-      nodejs: 10
+      nodejs: 12
     commands:
-      - env
       - npm install
   build:
     commands:
@@ -14,4 +13,4 @@ artifacts:
   files:
     - '**/*'
   base-directory: build
-  name: nva-frontend
+  name: nva-publication-channels
