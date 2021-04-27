@@ -87,7 +87,7 @@ Resources:
   ChannelsBasePathMapping:
     Type: AWS::ApiGateway::BasePathMapping
     Properties:
+      DomainName: !Sub api.${CustomDomain}
       BasePath: !Ref CustomDomainBasePath
-      DomainName: !Ref CustomDomain
       RestApiId: !Ref PublicationChannelsApi
       Stage: !Ref PublicationChannelsApi.Stage
