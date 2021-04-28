@@ -1,0 +1,166 @@
+openapi: 3.0.3
+info:
+  description: "This is NVA Publication Channels API."
+  version: "1.0.0"
+  title: "NVA Publication Channels"
+  termsOfService: "http://nva.unit.no/terms/"
+  contact:
+    email: "nva@unit.no"
+  license:
+    name: "MIT"
+host: "api.nva.unit.no"
+basePath: "/channels"
+schemes:
+- "https"
+paths:
+  /journal:
+    get:
+      tags:
+      - "Journal"
+      summary: "List journals"
+      description: "Returns a list of journals"
+      operationId: "getJournals"
+      produces:
+      - "application/json"
+      responses:
+        "200":
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/Journal"
+        "400":
+          description: "Invalid ID supplied"
+        "404":
+          description: "Journal not found"
+  /journal/{pid}:
+    get:
+      tags:
+      - "Journal"
+      summary: "Find journal by ID"
+      description: "Returns a single Journal"
+      operationId: "getJournalById"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "pid"
+        in: "path"
+        description: "ID of journal to return"
+        required: true
+        type: "string"
+      responses:
+        "200":
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/Journal"
+        "400":
+          description: "Invalid ID supplied"
+        "404":
+          description: "Journal not found"
+
+  /publisher:
+    get:
+      tags:
+      - "Publisher"
+      summary: "List publishers"
+      description: "Returns a list of publishers"
+      operationId: "getPublishers"
+      produces:
+      - "application/json"
+      responses:
+        "200":
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/Publisher"
+        "400":
+          description: "Invalid ID supplied"
+        "404":
+          description: "Publisher not found"
+  /publisher/{pid}:
+    get:
+      tags:
+      - "Publisher"
+      summary: "Find publisher by ID"
+      description: "Returns a single Publisher"
+      operationId: "getPublisherById"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "pid"
+        in: "path"
+        description: "ID of publisherl to return"
+        required: true
+        type: "string"
+      responses:
+        "200":
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/Publisher"
+        "400":
+          description: "Invalid ID supplied"
+        "404":
+          description: "Publisher not found"
+
+
+definitions:
+  Journal:
+    type: "object"
+    properties:
+      '@context':
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      identifier:
+        type: string
+      eIssn:
+        type: string
+      issn:
+        type: string
+        format: nullable
+      active:
+        type: boolean
+      language:
+        type: string
+      url:
+        type: string
+      publisher:
+        type: string
+      npiDomain:
+        type: string
+      scientificValue:
+        type: string
+  Publisher:
+    type: "object"
+    properties:
+      '@context':
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      identifier:
+        type: string
+      isbnPrefixes:
+        type: array
+        items:
+          type: string
+      webpage:
+        type: string
+      active:
+        type: boolean
+      scientificValue:
+        type: string
+  ApiResponse:
+    type: "object"
+    properties:
+      code:
+        type: "integer"
+        format: "int32"
+      type:
+        type: "string"
+      message:
+        type: "string"
+externalDocs:
+  description: "Find out more about NVA"
+  url: "https://nva.unit.no"
+  

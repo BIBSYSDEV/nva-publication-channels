@@ -20,7 +20,7 @@ exports.journal = async (event, context) => {
         response = {
             'statusCode': 200,
             'body': JSON.stringify({
-                message: 'hello world',
+                message: 'hello journal',
                 // location: ret.data.trim()
             })
         }
@@ -32,13 +32,13 @@ exports.journal = async (event, context) => {
     return response
 };
 
-exports.publication = async (event, context) => {
+exports.publisher = async (event, context) => {
     try {
         // const ret = await axios(url);
         response = {
             'statusCode': 200,
             'body': JSON.stringify({
-                message: 'hello world',
+                message: 'hello publisher',
                 // location: ret.data.trim()
             })
         }

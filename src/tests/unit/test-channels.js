@@ -1,6 +1,6 @@
 'use strict';
 
-const app = require('../channels.js');
+const channels = require('../../channels.js');
 const chai = require('chai');
 const expect = chai.expect;
 var event, context;
@@ -22,9 +22,9 @@ describe('Tests journal', function () {
 });
 
 
-describe('Tests publication', function () {
+describe('Tests publisher', function () {
     it('verifies successful response', async () => {
-        const result = await channels.publication(event, context)
+        const result = await channels.publisher(event, context)
 
         expect(result).to.be.an('object');
         expect(result.statusCode).to.equal(200);
