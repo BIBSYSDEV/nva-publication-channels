@@ -10,7 +10,8 @@ phases:
 
   build:
     commands:
-      - npm build
+      - sam build
+      - sam package --s3-bucket $S3_BUCKET --output-template-file packaged.yaml
 
 cache:
   paths:
