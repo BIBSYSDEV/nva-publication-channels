@@ -7,10 +7,16 @@ phases:
 
     commands:
       - npm install
+      -
   build:
     commands:
       - npm build
 
+cache:
+  paths:
+    - '/node_modules/**/*'
+    -
 artifacts:
   files:
-    - packaged.yaml
+    - '**/*'
+
