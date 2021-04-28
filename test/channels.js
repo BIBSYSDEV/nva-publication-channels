@@ -1,6 +1,6 @@
 'use strict';
 
-const app = require('../../channels.js');
+const app = require('../channels.js');
 const chai = require('chai');
 const expect = chai.expect;
 var event, context;

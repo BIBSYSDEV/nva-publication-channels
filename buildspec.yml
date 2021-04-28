@@ -6,12 +6,11 @@ phases:
       nodejs: 12
 
     commands:
-      - pip3 install aws-sam-cli
+      - npm install
   build:
     commands:
-      - sam build
-      - sam package --s3-bucket $S3_BUCKET --output-template-file packaged.yaml
+      - npm build
 
 artifacts:
   files:
-    - packaged.yaml
+    - '**/*'
