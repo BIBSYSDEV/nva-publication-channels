@@ -27,7 +27,7 @@ paths:
       x-amazon-apigateway-integration:
         uri: "arn:aws:apigateway:uu-west-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-1:884807050265:function:JournalFunction/invocations"
         httpMethod: POST
-        type: AWS_PROXY
+        type: "aws"
       responses:
         "200":
           description: "successful operation"
