@@ -24,11 +24,11 @@ paths:
       operationId: "getJournals"
       produces:
       - "application/json"
-#       x-amazon-apigateway-integration:
-#         uri:
-#           "Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${JournalFunction.Arn}:invocations"
-#         httpMethod: POST
-#         type: AWS_PROXY
+      x-amazon-apigateway-integration:
+        uri:
+          "Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${JournalFunction.Arn}:invocations"
+        httpMethod: POST
+        type: AWS_PROXY
       responses:
         "200":
           description: "successful operation"
