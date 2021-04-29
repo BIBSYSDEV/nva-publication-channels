@@ -4,7 +4,7 @@ A thin client to wrap NSD DBH's publication channel databases.
 
 [Swagger UI API definition](http://nva-dev-public-api.s3-website-eu-west-1.amazonaws.com/?urls.primaryName=Publication%20Channels)
 
-![API definition](docs/nva-publication-channels.yaml)
+[API definition](docs/nva-publication-channels.yaml)
 
 ![Structure](docs/nva-publication-channels.png)
 
