@@ -2,6 +2,8 @@
 
 A thin client to wrap NSD DBH's publication channel databases. 
 
+![Swagger UI API definition](docs/swagger/index.html)
+
 ![API definition](docs/nva-publication-channels.yaml)
 
 ![Structure](docs/nva-publication-channels.png)
