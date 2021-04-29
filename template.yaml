@@ -30,7 +30,7 @@ Resources:
   PublicationChannelsApi:
     Type: AWS::Serverless::Api
     Properties:
-      DefinitionUri: ./docs/publicationchannels.yaml
+      DefinitionUri: ./docs/nva-publication-channels.yaml
       AccessLogSetting:
         DestinationArn: !GetAtt ApiAccessLogGroup.Arn
         Format: '{ "apiId": "$context.apiId", "requestId": "$context.requestId", "requestTime": "$context.requestTime", "requestTimeEpoch": "$context.requestTimeEpoch", "httpMethod": "$context.httpMethod", "path": "$context.path", "status": "$context.status",  "error.message": "$context.error.message" }'
@@ -39,11 +39,11 @@ Resources:
 #        AllowMethods: "'GET,OPTIONS'"
 #        AllowHeaders: "'Content-Type'"
 #        AllowOrigin: "'*'"
-#      Auth:
+      Auth:
 #        DefaultAuthorizer: CognitoAuthorizer
-#        Authorizers:
-#          CognitoAuthorizer:
-#            UserPoolArn: !Ref CognitoAuthorizerArn
+        Authorizers:
+          CognitoAuthorizer:
+            UserPoolArn: !Ref CognitoAuthorizerArn
       EndpointConfiguration: REGIONAL
 #      Models:
 #        Search:

@@ -22,6 +22,13 @@ paths:
       operationId: "getJournals"
       produces:
       - "application/json"
+      x-amazon-apigateway-integration:
+        uri:
+          Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${JournalFunction.Arn}:invocations
+        responses: { }
+        httpMethod: POST
+        type: AWS_PROXY
+
       responses:
         "200":
           description: "successful operation"
@@ -46,6 +53,12 @@ paths:
         description: "ID of journal to return"
         required: true
         type: "string"
+      x-amazon-apigateway-integration:
+        uri:
+          Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${JournalFunction.Arn}:invocations
+        responses: { }
+        httpMethod: POST
+        type: AWS_PROXY
       responses:
         "200":
           description: "successful operation"
@@ -65,6 +78,12 @@ paths:
       operationId: "getPublishers"
       produces:
       - "application/json"
+      x-amazon-apigateway-integration:
+        uri:
+          Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${PublisherFunction.Arn}:invocations
+        responses: { }
+        httpMethod: POST
+        type: AWS_PROXY
       responses:
         "200":
           description: "successful operation"
@@ -89,6 +108,12 @@ paths:
         description: "ID of publisher to return"
         required: true
         type: "string"
+      x-amazon-apigateway-integration:
+        uri:
+          Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${PublisherFunction.Arn}:invocations
+        responses: { }
+        httpMethod: POST
+        type: AWS_PROXY
       responses:
         "200":
           description: "successful operation"
