@@ -16,7 +16,7 @@ describe('Tests journal', function () {
         let response = JSON.parse(result.body);
 
         expect(response).to.be.an('object');
-        expect(response.message).to.be.equal("hello world");
+        expect(response.message).to.be.equal("hello journal");
         // expect(response.location).to.be.an("string");
     });
 });
@@ -33,7 +33,7 @@ describe('Tests publisher', function () {
         let response = JSON.parse(result.body);
 
         expect(response).to.be.an('object');
-        expect(response.message).to.be.equal("hello world");
+        expect(response.message).to.be.equal("hello publisher");
         // expect(response.location).to.be.an("string");
     });
 });
