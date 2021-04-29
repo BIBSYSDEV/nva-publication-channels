@@ -74,20 +74,20 @@ Resources:
             Method: get
             RestApiId:
               Ref: PublicationChannelsApi
-  PublisherFunction:
-    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
-    Properties:
-      CodeUri: src/
-      Handler: channels.publisher
-      Runtime: nodejs12.x
-      Events:
-        GetPublisherEvent:
-          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
-          Properties:
-            Path: /publisher
-            Method: get
-            RestApiId:
-              Ref: PublicationChannelsApi
+#  PublisherFunction:
+#    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+#    Properties:
+#      CodeUri: src/
+#      Handler: channels.publisher
+#      Runtime: nodejs12.x
+#      Events:
+#        GetPublisherEvent:
+#          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+#          Properties:
+#            Path: /publisher
+#            Method: get
+#            RestApiId:
+#              Ref: PublicationChannelsApi
 
   ChannelsBasePathMapping:
     Type: AWS::ApiGateway::BasePathMapping
