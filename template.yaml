@@ -30,7 +30,11 @@ Resources:
   PublicationChannelsApi:
     Type: AWS::Serverless::Api
     Properties:
-      DefinitionUri: ./docs/nva-publication-channels.yaml
+      DefinitionBody:
+        'Fn::Transform':
+          Name: AWS::Include
+          Parameters:
+            Location: ./docs/nva-publication-channels.yaml
       AccessLogSetting:
         DestinationArn: !GetAtt ApiAccessLogGroup.Arn
         Format: '{ "apiId": "$context.apiId", "requestId": "$context.requestId", "requestTime": "$context.requestTime", "requestTimeEpoch": "$context.requestTimeEpoch", "httpMethod": "$context.httpMethod", "path": "$context.path", "status": "$context.status",  "error.message": "$context.error.message" }'
