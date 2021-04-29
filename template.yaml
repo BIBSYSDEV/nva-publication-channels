@@ -30,6 +30,7 @@ Resources:
   PublicationChannelsApi:
     Type: AWS::Serverless::Api
     Properties:
+      DefinitionUri: ./docs/nva-publication-channels.yaml
       AccessLogSetting:
         DestinationArn: !GetAtt ApiAccessLogGroup.Arn
         Format: '{ "apiId": "$context.apiId", "requestId": "$context.requestId", "requestTime": "$context.requestTime", "requestTimeEpoch": "$context.requestTimeEpoch", "httpMethod": "$context.httpMethod", "path": "$context.path", "status": "$context.status",  "error.message": "$context.error.message" }'
@@ -44,17 +45,17 @@ Resources:
           CognitoAuthorizer:
             UserPoolArn: !Ref CognitoAuthorizerArn
       EndpointConfiguration: REGIONAL
-      Models:
-        Search:
-          type: object
-          required:
-            - tableId
-            - searchTerm
-          properties:
-            tableId:
-              type: integer
-            searchTerm:
-              type: string
+#      Models:
+#        Search:
+#          type: object
+#          required:
+#            - tableId
+#            - searchTerm
+#          properties:
+#            tableId:
+#              type: integer
+#            searchTerm:
+#              type: string
   JournalFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
