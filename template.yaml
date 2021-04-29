@@ -35,15 +35,15 @@ Resources:
         DestinationArn: !GetAtt ApiAccessLogGroup.Arn
         Format: '{ "apiId": "$context.apiId", "requestId": "$context.requestId", "requestTime": "$context.requestTime", "requestTimeEpoch": "$context.requestTimeEpoch", "httpMethod": "$context.httpMethod", "path": "$context.path", "status": "$context.status",  "error.message": "$context.error.message" }'
       StageName: Prod
-      Cors:
-        AllowMethods: "'GET,OPTIONS'"
-        AllowHeaders: "'Content-Type'"
-        AllowOrigin: "'*'"
-      Auth:
-        DefaultAuthorizer: CognitoAuthorizer
-        Authorizers:
-          CognitoAuthorizer:
-            UserPoolArn: !Ref CognitoAuthorizerArn
+#      Cors:
+#        AllowMethods: "'GET,OPTIONS'"
+#        AllowHeaders: "'Content-Type'"
+#        AllowOrigin: "'*'"
+#      Auth:
+#        DefaultAuthorizer: CognitoAuthorizer
+#        Authorizers:
+#          CognitoAuthorizer:
+#            UserPoolArn: !Ref CognitoAuthorizerArn
       EndpointConfiguration: REGIONAL
 #      Models:
 #        Search:
