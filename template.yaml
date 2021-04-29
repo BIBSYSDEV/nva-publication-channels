@@ -39,11 +39,11 @@ Resources:
 #        AllowMethods: "'GET,OPTIONS'"
 #        AllowHeaders: "'Content-Type'"
 #        AllowOrigin: "'*'"
-      Auth:
-#        DefaultAuthorizer: CognitoAuthorizer
-        Authorizers:
-          CognitoAuthorizer:
-            UserPoolArn: !Ref CognitoAuthorizerArn
+#      Auth:
+##        DefaultAuthorizer: CognitoAuthorizer
+#        Authorizers:
+#          CognitoAuthorizer:
+#            UserPoolArn: !Ref CognitoAuthorizerArn
       EndpointConfiguration: REGIONAL
 #      Models:
 #        Search:
