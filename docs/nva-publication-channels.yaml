@@ -12,8 +12,8 @@ info:
 # servers:
 # - url: "https://api.dev.nva.aws.unit.no/{basePath}"
 # basePath: "/channels"
-schemes:
-- "https"
+# schemes:
+# - "https"
 paths:
   /journal:
     get:
