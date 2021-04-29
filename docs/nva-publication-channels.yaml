@@ -25,8 +25,7 @@ paths:
       produces:
       - "application/json"
       x-amazon-apigateway-integration:
-        uri:
-          Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${JournalFunction.Arn}:invocations
+        uri: arn:aws:lambda:eu-west-1:884807050265:function:sg-publication-channels-pl-nva-pub-JournalFunction-ZMZ2CNWJCW47
         httpMethod: POST
         type: AWS_PROXY
       responses:
