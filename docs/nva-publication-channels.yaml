@@ -8,65 +8,78 @@ info:
     email: "nva@unit.no"
   license:
     name: "MIT"
-# host: "api.nva.unit.no"
-# servers:
-# - url: "https://api.dev.nva.aws.unit.no/{basePath}"
-# basePath: "/channels"
-# schemes:
-# - "https"
+externalDocs:
+  description: Find out more about NVA
+  url: https://nva.unit.no
 paths:
   /journal:
     get:
-      tags:
-      - "Journal"
-      summary: "List journals"
-      description: "Returns a list of journals"
-      operationId: "getJournals"
-#       produces:
-#       - "application/json"
       x-amazon-apigateway-integration:
         uri: "arn:aws:apigateway:eu-west-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-1:884807050265:function:JournalFunction/invocations"
         httpMethod: POST
         type: "AWS_PROXY"
+      tags:
+      - Journal
+      summary: List journals
+      description: Returns a list of journals
+      operationId: Listournals
       responses:
-        "200":
-          description: "successful operation"
-#           schema:
-#             $ref: "#/definitions/Journal"
-        "400":
-          description: "Invalid ID supplied"
-        "404":
-          description: "Journal not found"
-#   /journal/{pid}:
-#     get:
-#       tags:
-#       - "Journal"
-#       summary: "Find journal by ID"
-#       description: "Returns a single Journal"
-#       operationId: "getJournalById"
-#       produces:
-#       - "application/json"
-#       parameters:
-#       - name: "pid"
-#         in: "path"
-#         description: "ID of journal to return"
-#         required: true
-#         type: "string"
-#       x-amazon-apigateway-integration:
-#         uri:
-#           "Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${JournalFunction.Arn}:invocations"
-#         httpMethod: POST
-#         type: AWS_PROXY
-#       responses:
-#         "200":
-#           description: "successful operation"
-#           schema:
-#             $ref: "#/definitions/Journal"
-#         "400":
-#           description: "Invalid ID supplied"
-#         "404":
-#           description: "Journal not found"
-#
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Journal'
+        400:
+          description: Invalid ID supplied
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+        404:
+          description: Journal not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+  /journal/{pid}:
+    get:
+      x-amazon-apigateway-integration:
+        uri: "arn:aws:apigateway:eu-west-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-1:884807050265:function:JournalFunction/invocations"
+        httpMethod: POST
+        type: "AWS_PROXY"
+      tags:
+      - Journal
+      summary: Find journal by ID
+      description: Returns a single Journal
+      operationId: GetJournalById
+      parameters:
+      - name: pid
+        in: path
+        description: ID of journal to return
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Journal'
+        400:
+          description: Invalid ID supplied
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+        404:
+          description: Journal not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+
 #   /publisher:
 #     get:
 #       tags:
@@ -119,67 +132,64 @@ paths:
 #           description: "Invalid ID supplied"
 #         "404":
 #           description: "Publisher not found"
-definitions:
-  Journal:
-    type: "object"
-    properties:
-      '@context':
-        type: string
-      id:
-        type: string
-      name:
-        type: string
-      identifier:
-        type: string
-      eIssn:
-        type: string
-      issn:
-        type: string
-        format: nullable
-      active:
-        type: boolean
-      language:
-        type: string
-      url:
-        type: string
-      publisher:
-        type: string
-      npiDomain:
-        type: string
-      scientificValue:
-        type: string
-  Publisher:
-    type: "object"
-    properties:
-      '@context':
-        type: string
-      id:
-        type: string
-      name:
-        type: string
-      identifier:
-        type: string
-      isbnPrefixes:
-        type: array
-        items:
+components:
+  schemas:
+    Journal:
+      type: object
+      properties:
+        '@context':
           type: string
-      webpage:
-        type: string
-      active:
-        type: boolean
-      scientificValue:
-        type: string
-  ApiResponse:
-    type: "object"
-    properties:
-      code:
-        type: "integer"
-        format: "int32"
-      type:
-        type: "string"
-      message:
-        type: "string"
-externalDocs:
-  description: "Find out more about NVA"
-  url: "https://nva.unit.no"
-  
+        id:
+          type: string
+        name:
+          type: string
+        identifier:
+          type: string
+        eIssn:
+          type: string
+        issn:
+          type: string
+          format: nullable
+        active:
+          type: boolean
+        language:
+          type: string
+        url:
+          type: string
+        publisher:
+          type: string
+        npiDomain:
+          type: string
+        scientificValue:
+          type: string
+    Publisher:
+      type: object
+      properties:
+        '@context':
+          type: string
+        id:
+          type: string
+        name:
+          type: string
+        identifier:
+          type: string
+        isbnPrefixes:
+          type: array
+          items:
+            type: string
+        webpage:
+          type: string
+        active:
+          type: boolean
+        scientificValue:
+          type: string
+    ApiResponse:
+      type: object
+      properties:
+        code:
+          type: integer
+          format: int32
+        type:
+          type: string
+        message:
+          type: string
