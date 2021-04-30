@@ -17,7 +17,8 @@ paths:
   /journal:
     get:
       x-amazon-apigateway-integration:
-        uri: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${JournalFunction.Arn}:invocations
+        uri:
+            Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${JournalFunction.Arn}:invocations
         httpMethod: POST
         type: "AWS_PROXY"
       tags:
@@ -53,7 +54,8 @@ paths:
   /journal/{pid}:
     get:
       x-amazon-apigateway-integration:
-        uri: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${JournalFunction.Arn}:invocations
+        uri:
+            Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${JournalFunction.Arn}:invocations
         httpMethod: POST
         type: "AWS_PROXY"
       tags:
