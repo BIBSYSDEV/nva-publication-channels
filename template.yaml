@@ -5,7 +5,6 @@ Description: >
 
   Sample SAM Template for nva-publication-channels
   
-# More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
 Globals:
   Function:
     Timeout: 3
@@ -39,27 +38,7 @@ Resources:
         DestinationArn: !GetAtt ApiAccessLogGroup.Arn
         Format: '{ "apiId": "$context.apiId", "requestId": "$context.requestId", "requestTime": "$context.requestTime", "requestTimeEpoch": "$context.requestTimeEpoch", "httpMethod": "$context.httpMethod", "path": "$context.path", "status": "$context.status",  "error.message": "$context.error.message" }'
       StageName: Prod
-#      Cors:
-#        AllowMethods: "'GET,OPTIONS'"
-#        AllowHeaders: "'Content-Type'"
-#        AllowOrigin: "'*'"
-#      Auth:
-##        DefaultAuthorizer: CognitoAuthorizer
-#        Authorizers:
-#          CognitoAuthorizer:
-#            UserPoolArn: !Ref CognitoAuthorizerArn
       EndpointConfiguration: REGIONAL
-#      Models:
-#        Search:
-#          type: object
-#          required:
-#            - tableId
-#            - searchTerm
-#          properties:
-#            tableId:
-#              type: integer
-#            searchTerm:
-#              type: string
   JournalFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
@@ -74,20 +53,20 @@ Resources:
             Method: get
             RestApiId:
               Ref: PublicationChannelsApi
-#  PublisherFunction:
-#    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
-#    Properties:
-#      CodeUri: src/
-#      Handler: channels.publisher
-#      Runtime: nodejs12.x
-#      Events:
-#        GetPublisherEvent:
-#          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
-#          Properties:
-#            Path: /publisher
-#            Method: get
-#            RestApiId:
-#              Ref: PublicationChannelsApi
+  PublisherFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      CodeUri: src/
+      Handler: channels.publisher
+      Runtime: nodejs12.x
+      Events:
+        GetPublisherEvent:
+          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+          Properties:
+            Path: /publisher
+            Method: get
+            RestApiId:
+              Ref: PublicationChannelsApi
 
   ChannelsBasePathMapping:
     Type: AWS::ApiGateway::BasePathMapping
