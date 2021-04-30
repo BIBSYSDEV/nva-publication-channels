@@ -44,7 +44,7 @@ Resources:
     Properties:
       CodeUri: src/
       Handler: channels.journal
-      Runtime: nodejs12.x
+      Runtime: nodejs14.x
       Events:
         GetJournalEvent:
           Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
@@ -58,7 +58,7 @@ Resources:
     Properties:
       CodeUri: src/
       Handler: channels.publisher
-      Runtime: nodejs12.x
+      Runtime: nodejs14.x
       Events:
         GetPublisherEvent:
           Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
