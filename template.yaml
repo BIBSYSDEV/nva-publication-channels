@@ -42,7 +42,7 @@ Resources:
   JournalFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
-      CodeUri: src/
+      CodeUri: ./
       Handler: channels.journal
       Runtime: nodejs14.x
       Events:
@@ -56,7 +56,7 @@ Resources:
   PublisherFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
-      CodeUri: src/
+      CodeUri: ./
       Handler: channels.publisher
       Runtime: nodejs14.x
       Events:
@@ -67,6 +67,32 @@ Resources:
             Method: get
             RestApiId:
               Ref: PublicationChannelsApi
+  FindChannelFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ./
+      Handler: channels.searchHandler
+      Runtime: nodejs14.x
+      Events:
+        FindChannel:
+          Type: Api
+          Properties:
+            Path: /search
+            Method: POST
+            RestApiId:
+              Ref: PublicationChannelsApi
+            RequestModel:
+              Model: Search
+          type: object
+          required:
+            - tableId
+            - searchTerm
+          properties:
+            tableId:
+              type: integer
+            searchTerm:
+              type: string
+            Required: true
 
   ChannelsBasePathMapping:
     Type: AWS::ApiGateway::BasePathMapping
