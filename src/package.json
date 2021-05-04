@@ -10,13 +10,20 @@
     "axios": "^0.21.1"
   },
   "scripts": {
-    "test": "mocha tests/unit/",
-    "integ-test": "mocha tests/integration/"
+    "lint": "eslint . --ext .js",
+    "lint:fix": "npm run lint -- --fix",
+    "test": "npm run lint && mocha tests/unit/",
+    "integ-test": "run lint && mocha tests/integration/"
   },
   "devDependencies": {
     "aws-sdk": "^2.815.0",
     "chai": "^4.2.0",
+    "dirty-chai": "^2.0.1",
+    "eslint": "^7.25.0",
+    "eslint-config-standard": "^16.0.2",
+    "eslint-plugin-import": "^2.22.1",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-promise": "^4.3.1",
     "mocha": "^8.2.1"
   }
 }
-
