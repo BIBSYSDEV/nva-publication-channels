@@ -25,23 +25,21 @@ function createRequestFromEvent (requestDetails) {
 }
 
 const searchHandler = async (event) => {
-  let data
   try {
     console.log('REAL Channels')
     console.log(event)
     const request = createRequestFromEvent(JSON.parse(event.body))
     const response = await fetch(request)
-    data = response.data
     console.log('status=' + response.status)
-    console.log('statustext=' + response.statusText)
-    console.log('(channels.searchHandler response.data=')
+    console.log('statusText=' + response.statusText)
+    console.log('response.data=')
     console.log(response.data)
+    return response.data
   } catch (err) {
     console.log('UPS Error!!!')
     console.log(err)
     return err
   }
-  return data
 }
 
 exports.searchHandler = searchHandler
