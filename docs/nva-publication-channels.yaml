@@ -137,7 +137,9 @@ paths:
           content:
             application/json:
               schema:
-                type: object
+                type: array
+                items:
+                  type: object
         404:
           description: Channel not found
           content:
