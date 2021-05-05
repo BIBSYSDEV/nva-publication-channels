@@ -294,7 +294,7 @@ components:
       description: The activity status of the Publisher; true if it is currently publishing content, false if it has ceased publishing
     ScientificValue:
       type: string
-      enum: ['LEVEL_0', 'LEVEL_1', 'LEVEL_2', null]
+      enum: ['LEVEL_0', 'LEVEL_1', 'LEVEL_2']
       nullable: true
       description: The NPI level of the journal, either null, LEVEL_0, LEVEL_1, LEVEL_2
   examples:
