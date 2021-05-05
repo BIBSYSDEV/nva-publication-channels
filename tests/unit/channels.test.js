@@ -4,7 +4,7 @@ const chai = require('chai')
 const { searchHandler } = require('../../channels')
 const expect = chai.expect
 
-describe('Tests search for publication channel', function () {
+describe('Tests successful search for channel when all parameters are given', function () {
   let result
   const event = {
     body: {
@@ -13,7 +13,7 @@ describe('Tests search for publication channel', function () {
     }
   }
 
-  describe('TestSimpleSearch', () => {
+  describe('Test search response content', () => {
     it('verifies response is success and has a body', async function () {
       result = await searchHandler(event)
       expect(result).to.be.an('Array')
@@ -22,9 +22,7 @@ describe('Tests search for publication channel', function () {
     console.log(result)
   })
 
-  it('should be sucess', function () {
-    console.log('is sucess')
-    console.log(result)
-    // expect(result.status).to.equal(200);
+  it('result.status should be http.StatusOK', function () {
+    expect(result.status).to.equal(200)
   })
 })

@@ -4,7 +4,7 @@ Description: >
   nva-publication-channels
 
   Sample SAM Template for nva-publication-channels
-  
+
 Globals:
   Function:
     Timeout: 3
@@ -67,7 +67,7 @@ Resources:
             Method: get
             RestApiId:
               Ref: PublicationChannelsApi
-  FindChannelFunction:
+  SearchChannelFunction:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: ./
