@@ -26,7 +26,7 @@ paths:
     get:
       x-amazon-apigateway-integration:
         uri:
-            Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${JournalFunction.Arn}/invocations
+            Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${GetJournalFunction.Arn}/invocations
         httpMethod: POST
         type: "AWS_PROXY"
       tags:
@@ -69,7 +69,7 @@ paths:
     get:
       x-amazon-apigateway-integration:
         uri:
-            Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${PublisherFunction.Arn}/invocations
+            Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${GetPublisherFunction.Arn}/invocations
         httpMethod: POST
         type: "AWS_PROXY"
       tags:
@@ -120,6 +120,17 @@ paths:
       summary: SearchChannelFunction search format a publication channel channel
       description: Returns a list of publication channels matching criteria
       operationId: SearchChannelFunctionChannels
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                tableId:
+                  type: integer
+                searchTerm:
+                  type: string
       responses:
         200:
           description: successful operation
