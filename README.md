@@ -108,7 +108,7 @@ the [SAM CLI Documentation](https://docs.aws.amazon.com/serverless-application-m
 
 ## Tests
 
-Tests are defined in the `src/tests` folder in this project. Use NPM to install
+Tests are defined in the `tests` folder in this project. Use NPM to install
 the [Mocha test framework](https://mochajs.org/) and run tests.
 
 ```bash
