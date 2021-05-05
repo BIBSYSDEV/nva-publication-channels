@@ -136,10 +136,10 @@ paths:
           description: successful operation
           content:
             application/json:
-#               schema:
-#                 type: array
-#                 items:
-#                   type: object
+              schema:
+                type: array
+                items:
+                  type: object
         404:
           description: Channel not found
           content:
