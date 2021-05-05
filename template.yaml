@@ -81,18 +81,6 @@ Resources:
             Method: POST
             RestApiId:
               Ref: PublicationChannelsApi
-            RequestModel:
-              Model: Search
-          type: object
-          required:
-            - tableId
-            - searchTerm
-          properties:
-            tableId:
-              type: integer
-            searchTerm:
-              type: string
-            Required: true
 
   ChannelsBasePathMapping:
     Type: AWS::ApiGateway::BasePathMapping

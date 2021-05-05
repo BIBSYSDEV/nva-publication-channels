@@ -128,7 +128,7 @@ paths:
               schema:
                 type: array
                 items:
-                $ref: '#/components/schemas/PublicationChannel'
+                  $ref: '#/components/schemas/PublicationChannel'
         404:
           description: Channel not found
           content:
