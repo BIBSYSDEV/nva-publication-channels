@@ -29,12 +29,13 @@ const searchHandler = async (event) => {
     console.log('REAL Channels')
     console.log(event)
     const request = createRequestFromEvent(JSON.parse(event.body))
-    const response = await fetch(request)
-    console.log('status=' + response.status)
-    console.log('statusText=' + response.statusText)
+    const responseBody = await fetch(request)
+    console.log('status=' + responseBody.status)
+    console.log('statusText=' + responseBody.statusText)
     console.log('response.data=')
-    console.log(response.data)
-    return response.data
+    console.log(responseBody.data)
+    const response = { statusCode: 200, body: JSON.stringify(responseBody.data) }
+    return response
   } catch (err) {
     console.log('UPS Error!!!')
     console.log(err)
