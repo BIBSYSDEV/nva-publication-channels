@@ -1,17 +1,15 @@
 const fs = require('fs')
 
-const fetch = async (request) => {
-  console.log('Calling MOCK')
+const fetch = async () => {
   let data
   try {
-    data = fs.readFileSync('response.json', 'utf8')
-    // console.log(data);
+    data = fs.readFileSync('./response.json', 'utf8')
   } catch (err) {
     console.error(err)
   }
   return {
     status: 200,
-    data: data
+    data: JSON.parse(data)
   }
 }
 

@@ -39,34 +39,34 @@ Resources:
         Format: '{ "apiId": "$context.apiId", "requestId": "$context.requestId", "requestTime": "$context.requestTime", "requestTimeEpoch": "$context.requestTimeEpoch", "httpMethod": "$context.httpMethod", "path": "$context.path", "status": "$context.status",  "error.message": "$context.error.message" }'
       StageName: Prod
       EndpointConfiguration: REGIONAL
-#  JournalFunction:
-#    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
-#    Properties:
-#      CodeUri: ./
-#      Handler: channels.journal
-#      Runtime: nodejs14.x
-#      Events:
-#        GetJournalEvent:
-#          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
-#          Properties:
-#            Path: /journal
-#            Method: get
-#            RestApiId:
-#              Ref: PublicationChannelsApi
-#  PublisherFunction:
-#    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
-#    Properties:
-#      CodeUri: ./
-#      Handler: channels.publisher
-#      Runtime: nodejs14.x
-#      Events:
-#        GetPublisherEvent:
-#          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
-#          Properties:
-#            Path: /publisher
-#            Method: get
-#            RestApiId:
-#              Ref: PublicationChannelsApi
+  GetJournalFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      CodeUri: ./
+      Handler: channels.journal
+      Runtime: nodejs14.x
+      Events:
+        GetJournalEvent:
+          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+          Properties:
+            Path: /journal
+            Method: get
+            RestApiId:
+              Ref: PublicationChannelsApi
+  GetPublisherFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      CodeUri: ./
+      Handler: channels.publisher
+      Runtime: nodejs14.x
+      Events:
+        GetPublisherEvent:
+          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+          Properties:
+            Path: /publisher
+            Method: get
+            RestApiId:
+              Ref: PublicationChannelsApi
   SearchChannelFunction:
     Type: AWS::Serverless::Function
     Properties:

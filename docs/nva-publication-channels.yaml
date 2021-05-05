@@ -14,54 +14,17 @@ externalDocs:
 servers:
 - url: https://api.nva.unit.no/channels
 paths:
-  /journal:
-    get:
-      x-amazon-apigateway-integration:
-        uri:
-            Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${JournalFunction.Arn}/invocations
-        httpMethod: POST
-        type: "AWS_PROXY"
-      tags:
-      - Journal
-      summary: List journals
-      description: Returns a list of journals
-      operationId: ListJournals
-      responses:
-        200:
-          description: successful operation
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Journal'
-        400:
-          description: Invalid ID supplied
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/ApiResponse'
-        404:
-          description: Journal not found
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/ApiResponse'
-        500:
-          description: Internal Server Error
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/ApiResponse'
   /journal/{pid}:
     get:
       x-amazon-apigateway-integration:
         uri:
-            Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${JournalFunction.Arn}/invocations
+            Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${GetJournalFunction.Arn}/invocations
         httpMethod: POST
         type: "AWS_PROXY"
       tags:
       - Journal
       summary: Find journal by ID
-      description: Returns a single Journal
+      description: Returns a single Journal specified by id
       operationId: GetJournalById
       parameters:
       - name: pid
@@ -76,67 +39,30 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Journal'
+                $ref: '#/components/schemas/PublicationChannel'
         400:
           description: Invalid ID supplied
           content:
             application/problem+json:
               schema:
-                $ref: '#/components/schemas/ApiResponse'
+                $ref: '#/components/schemas/Problem'
         404:
           description: Journal not found
           content:
             application/problem+json:
               schema:
-                $ref: '#/components/schemas/ApiResponse'
+                $ref: '#/components/schemas/Problem'
         500:
           description: Internal Server Error
           content:
             application/problem+json:
               schema:
-                $ref: '#/components/schemas/ApiResponse'
-  /publisher:
-    get:
-      x-amazon-apigateway-integration:
-        uri:
-            Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${PublisherFunction.Arn}/invocations
-        httpMethod: POST
-        type: "AWS_PROXY"
-      tags:
-      - Publisher
-      summary: List publishers
-      description: Returns a list of publishers
-      operationId: ListPublishers
-      responses:
-        200:
-          description: successful operation
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Publisher'
-        400:
-          description: Invalid ID supplied
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/ApiResponse'
-        404:
-          description: Journal not found
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/ApiResponse'
-        500:
-          description: Internal Server Error
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/ApiResponse'
+                $ref: '#/components/schemas/Problem'
   /publisher/{pid}:
     get:
       x-amazon-apigateway-integration:
         uri:
-            Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${PublisherFunction.Arn}/invocations
+            Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${GetPublisherFunction.Arn}/invocations
         httpMethod: POST
         type: "AWS_PROXY"
       tags:
@@ -157,33 +83,68 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Publisher'
+                $ref: '#/components/schemas/PublicationChannel'
         400:
           description: Invalid ID supplied
           content:
             application/problem+json:
               schema:
-                $ref: '#/components/schemas/ApiResponse'
+                $ref: '#/components/schemas/Problem'
         404:
           description: Journal not found
           content:
             application/problem+json:
               schema:
-                $ref: '#/components/schemas/ApiResponse'
+                $ref: '#/components/schemas/Problem'
         500:
           description: Internal Server Error
           content:
             application/problem+json:
               schema:
-                $ref: '#/components/schemas/ApiResponse'
+                $ref: '#/components/schemas/Problem'
+  /search:
+    post:
+      x-amazon-apigateway-integration:
+        uri:
+            Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${SearchChannelFunction.Arn}/invocations
+        httpMethod: POST
+        type: "AWS_PROXY"
+      tags:
+      - Channel
+      summary: SearchChannelFunction search format a publication channel channel
+      description: Returns a list of publication channels matching criteria
+      operationId: SearchChannelFunctionChannels
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+               type: array
+                 items:
+                   $ref: '#/components/schemas/PublicationChannel'
+        404:
+          description: Channel not found
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        500:
+          description: Internal Server Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
 components:
   schemas:
-    Journal:
+    PublicationChannel:
       type: object
       properties:
         '@context':
           type: string
         id:
+          type: string
+        type:
           type: string
         name:
           type: string
@@ -206,28 +167,7 @@ components:
           type: string
         scientificValue:
           type: string
-    Publisher:
-      type: object
-      properties:
-        '@context':
-          type: string
-        id:
-          type: string
-        name:
-          type: string
-        identifier:
-          type: string
-        isbnPrefixes:
-          type: array
-          items:
-            type: string
-        webpage:
-          type: string
-        active:
-          type: boolean
-        scientificValue:
-          type: string
-    ApiResponse:
+    Problem:
       type: object
       properties:
         status:
