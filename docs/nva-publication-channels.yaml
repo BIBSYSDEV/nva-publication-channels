@@ -139,7 +139,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/PublicationChannel'
+                  type: object
         404:
           description: Channel not found
           content:
