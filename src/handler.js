@@ -1,7 +1,8 @@
 exports.handler = async function (event, context) {
   try {
     const queryParameters = getQueryParameters(event)
-    return formatResponse(serialize(queryParameters))
+    console.log('incoming queryParameters=' + JSON.stringify(queryParameters))
+    return formatResponse(serialize({}))
   } catch (error) {
     return formatError(error)
   }

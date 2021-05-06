@@ -18,6 +18,7 @@ describe('Tests successful response when all query parameters are given', functi
       const response = await handler(event)
       expect(response).to.be.an('Object')
       expect(response.statusCode).to.equal(200)
+      expect(response.body).to.equal('{}')
     })
   })
 })
