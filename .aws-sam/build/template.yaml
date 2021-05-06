@@ -43,6 +43,20 @@ Resources:
           "$context.status",  "error.message": "$context.error.message" }'
       StageName: Prod
       EndpointConfiguration: REGIONAL
+  PublicationChannelsHandler:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: PublicationChannelsHandler
+      Handler: handler.handler
+      Runtime: nodejs14.x
+      Events:
+        GetJournalEvent:
+          Type: Api
+          Properties:
+            Path: /
+            Method: get
+            RestApiId:
+              Ref: PublicationChannelsApi
   ChannelsBasePathMapping:
     Type: AWS::ApiGateway::BasePathMapping
     Properties:
