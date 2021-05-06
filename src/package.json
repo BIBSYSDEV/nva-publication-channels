@@ -1,0 +1,19 @@
+{
+  "name": "nva-publication-channels",
+  "version": "0.0.1",
+  "description": "A thin client to wrap NSD DBH's publication channel databases",
+  "main": "handler.js",
+  "scripts": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/BIBSYSDEV/nva-publication-channels.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/BIBSYSDEV/nva-publication-channels/issues"
+  },
+  "homepage": "https://github.com/BIBSYSDEV/nva-publication-channels#readme"
+}

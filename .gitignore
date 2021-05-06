@@ -331,6 +331,7 @@ temp/
 # Info: https://aws.amazon.com/serverless/sam/
 # Docs: https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-reference.html
 
+.aws-sam/
 **/.aws-sam
 
 ### VisualStudioCode ###
@@ -373,3 +374,4 @@ $RECYCLE.BIN/
 *.lnk
 
 # End of https://www.toptal.com/developers/gitignore/api/node,linux,macos,windows,eclipse,intellij+all,visualstudiocode,sam
+/.aws-sam/*
