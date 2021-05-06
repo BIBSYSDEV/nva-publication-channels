@@ -1,0 +1,24 @@
+version: 0.2
+
+phases:
+  install:
+    runtime-versions:
+      nodejs: 14.x
+
+    commands:
+      - npm install
+
+  build:
+    commands:
+      - sam build
+      - sam package --s3-bucket $S3_BUCKET --output-template-file packaged.yaml
+
+cache:
+  paths:
+    - '/src/node_modules/**/*'
+
+artifacts:
+  files:
+    - '**/*'
+    - packaged.yaml
+
