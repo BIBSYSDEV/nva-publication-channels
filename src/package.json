@@ -4,7 +4,12 @@
   "description": "A thin client to wrap NSD DBH's publication channel databases",
   "main": "handler.js",
   "scripts": {
-    "test": "test"
+    "lint": "eslint . --ext .js",
+    "lint:fix": "npm run lint -- --fix",
+    "mocha": "mocha --full-trace tests/unit/",
+    "test": "npm run lint && mocha tests/unit/",
+    "integ-test": "run lint && mocha tests/integration/",
+    "coverage": "nyc --reporter=cobertura --reporter=text npm run test"
   },
   "repository": {
     "type": "git",
@@ -15,5 +20,16 @@
   "bugs": {
     "url": "https://github.com/BIBSYSDEV/nva-publication-channels/issues"
   },
-  "homepage": "https://github.com/BIBSYSDEV/nva-publication-channels#readme"
+  "homepage": "https://github.com/BIBSYSDEV/nva-publication-channels#readme",
+  "devDependencies": {
+    "chai": "^4.3.4",
+    "dirty-chai": "^2.0.1",
+    "eslint": "^7.25.0",
+    "eslint-config-standard": "^16.0.2",
+    "eslint-plugin-import": "^2.22.1",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-promise": "^4.3.1",
+    "jest": "^26.6.3",
+    "mocha": "^8.3.2"
+  }
 }
