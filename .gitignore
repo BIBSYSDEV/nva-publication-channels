@@ -1,6 +1,6 @@
 
-# Created by https://www.toptal.com/developers/gitignore/api/windows,macos,linux,node,intellij+all,visualstudiocode,eclipse
-# Edit at https://www.toptal.com/developers/gitignore?templates=windows,macos,linux,node,intellij+all,visualstudiocode,eclipse
+# Created by https://www.toptal.com/developers/gitignore/api/node,linux,macos,windows,eclipse,intellij+all,visualstudiocode,sam
+# Edit at https://www.toptal.com/developers/gitignore?templates=node,linux,macos,windows,eclipse,intellij+all,visualstudiocode,sam
 
 ### Eclipse ###
 .metadata
@@ -326,6 +326,13 @@ dist/
 # Temporary folders
 temp/
 
+### SAM ###
+# Ignore build directories for the AWS Serverless Application Model (SAM)
+# Info: https://aws.amazon.com/serverless/sam/
+# Docs: https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-reference.html
+
+**/.aws-sam
+
 ### VisualStudioCode ###
 .vscode/*
 !.vscode/settings.json
@@ -365,4 +372,4 @@ $RECYCLE.BIN/
 # Windows shortcuts
 *.lnk
 
-# End of https://www.toptal.com/developers/gitignore/api/windows,macos,linux,node,intellij+all,visualstudiocode,eclipse
+# End of https://www.toptal.com/developers/gitignore/api/node,linux,macos,windows,eclipse,intellij+all,visualstudiocode,sam
