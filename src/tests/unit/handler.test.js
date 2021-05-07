@@ -22,3 +22,10 @@ describe('Tests successful response when all query parameters are given', functi
     })
   })
 })
+
+describe('Handler throws error when called', () => {
+  it('verifies response is error 500 and  has Internal Server Error message', async function () {
+    const response = await handler(event)
+    expect(response.statusCode).to.equal(500)
+  })
+})

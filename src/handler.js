@@ -1,42 +1,34 @@
+class GeneralError extends Error {
+  constructor (message, code) {
+    super(message)
+    this.code = code
+    this.errorMessage = message
+    this.errorType = 'severe'
+  }
+}
+
 exports.handler = async function (event, context) {
   try {
-    const queryParameters = getQueryParameters(event)
-    console.log('incoming queryParameters=' + JSON.stringify(queryParameters))
-    return formatResponse(serialize({}))
+    throwGeneralError()
   } catch (error) {
-    return formatError(error)
+    console.log(error)
+    return generateErrorResponse(error)
   }
 }
 
-const formatResponse = function (body) {
-  const response = {
-    statusCode: 200,
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    isBase64Encoded: false,
-    body: body
-  }
-  return response
-}
-
-const formatError = function (error) {
+const generateErrorResponse = function (error) {
   const response = {
     statusCode: error.statusCode,
     headers: {
-      'Content-Type': 'text/plain',
+      'Content-Type': 'application/problem+json',
       'x-amzn-ErrorType': error.code
     },
     isBase64Encoded: false,
-    body: error.code + ': ' + error.message
+    body: JSON.stringify(error)
   }
   return response
 }
-// Use SDK client
-const getQueryParameters = function (event) {
-  return { query: event.query }
-}
 
-const serialize = function (object) {
-  return JSON.stringify(object, null, 2)
+const throwGeneralError = function (event) {
+  throw new GeneralError('Eternal server error', 500)
 }
