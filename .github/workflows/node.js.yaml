@@ -22,7 +22,6 @@ jobs:
     - run: npm run build --if-present --prefix src
     - run: npm test  --prefix src
     - run: npm run coverage  --prefix src
-    - run: ls -lR
     - name: codacy-coverage-reporter
       uses: codacy/codacy-coverage-reporter-action@v1
       with:
