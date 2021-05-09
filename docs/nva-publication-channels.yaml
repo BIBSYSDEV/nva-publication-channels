@@ -22,6 +22,62 @@ externalDocs:
 servers:
   - url: https://api.nva.unit.no/channels
 paths:
+  /journal:
+    get:
+      x-amazon-apigateway-integration:
+        uri:
+            Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${PublicationChannelsHandler.Arn}/invocations
+        httpMethod: POST
+        type: "AWS_PROXY"
+      tags:
+      - Journal
+      summary: Find journal by ID
+      description: Returns a single Journal
+      operationId: GetJournalById
+      parameters:
+      - name: query
+        in: query
+        description: Term to search for in publication
+        required: true
+        schema:
+          type: string
+        example: '&journal%'
+      - name: year
+        in: query
+        description: Year of publication
+        required: false
+        schema:
+          type: integer
+        example: 2921
+      - name: start
+        in: query
+        description: First position dor record in response
+        required: false
+        schema:
+          type: integer
+        example: 1
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Journal'
+              examples:
+                objectExample:
+                  $ref: '#/components/examples/JournalExample'
+            application/ld+json:
+              schema:
+                $ref: '#/components/schemas/Journal'
+              examples:
+                objectExample:
+                  $ref: '#/components/examples/JournalExample'
+        400:
+          $ref: '#/components/responses/400'
+        404:
+          $ref: '#/components/responses/404'
+        500:
+          $ref: '#/components/responses/500'
   /journal/{pid}:
     get:
       x-amazon-apigateway-integration:

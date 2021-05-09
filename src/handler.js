@@ -1,19 +1,36 @@
 class GeneralError extends Error {
-  constructor (message, code) {
-    super(message)
-    this.code = code
-    this.errorMessage = message
-    this.errorType = 'severe'
+  constructor (code, detail, requestUri) {
+    super(detail)
+    this.statusCode = code
+    this.type = 'about:blank '
+    this.title = 'Internal Server Error'
+    this.detail = detail
+    this.instance = requestUri
   }
 }
 
 exports.handler = async function (event, context) {
+  let response
   try {
-    throwGeneralError()
+    throwGeneralError(event)
+    response = formatResponse('This message should not be visible..')
   } catch (error) {
     console.log(error)
-    return generateErrorResponse(error)
+    response = generateErrorResponse(error)
   }
+  return response
+}
+
+const formatResponse = function (body) {
+  const response = {
+    statusCode: 200,
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    isBase64Encoded: false,
+    body: JSON.stringify(body)
+  }
+  return response
 }
 
 const generateErrorResponse = function (error) {
@@ -30,5 +47,6 @@ const generateErrorResponse = function (error) {
 }
 
 const throwGeneralError = function (event) {
-  throw new GeneralError('Eternal server error', 500)
+  console.log(event)
+  throw new GeneralError(500, 'Your request cannot be processed at this time because of an internal server error', event.path)
 }
