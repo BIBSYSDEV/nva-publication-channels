@@ -31,17 +31,17 @@ paths:
         type: "AWS_PROXY"
       tags:
       - Journal
-      summary: Find journal by ID
-      description: Returns a single Journal
-      operationId: GetJournalById
+      summary: Find journal
+      description: Returns a list of Journals matching criteria
+      operationId: getJournalsByQuery
       parameters:
       - name: query
         in: query
-        description: Term to search for in publication
+        description: Term to search for in Journal
         required: true
         schema:
           type: string
-        example: '&journal%'
+        example: 'Journal of pygmy sheep'
       - name: year
         in: query
         description: Year of publication
@@ -130,7 +130,7 @@ paths:
         type: "AWS_PROXY"
       tags:
       - Publisher
-      summary: Find publisher by ID
+      summary: Get publisher by ID
       description: Returns a single Publisher
       operationId: getPublisherById
       parameters:
