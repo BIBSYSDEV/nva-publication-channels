@@ -2,8 +2,6 @@ class ProblemResponse extends Error {
   constructor (code, detail, requestUri) {
     super(detail)
     this.statusCode = code
-    this.type = 'about:blank '
-    this.title = 'Internal Server Error'
     this.detail = detail
     this.instance = requestUri
   }
