@@ -1,4 +1,4 @@
-class GeneralError extends Error {
+class ProblemResponse extends Error {
   constructor (code, detail, requestUri) {
     super(detail)
     this.statusCode = code
@@ -16,7 +16,7 @@ exports.handler = async function (event, context) {
     response = formatResponse('This message should not be visible..')
   } catch (error) {
     console.log(error)
-    response = generateErrorResponse(error)
+    response = generateProblemResponse(error)
   }
   return response
 }
@@ -33,7 +33,7 @@ const formatResponse = function (body) {
   return response
 }
 
-const generateErrorResponse = function (error) {
+const generateProblemResponse = function (error) {
   const response = {
     statusCode: error.statusCode,
     headers: {
@@ -48,5 +48,5 @@ const generateErrorResponse = function (error) {
 
 const throwGeneralError = function (event) {
   console.log(event)
-  throw new GeneralError(500, 'Your request cannot be processed at this time because of an internal server error', event.path)
+  throw new ProblemResponse(500, 'Your request cannot be processed at this time because of an internal server error', event.path)
 }
