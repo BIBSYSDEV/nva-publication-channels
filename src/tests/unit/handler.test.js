@@ -13,17 +13,7 @@ describe('Tests successful response when all query parameters are given', functi
     }
   }
 
-  describe('Test search response content', () => {
-    it('verifies response is success and has a empty body', async function () {
-      const response = await handler(event)
-      expect(response).to.be.an('Object')
-      expect(response.statusCode).to.equal(200)
-      expect(response.body).to.equal('{}')
-    })
-  })
-})
-
-describe('Handler throws error when called', () => {
+ describe('Handler throws error when called', () => {
   it('verifies response is error 500 and  has Internal Server Error message', async function () {
     const calledPath = '/some.path'
     const event = { path: calledPath }
