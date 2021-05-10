@@ -1,42 +1,32 @@
+const ProblemDocument = require('http-problem-details').ProblemDocument
+
 exports.handler = async function (event, context) {
-  try {
-    const queryParameters = getQueryParameters(event)
-    console.log('incoming queryParameters=' + JSON.stringify(queryParameters))
-    return formatResponse(serialize({}))
-  } catch (error) {
-    return formatError(error)
-  }
+  return generateProblemResponse(event)
 }
 
-const formatResponse = function (body) {
-  const response = {
-    statusCode: 200,
+exports.handler = async function (event, context) {
+  return generateProblemResponse(event)
+}
+
+const generateProblemResponse = function (event) {
+  const INTERNAL_SERVER_ERROR = 500
+  const detail = 'Your request cannot be processed at this time because of an internal server error'
+  const path = event.path
+  console.log(detail, path)
+  return {
+    statusCode: INTERNAL_SERVER_ERROR,
     headers: {
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/problem+json',
+      'x-amzn-ErrorType': INTERNAL_SERVER_ERROR
     },
     isBase64Encoded: false,
-    body: body
+    body: JSON.stringify(
+      new ProblemDocument(
+        {
+          status: INTERNAL_SERVER_ERROR,
+          detail: detail,
+          instance: event.path
+        }
+      ))
   }
-  return response
-}
-
-const formatError = function (error) {
-  const response = {
-    statusCode: error.statusCode,
-    headers: {
-      'Content-Type': 'text/plain',
-      'x-amzn-ErrorType': error.code
-    },
-    isBase64Encoded: false,
-    body: error.code + ': ' + error.message
-  }
-  return response
-}
-// Use SDK client
-const getQueryParameters = function (event) {
-  return { query: event.query }
-}
-
-const serialize = function (object) {
-  return JSON.stringify(object, null, 2)
 }
