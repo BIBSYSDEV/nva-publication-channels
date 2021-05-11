@@ -5,9 +5,9 @@ const logger = require('pino')({ useLevelLabels: true })
 logger.info('Logger initialized')
 exports.handler = async (event, context) => generateProblemResponse(event, httpStatus.INTERNAL_SERVER_ERROR)
 
-const generateProblemResponse = function (event, errorCode) {
+const generateProblemResponse = (event, errorCode) => {
   const reason = httpStatus.getReasonPhrase(errorCode)
-  const detail = `Your request cannot be processed at this time because of '${reason}'`
+  const detail = `Your request cannot be processed at this time due of '${reason}'`
   const path = event.path
   logger.info(detail, path)
   return {
