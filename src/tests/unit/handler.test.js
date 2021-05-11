@@ -13,7 +13,7 @@ describe('Handler throws error when called', () => {
     const responseBody = JSON.parse(response.body)
     expect(responseBody.instance).to.equal(calledPath)
     expect(responseBody.status).to.equal(500)
-    expect(responseBody.detail).to.equal('Your request cannot be processed at this time because of an internal server error')
+    expect(responseBody.detail).to.equal("Your request cannot be processed at this time due of 'Internal Server Error'")
     expect(responseBody.title).to.equal('Internal Server Error')
     expect(responseBody.type).to.equal('about:blank')
   })
