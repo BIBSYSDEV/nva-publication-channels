@@ -1,9 +1,23 @@
 const ProblemDocument = require('http-problem-details').ProblemDocument
 const httpStatus = require('http-status-codes')
-const logger = require('pino')({ useLevelLabels: true })
+const logger = require('pino')({
+  formatters: {
+    level: (label) => {
+      return { level: label }
+    }
+  }
+})
+
+const supportedPaths = ['/journal', '/publisher']
+const isSupportedHttpMethod = event => 'httpMethod' in event && event.httpMethod.toUpperCase() === 'GET'
+const isSupportedPath = event => 'path' in event && supportedPaths.includes(event.path)
+const executeSomeFunctionality = () => formatResponse('{}')
+const validRequest = (event) => isSupportedPath(event) && isSupportedHttpMethod(event)
+const getErrorCode = (event) => !isSupportedPath(event) ? httpStatus.NOT_FOUND : !isSupportedHttpMethod(event) ? httpStatus.METHOD_NOT_ALLOWED : httpStatus.INTERNAL_SERVER_ERROR
 
 logger.info('Logger initialized')
-exports.handler = async (event, context) => generateProblemResponse(event, httpStatus.INTERNAL_SERVER_ERROR)
+
+exports.handler = async (event, context) => validRequest(event) ? executeSomeFunctionality() : generateProblemResponse(event, getErrorCode(event))
 
 const generateProblemResponse = (event, errorCode) => {
   const reason = httpStatus.getReasonPhrase(errorCode)
@@ -26,4 +40,16 @@ const generateProblemResponse = (event, errorCode) => {
         }
       ))
   }
+}
+
+const formatResponse = (body) => {
+  const response = {
+    statusCode: 200,
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    isBase64Encoded: false,
+    body: body
+  }
+  return response
 }
