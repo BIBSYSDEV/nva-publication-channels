@@ -8,7 +8,7 @@ exports.handler = async (event, context) => {
   try {
     return findError(event)
   } catch (err) {
-    const code = err.name === 'NotFoundError' ? httpStatus.NOT_FOUND : httpStatus.INTERNAL_SERVER_ERROR
+    const code = err instanceof NotFoundError ? httpStatus.NOT_FOUND : httpStatus.INTERNAL_SERVER_ERROR
     return errorResponse(code, err.message, event)
   }
 }

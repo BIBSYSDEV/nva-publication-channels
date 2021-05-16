@@ -1,8 +1,9 @@
 'use strict'
 
 class NotFoundError extends Error {
-  get name () {
-    return this.constructor.name
+  constructor (message) {
+    super(message)
+    this.name = this.constructor.name
   }
 }
 
