@@ -6,7 +6,7 @@ const logger = require('pino')({ useLevelLabels: true })
 logger.info('Logger initialized')
 exports.handler = async (event, context) => {
   try {
-    return findRoute(event)
+    return findError(event)
   } catch (err) {
     const code = err.name === 'NotFoundError' ? httpStatus.NOT_FOUND : httpStatus.INTERNAL_SERVER_ERROR
     return errorResponse(code, err.message, event)
@@ -15,7 +15,7 @@ exports.handler = async (event, context) => {
 
 const routes = []
 
-const findRoute = (event) => {
+const findError = (event) => {
   if ('path' in event && !routes.includes(event.path)) {
     throw new NotFoundError(`The requested resource ${event.path} could not be found`)
   } else {
