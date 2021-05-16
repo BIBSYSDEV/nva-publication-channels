@@ -1,15 +1,30 @@
 const ProblemDocument = require('http-problem-details').ProblemDocument
+const NotFoundError = require('./error/NotFoundError')
 const httpStatus = require('http-status-codes')
 const logger = require('pino')({ useLevelLabels: true })
 
 logger.info('Logger initialized')
-exports.handler = async (event, context) => generateProblemResponse(event, httpStatus.INTERNAL_SERVER_ERROR)
+exports.handler = async (event, context) => {
+  try {
+    return findRoute(event)
+  } catch (err) {
+    const code = err.name === 'NotFoundError' ? httpStatus.NOT_FOUND : httpStatus.INTERNAL_SERVER_ERROR
+    return errorResponse(code, err.message, event)
+  }
+}
 
-const generateProblemResponse = (event, errorCode) => {
-  const reason = httpStatus.getReasonPhrase(errorCode)
-  const detail = `Your request cannot be processed at this time due of '${reason}'`
-  const path = event.path
-  logger.info(detail, path)
+const routes = []
+
+const findRoute = (event) => {
+  if ('path' in event && !routes.includes(event.path)) {
+    throw new NotFoundError(`The requested resource ${event.path} could not be found`)
+  } else {
+    throw new Error('Your request cannot be processed at this time due to an internal server error')
+  }
+}
+
+const errorResponse = (errorCode, detail, event) => {
+  const path = 'path' in event ? event.path : 'Undefined path'
   return {
     statusCode: errorCode,
     headers: {
@@ -22,8 +37,9 @@ const generateProblemResponse = (event, errorCode) => {
         {
           status: errorCode,
           detail: detail,
-          instance: event.path
+          instance: path
         }
-      ))
+      )
+    )
   }
 }
