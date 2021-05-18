@@ -9,7 +9,7 @@
     "mocha": "mocha --full-trace tests/unit/",
     "test": "npm run lint && mocha tests/unit/",
     "integ-test": "run lint && mocha tests/integration/",
-    "coverage": "nyc --reporter=cobertura --reporter=text npm run test"
+    "coverage": "nyc --reporter=cobertura --reporter=text --reporter=html npm run test"
   },
   "repository": {
     "type": "git",
