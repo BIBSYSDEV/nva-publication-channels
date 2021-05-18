@@ -1,42 +1,31 @@
 const ProblemDocument = require('http-problem-details').ProblemDocument
-const NotFoundError = require('./error/NotFoundError')
 const httpStatus = require('http-status-codes')
 const logger = require('pino')({ useLevelLabels: true })
 
 logger.info('Logger initialized')
 exports.handler = async (event, context) => {
-  try {
-    return findError(event)
-  } catch (err) {
-    const code = err instanceof NotFoundError ? httpStatus.NOT_FOUND : httpStatus.INTERNAL_SERVER_ERROR
-    return errorResponse(code, err.message, event)
-  }
+  const response = 'path' in event && !routes.includes(event.path)
+    ? { code: httpStatus.NOT_FOUND, message: `The requested resource ${event.path} could not be found` }
+    : { code: httpStatus.INTERNAL_SERVER_ERROR, message: 'Your request cannot be processed at this time due to an internal server error' }
+  return errorResponse(response, event)
 }
 
 const routes = []
 
-const findError = (event) => {
-  if ('path' in event && !routes.includes(event.path)) {
-    throw new NotFoundError(`The requested resource ${event.path} could not be found`)
-  } else {
-    throw new Error('Your request cannot be processed at this time due to an internal server error')
-  }
-}
-
-const errorResponse = (errorCode, detail, event) => {
+const errorResponse = (response, event) => {
   const path = 'path' in event ? event.path : 'Undefined path'
   return {
-    statusCode: errorCode,
+    statusCode: response.code,
     headers: {
       'Content-Type': 'application/problem+json',
-      'x-amzn-ErrorType': errorCode
+      'x-amzn-ErrorType': response.code
     },
     isBase64Encoded: false,
     body: JSON.stringify(
       new ProblemDocument(
         {
-          status: errorCode,
-          detail: detail,
+          status: response.code,
+          detail: response.message,
           instance: path
         }
       )
