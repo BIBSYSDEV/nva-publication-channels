@@ -7,10 +7,7 @@ logger.info('Logger initialized')
 const routes = []
 
 exports.handler = async (event, context) => {
-  const response = 'path' in event && !routes.includes(event.path)
-    ? { code: httpStatus.NOT_FOUND, message: `The requested resource ${event.path} could not be found` }
-    : { code: httpStatus.INTERNAL_SERVER_ERROR, message: 'Your request cannot be processed at this time due to an internal server error' }
-  return errorResponse(response, event)
+  return errorResponse(createErrorResponseDetails(event), event)
 }
 
 const errorResponse = (response, event) => {
@@ -32,4 +29,16 @@ const errorResponse = (response, event) => {
       )
     )
   }
+}
+
+const createErrorResponseDetails = (event) => isRequestWithPath(event) ? createNotFoundDetails(event) : createInternalServerErrorDetails()
+
+const isRequestWithPath = (event) => 'path' in event && !routes.includes(event.path)
+
+const createNotFoundDetails = (event) => {
+  return { code: httpStatus.NOT_FOUND, message: `The requested resource ${event.path} could not be found` }
+}
+
+const createInternalServerErrorDetails = () => {
+  return { code: httpStatus.INTERNAL_SERVER_ERROR, message: 'Your request cannot be processed at this time due to an internal server error' }
 }
