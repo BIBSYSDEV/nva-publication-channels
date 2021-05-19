@@ -56,4 +56,3 @@ const optionsResponse = () => {
     body: '{}'
   }
 }
-
