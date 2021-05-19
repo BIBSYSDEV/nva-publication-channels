@@ -31,15 +31,3 @@ describe('Handler returns 404 when any route is called', () => {
     expect(responseBody.type).to.equal('about:blank')
   })
 })
-
-describe('Handler returns Access-Control-headers when method is OPTIONS', () => {
-  const calledPath = '/'
-  const httpMethod = 'OPTIONS'
-  it(`Handler returns 200 when ${calledPath} is called`, async function () {
-    const response = await handler({ path: calledPath, httpMethod: httpMethod })
-    expect(response.statusCode).to.equal(200)
-    expect(response.headers).to.include.key('Access-Control-Allow-Origin')
-    expect(response.headers).to.include.key('Access-Control-Allow-Methods')
-    expect(response.headers).to.include.key('Access-Control-Allow-Headers')
-  })
-})

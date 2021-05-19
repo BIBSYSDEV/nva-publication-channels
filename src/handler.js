@@ -7,7 +7,7 @@ logger.info('Logger initialized')
 const routes = []
 
 exports.handler = async (event, context) => {
-  return (event.httpMethod === 'OPTIONS') ? optionsResponse() : errorResponse(createErrorResponseDetails(event), event)
+  return errorResponse(createErrorResponseDetails(event), event)
 }
 
 const errorResponse = (response, event) => {
@@ -41,18 +41,4 @@ const createNotFoundDetails = (event) => {
 
 const createInternalServerErrorDetails = () => {
   return { code: httpStatus.INTERNAL_SERVER_ERROR, message: 'Your request cannot be processed at this time due to an internal server error' }
-}
-
-const optionsResponse = () => {
-  return {
-    statusCode: httpStatus.OK,
-    headers: {
-      'Content-Type': 'application/json',
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Methods': 'GET,OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'
-    },
-    isBase64Encoded: false,
-    body: '{}'
-  }
 }
