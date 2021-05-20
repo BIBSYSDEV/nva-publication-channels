@@ -7,9 +7,10 @@ logger.info('Logger initialized')
 const routes = ['/journal', '/publisher']
 
 exports.handler = async (event, context) => {
-  return ('path' in event && 'httpMethod' in event)
-    ? isValidRequest(event) ? responseWithEmptyBody() : errorResponse(createErrorResponseDetails(event), event)
-    : errorResponse(createInternalServerErrorDetails(), event)
+  if (isInvalidValidEvent(event)) {
+    return errorResponse(createInternalServerErrorDetails(), event)
+  }
+  return isValidRequest(event) ? responseWithEmptyBody() : errorResponse(createNotFoundDetails(event), event)
 }
 
 const errorResponse = (response, event) => {
@@ -45,12 +46,8 @@ const responseWithEmptyBody = () => {
   return response
 }
 
-const isValidRequest = (event) => isSupportedPath(event) && isGetMethod(event)
-const isSupportedPath = (event) => 'path' in event && routes.includes(event.path)
-const isGetMethod = event => 'httpMethod' in event && event.httpMethod.toUpperCase() === 'GET'
-
-const createErrorResponseDetails = (event) => isSupportedPath(event) ? createInternalServerErrorDetails() : createNotFoundDetails(event)
-
+const isInvalidValidEvent = (event) => !('path' in event && 'httpMethod' in event)
+const isValidRequest = (event) => routes.includes(event.path) && event.httpMethod.toUpperCase() === 'GET'
 const createNotFoundDetails = (event) => {
   return { code: httpStatus.NOT_FOUND, message: `The requested resource ${event.path} could not be found` }
 }
