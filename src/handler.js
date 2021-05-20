@@ -50,7 +50,12 @@ const isInvalidValidEvent = (event) => !('path' in event && 'httpMethod' in even
 
 const isGetMethod = (event) => event.httpMethod.toUpperCase() === 'GET'
 
-const isValidRequest = (event) => routes.includes(event.path) && isGetMethod(event)
+const hasQueryParameters = (event) => {
+  return 'queryStringParameters' in event && event.queryStringParameters !== undefined
+}
+
+const isValidRequest = (event) => routes.includes(event.path) && isGetMethod(event) && !hasQueryParameters(event)
+
 const createNotFoundDetails = (event) => {
   return { code: httpStatus.NOT_FOUND, message: `The requested resource ${event.path} could not be found` }
 }
@@ -63,4 +68,12 @@ const createInternalServerErrorDetails = () => {
   return { code: httpStatus.INTERNAL_SERVER_ERROR, message: 'Your request cannot be processed at this time due to an internal server error' }
 }
 
-const createErrorDetails = (event) => isGetMethod(event) ? createNotFoundDetails(event) : createMethodNotAllowedDetails(event)
+const createBadRequestDetails = (event) => {
+  return { code: httpStatus.BAD_REQUEST, message: `Your request cannot be processed because the supplied parameter(s) ${event.queryStringParameters} cannot be understood` }
+}
+
+const createErrorDetails = (event) => {
+  return isGetMethod(event)
+    ? hasQueryParameters(event) ? createBadRequestDetails(event) : createNotFoundDetails(event)
+    : createMethodNotAllowedDetails(event)
+}
