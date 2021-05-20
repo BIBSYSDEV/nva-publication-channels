@@ -7,7 +7,9 @@ logger.info('Logger initialized')
 const routes = ['/journal', '/publisher']
 
 exports.handler = async (event, context) => {
-  return validRequest(event) ? minimalResponse() : errorResponse(createErrorResponseDetails(event), event)
+  return ('path' in event && 'httpMethod' in event)
+    ? isValidRequest(event) ? responseWithEmptyBody() : errorResponse(createErrorResponseDetails(event), event)
+    : errorResponse(createInternalServerErrorDetails(), event)
 }
 
 const errorResponse = (response, event) => {
@@ -31,7 +33,7 @@ const errorResponse = (response, event) => {
   }
 }
 
-const minimalResponse = () => {
+const responseWithEmptyBody = () => {
   const response = {
     statusCode: 200,
     headers: {
@@ -43,9 +45,9 @@ const minimalResponse = () => {
   return response
 }
 
-const validRequest = (event) => isSupportedPath(event) && isSupportedHttpMethod(event)
+const isValidRequest = (event) => isSupportedPath(event) && isGetMethod(event)
 const isSupportedPath = (event) => 'path' in event && routes.includes(event.path)
-const isSupportedHttpMethod = event => 'httpMethod' in event && event.httpMethod.toUpperCase() === 'GET'
+const isGetMethod = event => 'httpMethod' in event && event.httpMethod.toUpperCase() === 'GET'
 
 const createErrorResponseDetails = (event) => isSupportedPath(event) ? createInternalServerErrorDetails() : createNotFoundDetails(event)
 
