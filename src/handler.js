@@ -47,7 +47,10 @@ const responseWithEmptyBody = () => {
 }
 
 const isInvalidValidEvent = (event) => !('path' in event && 'httpMethod' in event)
-const isValidRequest = (event) => routes.includes(event.path) && event.httpMethod.toUpperCase() === 'GET'
+
+const isGetMethod = (event) => event.httpMethod.toUpperCase() === 'GET'
+
+const isValidRequest = (event) => routes.includes(event.path) && isGetMethod(event)
 const createNotFoundDetails = (event) => {
   return { code: httpStatus.NOT_FOUND, message: `The requested resource ${event.path} could not be found` }
 }
@@ -60,6 +63,4 @@ const createInternalServerErrorDetails = () => {
   return { code: httpStatus.INTERNAL_SERVER_ERROR, message: 'Your request cannot be processed at this time due to an internal server error' }
 }
 
-function createErrorDetails (event) {
-  return (event.httpMethod.toUpperCase() !== 'GET') ? createMethodNotAllowedDetails(event) : createNotFoundDetails(event)
-}
+const createErrorDetails = (event) => isGetMethod(event) ? createNotFoundDetails(event) : createMethodNotAllowedDetails(event)
