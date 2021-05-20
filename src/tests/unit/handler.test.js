@@ -45,3 +45,19 @@ describe("Handler verifies route /journal; path '/journal', httpMethod.GET", () 
     })
   ))
 })
+
+describe('Handler throws 405 when httpMethod is not GET', () => {
+  ['HEAD', 'POST', 'PUT', 'DELETE', 'CONNECT', 'OPTIONS', 'TRACE', 'PATCH'].map(calledMethod => (
+    it(`httpmMethod ${calledMethod} returns 405`, async function () {
+      const httpMethod = calledMethod
+      const event = { path: '/journal', httpMethod: httpMethod }
+      const response = await handler(event)
+      const responseBody = JSON.parse(response.body)
+      expect(responseBody.instance).to.equal('/journal')
+      expect(responseBody.status).to.equal(405)
+      expect(responseBody.detail).to.equal(`The requested http method  ${calledMethod} is not supported`)
+      expect(responseBody.title).to.equal('Method Not Allowed')
+      expect(responseBody.type).to.equal('about:blank')
+    })
+  ))
+})
