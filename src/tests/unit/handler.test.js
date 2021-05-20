@@ -3,6 +3,7 @@
 const { handler } = require('../../handler')
 const chai = require('chai')
 const expect = chai.expect
+const httpStatus = require('http-status-codes')
 
 describe('Handler throws error when called', () => {
   it('verifies response is error 500 and  has Internal Server Error message', async function () {
@@ -18,10 +19,10 @@ describe('Handler throws error when called', () => {
   })
 })
 
-describe('Handler returns 404 when any route is called', () => {
+describe('Handler returns 404 when illegal route is called', () => {
   const calledPath = '/non-existent'
   it(`Handler returns 404 when ${calledPath} is called`, async function () {
-    const response = await handler({ path: calledPath })
+    const response = await handler({ path: calledPath, httpMethod: 'GET' })
     expect(response.statusCode).to.equal(404)
     const responseBody = JSON.parse(response.body)
     expect(responseBody.instance).to.equal(calledPath)
@@ -30,4 +31,17 @@ describe('Handler returns 404 when any route is called', () => {
     expect(responseBody.title).to.equal('Not Found')
     expect(responseBody.type).to.equal('about:blank')
   })
+})
+
+describe("Handler verifies route /journal; path '/journal', httpMethod.GET", () => {
+  ['/journal', '/publisher'].map(calledPath => (
+    it(`GET ${calledPath} returns 200 OK and has empty body`, async function () {
+      const httpMethod = 'GET'
+      const emptyBody = '{}'
+      const event = { path: calledPath, httpMethod: httpMethod }
+      const response = await handler(event)
+      expect(response.statusCode).to.equal(httpStatus.OK)
+      expect(response.body).to.equal(emptyBody)
+    })
+  ))
 })
