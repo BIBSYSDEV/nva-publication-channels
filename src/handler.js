@@ -4,10 +4,10 @@ const logger = require('pino')({ useLevelLabels: true })
 
 logger.info('Logger initialized')
 
-const routes = []
+const routes = ['/journal', '/publisher']
 
 exports.handler = async (event, context) => {
-  return errorResponse(createErrorResponseDetails(event), event)
+  return validRequest(event) ? minimalResponse() : errorResponse(createErrorResponseDetails(event), event)
 }
 
 const errorResponse = (response, event) => {
@@ -31,9 +31,23 @@ const errorResponse = (response, event) => {
   }
 }
 
-const createErrorResponseDetails = (event) => isRequestWithPath(event) ? createNotFoundDetails(event) : createInternalServerErrorDetails()
+const minimalResponse = () => {
+  const response = {
+    statusCode: 200,
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    isBase64Encoded: false,
+    body: '{}'
+  }
+  return response
+}
 
-const isRequestWithPath = (event) => 'path' in event && !routes.includes(event.path)
+const validRequest = (event) => isSupportedPath(event) && isSupportedHttpMethod(event)
+const isSupportedPath = (event) => 'path' in event && routes.includes(event.path)
+const isSupportedHttpMethod = event => 'httpMethod' in event && event.httpMethod.toUpperCase() === 'GET'
+
+const createErrorResponseDetails = (event) => isSupportedPath(event) ? createInternalServerErrorDetails() : createNotFoundDetails(event)
 
 const createNotFoundDetails = (event) => {
   return { code: httpStatus.NOT_FOUND, message: `The requested resource ${event.path} could not be found` }
