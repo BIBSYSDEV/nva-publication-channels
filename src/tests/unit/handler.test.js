@@ -61,3 +61,17 @@ describe('Handler throws 405 when httpMethod is not GET', () => {
     })
   ))
 })
+
+describe('Handler throws error when called with queryStringParameters', () => {
+  it('verifies response is error 400 and  has Bad Request Error message', async function () {
+    const event = { path: '/journal', httpMethod: 'GET', queryStringParameters: 'queryStringParameters' }
+    const response = await handler(event)
+    expect(response.statusCode).to.equal(400)
+    const responseBody = JSON.parse(response.body)
+    expect(responseBody.instance).to.equal('/journal')
+    expect(responseBody.status).to.equal(400)
+    expect(responseBody.detail).to.equal('Your request cannot be processed because the supplied parameter(s) "{parameters}" cannot be understood')
+    expect(responseBody.title).to.equal('Bad Request')
+    expect(responseBody.type).to.equal('about:blank')
+  })
+})
