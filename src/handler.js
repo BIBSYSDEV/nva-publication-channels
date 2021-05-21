@@ -14,9 +14,6 @@ exports.handler = async (event, context) => {
 }
 
 const errorResponse = (response, event) => {
-  const path = 'path' in event
-    ? 'queryStringParameters' in event ? event.path + '?' + event.queryStringParameters : event.path
-    : 'Undefined path'
   return {
     statusCode: response.code,
     headers: {
@@ -29,7 +26,7 @@ const errorResponse = (response, event) => {
         {
           status: response.code,
           detail: response.message,
-          instance: path
+          instance: getPath(event)
         }
       )
     )
@@ -48,9 +45,18 @@ const responseWithEmptyBody = () => {
   return response
 }
 
-const isInvalidValidEvent = (event) => !('path' in event && 'httpMethod' in event)
+const isInvalidValidEvent = (event) => !(hasPath(event) && 'httpMethod' in event)
 
 const isGetMethod = (event) => event.httpMethod.toUpperCase() === 'GET'
+
+const hasPath = (event) => 'path' in event
+
+const getPath = (event) => {
+  if (!hasPath(event)) {
+    return 'Undefined path'
+  }
+  return 'queryStringParameters' in event ? `${event.path}?${event.queryStringParameters}` : event.path
+}
 
 const hasQueryParameters = (event) => {
   return 'queryStringParameters' in event && event.queryStringParameters !== undefined
