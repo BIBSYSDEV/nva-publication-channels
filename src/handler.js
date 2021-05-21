@@ -26,7 +26,7 @@ const errorResponse = (response, event) => {
         {
           status: response.code,
           detail: response.message,
-          instance: getPath(event)
+          instance: getProblemInstance(event)
         }
       )
     )
@@ -51,7 +51,7 @@ const isGetMethod = (event) => event.httpMethod.toUpperCase() === 'GET'
 
 const hasPath = (event) => 'path' in event
 
-const getPath = (event) => {
+const getProblemInstance = (event) => {
   if (!hasPath(event)) {
     return 'Undefined path'
   }
