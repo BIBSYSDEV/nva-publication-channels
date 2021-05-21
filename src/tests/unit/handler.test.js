@@ -61,3 +61,35 @@ describe('Handler throws 405 when httpMethod is not GET', () => {
     })
   ))
 })
+
+describe('Handler throws error when called with queryStringParameters', () => {
+  it('verifies response is error 400 and has Bad Request problem response', async function () {
+    const queryStringParameters = 'sample.query.string.parameter'
+    const event = { path: '/journal', httpMethod: 'GET', queryStringParameters: queryStringParameters }
+    const response = await handler(event)
+    expect(response.statusCode).to.equal(400)
+    const responseBody = JSON.parse(response.body)
+    expect(responseBody.instance).to.equal(`/journal?${queryStringParameters}`)
+    expect(responseBody.status).to.equal(400)
+    expect(responseBody.detail).to.equal(`Your request cannot be processed because the supplied parameter(s) ${queryStringParameters} cannot be understood`)
+    expect(responseBody.title).to.equal('Bad Request')
+    expect(responseBody.type).to.equal('about:blank')
+  })
+})
+
+describe("Handler sets different 'Content-type' in respnse headers", () => {
+  it("handler returns 'Content-Type' 'application/json' when responsecode is 200", async function () {
+    const event = { path: '/journal', httpMethod: 'GET' }
+    const response = await handler(event)
+    expect(response.statusCode).to.equal(httpStatus.OK)
+    expect(response.headers).to.have.property('Content-Type')
+    expect(response.headers['Content-Type']).to.equal('application/json')
+  })
+  it("handler returns 'Content-Type' 'application/problem+json' when error occurs", async function () {
+    const event = { path: '/jornal', httpMethod: 'GET' }
+    const response = await handler(event)
+    expect(response.statusCode).to.equal(httpStatus.NOT_FOUND)
+    expect(response.headers).to.have.property('Content-Type')
+    expect(response.headers['Content-Type']).to.equal('application/problem+json')
+  })
+})

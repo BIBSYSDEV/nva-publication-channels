@@ -7,14 +7,13 @@ logger.info('Logger initialized')
 const routes = ['/journal', '/publisher']
 
 exports.handler = async (event, context) => {
-  if (isInvalidValidEvent(event)) {
+  if (isInvalidEvent(event)) {
     return errorResponse(createInternalServerErrorDetails(), event)
   }
   return isValidRequest(event) ? responseWithEmptyBody() : errorResponse(createErrorDetails(event), event)
 }
 
 const errorResponse = (response, event) => {
-  const path = 'path' in event ? event.path : 'Undefined path'
   return {
     statusCode: response.code,
     headers: {
@@ -27,7 +26,7 @@ const errorResponse = (response, event) => {
         {
           status: response.code,
           detail: response.message,
-          instance: path
+          instance: getProblemInstance(event)
         }
       )
     )
@@ -46,11 +45,25 @@ const responseWithEmptyBody = () => {
   return response
 }
 
-const isInvalidValidEvent = (event) => !('path' in event && 'httpMethod' in event)
+const isInvalidEvent = (event) => !(hasPath(event) && 'httpMethod' in event)
 
 const isGetMethod = (event) => event.httpMethod.toUpperCase() === 'GET'
 
-const isValidRequest = (event) => routes.includes(event.path) && isGetMethod(event)
+const hasPath = (event) => 'path' in event
+
+const getProblemInstance = (event) => {
+  if (!hasPath(event)) {
+    return 'Undefined path'
+  }
+  return 'queryStringParameters' in event ? `${event.path}?${event.queryStringParameters}` : event.path
+}
+
+const hasQueryParameters = (event) => {
+  return 'queryStringParameters' in event && event.queryStringParameters !== undefined
+}
+
+const isValidRequest = (event) => routes.includes(event.path) && isGetMethod(event) && !hasQueryParameters(event)
+
 const createNotFoundDetails = (event) => {
   return { code: httpStatus.NOT_FOUND, message: `The requested resource ${event.path} could not be found` }
 }
@@ -63,4 +76,10 @@ const createInternalServerErrorDetails = () => {
   return { code: httpStatus.INTERNAL_SERVER_ERROR, message: 'Your request cannot be processed at this time due to an internal server error' }
 }
 
-const createErrorDetails = (event) => isGetMethod(event) ? createNotFoundDetails(event) : createMethodNotAllowedDetails(event)
+const createBadRequestDetails = (event) => {
+  return { code: httpStatus.BAD_REQUEST, message: `Your request cannot be processed because the supplied parameter(s) ${event.queryStringParameters} cannot be understood` }
+}
+
+const problemsWithGetMethod = event => hasQueryParameters(event) ? createBadRequestDetails(event) : createNotFoundDetails(event)
+
+const createErrorDetails = (event) => isGetMethod(event) ? problemsWithGetMethod(event) : createMethodNotAllowedDetails(event)
