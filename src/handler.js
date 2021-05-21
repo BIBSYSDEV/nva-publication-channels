@@ -14,7 +14,9 @@ exports.handler = async (event, context) => {
 }
 
 const errorResponse = (response, event) => {
-  const path = 'path' in event ? event.path : 'Undefined path'
+  const path = 'path' in event
+    ? 'queryStringParameters' in event ? event.path + '?' + event.queryStringParameters : event.path
+    : 'Undefined path'
   return {
     statusCode: response.code,
     headers: {

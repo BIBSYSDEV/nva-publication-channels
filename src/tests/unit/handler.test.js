@@ -67,9 +67,11 @@ describe('Handler throws error when called with queryStringParameters', () => {
     const queryStringParameters = 'sample.query.string.parameter'
     const event = { path: '/journal', httpMethod: 'GET', queryStringParameters: queryStringParameters }
     const response = await handler(event)
+    expect(response.headers).to.have.property('Content-Type')
+    expect(response.headers['Content-Type']).to.equal('application/problem+json')
     expect(response.statusCode).to.equal(400)
     const responseBody = JSON.parse(response.body)
-    expect(responseBody.instance).to.equal('/journal')
+    expect(responseBody.instance).to.equal('/journal?sample.query.string.parameter')
     expect(responseBody.status).to.equal(400)
     expect(responseBody.detail).to.equal(`Your request cannot be processed because the supplied parameter(s) ${queryStringParameters} cannot be understood`)
     expect(responseBody.title).to.equal('Bad Request')
