@@ -95,7 +95,7 @@ describe("Handler sets different 'Content-type' in respnse headers", () => {
 })
 
 describe('Handler verifies queryStringParameters and returns 200 with empty body when called with specified queryStringParameters', () => {
-  it('response is 200 OK and response has a empty body when only "query"parameter is set', async function () {
+  it('response is 200 OK and response has a empty body when only "query" parameter is set', async function () {
     const queryStringParameters = { query: 'query' }
     const event = { path: '/journal', httpMethod: 'GET', queryStringParameters: queryStringParameters }
     const response = await handler(event)
@@ -113,7 +113,7 @@ describe('Handler verifies queryStringParameters and returns 200 with empty body
   })
 })
 
-describe('Handler return bad request when error in query ', () => {
+describe('Handler returns bad request when error in query ', () => {
   it('response is 400 Bad Request when obligatory "query"-parameter is missing', async function () {
     const queryStringParameters = { year: 2020, start: 1 }
     const event = { path: '/journal', httpMethod: 'GET', queryStringParameters: queryStringParameters }

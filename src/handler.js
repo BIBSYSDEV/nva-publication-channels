@@ -88,7 +88,5 @@ const hasValidQueryParameters = (event) => event.queryStringParameters.query !==
 
 const hasValidParameterNames = (event) => {
   const parameterNames = ['query', 'year', 'start']
-  let found = false
-  for (const key in event.queryStringParameters) found = parameterNames.includes(key)
-  return found
+  return Object.keys(event.queryStringParameters).filter(key => (!parameterNames.includes(key))).length === 0
 }
