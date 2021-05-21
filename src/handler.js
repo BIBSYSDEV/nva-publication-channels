@@ -62,7 +62,7 @@ const hasQueryParameters = (event) => {
   return 'queryStringParameters' in event && event.queryStringParameters !== undefined
 }
 
-const isValidRequest = (event) => routes.includes(event.path) && isGetMethod(event) && !hasQueryParameters(event)
+const isValidRequest = (event) => routes.includes(event.path) && isGetMethod(event) && (!hasQueryParameters(event) || hasValidQueryParameters(event))
 
 const createNotFoundDetails = (event) => {
   return { code: httpStatus.NOT_FOUND, message: `The requested resource ${event.path} could not be found` }
@@ -80,6 +80,15 @@ const createBadRequestDetails = (event) => {
   return { code: httpStatus.BAD_REQUEST, message: `Your request cannot be processed because the supplied parameter(s) ${event.queryStringParameters} cannot be understood` }
 }
 
+const createErrorDetails = (event) => isGetMethod(event) ? problemsWithGetMethod(event) : createMethodNotAllowedDetails(event)
+
 const problemsWithGetMethod = event => hasQueryParameters(event) ? createBadRequestDetails(event) : createNotFoundDetails(event)
 
-const createErrorDetails = (event) => isGetMethod(event) ? problemsWithGetMethod(event) : createMethodNotAllowedDetails(event)
+const hasValidQueryParameters = (event) => event.queryStringParameters.query !== undefined && hasValidParameterNames(event)
+
+const hasValidParameterNames = (event) => {
+  const parameterNames = ['query', 'year', 'start']
+  let found = false
+  for (const key in event.queryStringParameters) found = parameterNames.includes(key)
+  return found
+}
