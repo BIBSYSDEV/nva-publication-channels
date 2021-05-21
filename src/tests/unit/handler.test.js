@@ -93,3 +93,37 @@ describe("Handler sets different 'Content-type' in respnse headers", () => {
     expect(response.headers['Content-Type']).to.equal('application/problem+json')
   })
 })
+
+describe('Handler verifies queryStringParameters and returns 200 with empty body when called with specified queryStringParameters', () => {
+  it('response is 200 OK and response has a empty body when only "query"parameter is set', async function () {
+    const queryStringParameters = { query: 'query' }
+    const event = { path: '/journal', httpMethod: 'GET', queryStringParameters: queryStringParameters }
+    const response = await handler(event)
+    const emptyBody = '{}'
+    expect(response.statusCode).to.equal(httpStatus.OK)
+    expect(response.body).to.equal(emptyBody)
+  })
+  it('response is 200 OK and response has a empty body when all parameters set', async function () {
+    const queryStringParameters = { query: 'query', year: 2020, start: 1 }
+    const event = { path: '/journal', httpMethod: 'GET', queryStringParameters: queryStringParameters }
+    const response = await handler(event)
+    const emptyBody = '{}'
+    expect(response.statusCode).to.equal(httpStatus.OK)
+    expect(response.body).to.equal(emptyBody)
+  })
+})
+
+describe('Handler return bad request when error in query ', () => {
+  it('response is 400 Bad Request when obligatory "query"-parameter is missing', async function () {
+    const queryStringParameters = { year: 2020, start: 1 }
+    const event = { path: '/journal', httpMethod: 'GET', queryStringParameters: queryStringParameters }
+    const response = await handler(event)
+    expect(response.statusCode).to.equal(httpStatus.BAD_REQUEST)
+  })
+  it('response is 400 Bad Request when extra unknown parameter is added', async function () {
+    const queryStringParameters = { query: 'query', year: 2020, start: 1, nonSupportedParmeter: 'error' }
+    const event = { path: '/journal', httpMethod: 'GET', queryStringParameters: queryStringParameters }
+    const response = await handler(event)
+    expect(response.statusCode).to.equal(httpStatus.BAD_REQUEST)
+  })
+})
