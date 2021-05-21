@@ -7,7 +7,7 @@ logger.info('Logger initialized')
 const routes = ['/journal', '/publisher']
 
 exports.handler = async (event, context) => {
-  if (isInvalidValidEvent(event)) {
+  if (isInvalidEvent(event)) {
     return errorResponse(createInternalServerErrorDetails(), event)
   }
   return isValidRequest(event) ? responseWithEmptyBody() : errorResponse(createErrorDetails(event), event)
@@ -45,7 +45,7 @@ const responseWithEmptyBody = () => {
   return response
 }
 
-const isInvalidValidEvent = (event) => !(hasPath(event) && 'httpMethod' in event)
+const isInvalidEvent = (event) => !(hasPath(event) && 'httpMethod' in event)
 
 const isGetMethod = (event) => event.httpMethod.toUpperCase() === 'GET'
 
@@ -80,8 +80,6 @@ const createBadRequestDetails = (event) => {
   return { code: httpStatus.BAD_REQUEST, message: `Your request cannot be processed because the supplied parameter(s) ${event.queryStringParameters} cannot be understood` }
 }
 
-const createErrorDetails = (event) => {
-  return isGetMethod(event)
-    ? hasQueryParameters(event) ? createBadRequestDetails(event) : createNotFoundDetails(event)
-    : createMethodNotAllowedDetails(event)
-}
+const problemsWithGetMethod = event => hasQueryParameters(event) ? createBadRequestDetails(event) : createNotFoundDetails(event)
+
+const createErrorDetails = (event) => isGetMethod(event) ? problemsWithGetMethod(event) : createMethodNotAllowedDetails(event)
