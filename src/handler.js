@@ -57,11 +57,11 @@ const getProblemInstance = (event) => {
   return 'queryStringParameters' in event ? `${event.path}?${event.queryStringParameters}` : event.path
 }
 
-const hasQueryParameters = (event) => {
-  return 'queryStringParameters' in event && event.queryStringParameters !== undefined
-}
+const hasQueryParameters = (event) => 'queryStringParameters' in event && event.queryStringParameters !== undefined
 
-const isValidRequest = (event) => routes.includes(event.path) && isGetMethod(event) && (!hasQueryParameters(event) || hasValidQueryParameters(event))
+const isValidRequest = (event) => routes.includes(event.path) && isGetMethod(event) && hasValidQuery(event)
+
+const hasValidQuery = (event) => !hasQueryParameters(event) || hasValidQueryParameters(event)
 
 const createNotFoundDetails = (event) => {
   return { code: httpStatus.NOT_FOUND, message: `The requested resource ${event.path} could not be found` }
