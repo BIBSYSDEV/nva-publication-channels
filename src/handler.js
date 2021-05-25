@@ -34,7 +34,7 @@ const errorResponse = (response, event) => {
 }
 
 const responseWithEmptyBody = () => {
-  const response = {
+  return {
     statusCode: 200,
     headers: {
       'Content-Type': 'application/json'
@@ -42,7 +42,6 @@ const responseWithEmptyBody = () => {
     isBase64Encoded: false,
     body: '{}'
   }
-  return response
 }
 
 const isInvalidEvent = (event) => !(hasPath(event) && 'httpMethod' in event)
