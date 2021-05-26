@@ -57,7 +57,7 @@ const getProblemInstance = (event) => {
   return 'queryStringParameters' in event ? `${event.path}?${event.queryStringParameters}` : event.path
 }
 
-const hasQueryParameters = (event) => Object.prototype.hasOwnProperty.call(event, 'queryStringParameters') && (event.queryStringParameters !== null || (Array.isArray(event.queryStringParameters) && event.queryStringParameters.length))
+const hasQueryParameters = (event) => Object.prototype.hasOwnProperty.call(event, 'queryStringParameters') && (event.queryStringParameters !== null)
 
 const isValidRequest = (event) => routes.includes(event.path) && isGetMethod(event) && hasValidQuery(event)
 
@@ -96,4 +96,6 @@ const hasRequiredParameters = (actualKeys, querySpec) => {
   return required.every(item => actualKeys.includes(item))
 }
 
-const hasValidParameterValues = queryStringParameters => Object.values(queryStringParameters).length === Object.keys(queryStringParameters).length && Object.values(queryStringParameters).length === Object.values(queryStringParameters).filter(value => value !== undefined).filter(value => value !== null).map(value => ' ' + value).filter(value => value.length > 1).length
+const cleanValuesLength = queryStringParameters => Object.values(queryStringParameters).filter(value => value !== undefined).filter(value => value !== null).map(value => value.toString()).filter(value => value !== '').length
+
+const hasValidParameterValues = queryStringParameters => Object.values(queryStringParameters).length === Object.keys(queryStringParameters).length && Object.values(queryStringParameters).length === cleanValuesLength(queryStringParameters)
