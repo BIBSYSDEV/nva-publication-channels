@@ -21,7 +21,7 @@ describe('Handler throws error when called', () => {
 
 describe('Handler returns 404 when illegal route is called', () => {
   const calledPath = '/non-existent'
-  it(`Handler returns 404 when ${calledPath} is called`, async function () {
+  it(`return 404 when ${calledPath} is called`, async function () {
     const response = await handler({ path: calledPath, httpMethod: 'GET' })
     expect(response.statusCode).to.equal(404)
     const responseBody = JSON.parse(response.body)
@@ -78,18 +78,64 @@ describe('Handler throws error when called with queryStringParameters', () => {
 })
 
 describe("Handler sets different 'Content-type' in respnse headers", () => {
-  it("handler returns 'Content-Type' 'application/json' when responsecode is 200", async function () {
+  it("returns 'Content-Type' 'application/json' when responsecode is 200", async function () {
     const event = { path: '/journal', httpMethod: 'GET' }
     const response = await handler(event)
     expect(response.statusCode).to.equal(httpStatus.OK)
     expect(response.headers).to.have.property('Content-Type')
     expect(response.headers['Content-Type']).to.equal('application/json')
   })
-  it("handler returns 'Content-Type' 'application/problem+json' when error occurs", async function () {
+  it("returns 'Content-Type' 'application/problem+json' when error occurs", async function () {
     const event = { path: '/jornal', httpMethod: 'GET' }
     const response = await handler(event)
     expect(response.statusCode).to.equal(httpStatus.NOT_FOUND)
     expect(response.headers).to.have.property('Content-Type')
     expect(response.headers['Content-Type']).to.equal('application/problem+json')
+  })
+})
+
+describe('Handler verifies queryStringParameters and returns 200 with empty body when called with specified queryStringParameters', () => {
+  it('Returns 200 OK and a empty body when only "query" parameter is set', async function () {
+    const queryStringParameters = { query: 'query' }
+    const event = { path: '/journal', httpMethod: 'GET', queryStringParameters: queryStringParameters }
+    const response = await handler(event)
+    const emptyBody = '{}'
+    expect(response.statusCode).to.equal(httpStatus.OK)
+    expect(response.body).to.equal(emptyBody)
+  })
+  it('returns 200 OK and a empty body when all parameters set', async function () {
+    const queryStringParameters = { query: 'query', year: 2020, start: 1 }
+    const event = { path: '/journal', httpMethod: 'GET', queryStringParameters: queryStringParameters }
+    const response = await handler(event)
+    const emptyBody = '{}'
+    expect(response.statusCode).to.equal(httpStatus.OK)
+    expect(response.body).to.equal(emptyBody)
+  })
+})
+
+describe('Handler returns bad request when error in query ', () => {
+  it('returns 400 Bad Request when obligatory "query"-parameter is missing', async function () {
+    const queryStringParameters = { year: 2020, start: 1 }
+    const event = { path: '/journal', httpMethod: 'GET', queryStringParameters: queryStringParameters }
+    const response = await handler(event)
+    expect(response.statusCode).to.equal(httpStatus.BAD_REQUEST)
+  })
+  it('returns 400 Bad Request when extra unknown parameter is added', async function () {
+    const queryStringParameters = { query: 'query', year: 2020, start: 1, nonSupportedParmeter: 'error' }
+    const event = { path: '/journal', httpMethod: 'GET', queryStringParameters: queryStringParameters }
+    const response = await handler(event)
+    expect(response.statusCode).to.equal(httpStatus.BAD_REQUEST)
+  })
+  it('returns 400 Bad Request when value of query parameter is empty string', async function () {
+    const queryStringParameters = { query: '' }
+    const event = { path: '/journal', httpMethod: 'GET', queryStringParameters: queryStringParameters }
+    const response = await handler(event)
+    expect(response.statusCode).to.equal(httpStatus.BAD_REQUEST)
+  })
+  it('returns 400 Bad Request when value of query parameter is null', async function () {
+    const queryStringParameters = { query: null }
+    const event = { path: '/journal', httpMethod: 'GET', queryStringParameters: queryStringParameters }
+    const response = await handler(event)
+    expect(response.statusCode).to.equal(httpStatus.BAD_REQUEST)
   })
 })
