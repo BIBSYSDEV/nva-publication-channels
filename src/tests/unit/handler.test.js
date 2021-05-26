@@ -126,4 +126,16 @@ describe('Handler returns bad request when error in query ', () => {
     const response = await handler(event)
     expect(response.statusCode).to.equal(httpStatus.BAD_REQUEST)
   })
+  it('returns 400 Bad Request when value of query parameter is empty string', async function () {
+    const queryStringParameters = { query: '' }
+    const event = { path: '/journal', httpMethod: 'GET', queryStringParameters: queryStringParameters }
+    const response = await handler(event)
+    expect(response.statusCode).to.equal(httpStatus.BAD_REQUEST)
+  })
+  it('returns 400 Bad Request when value of query parameter is null', async function () {
+    const queryStringParameters = { query: null }
+    const event = { path: '/journal', httpMethod: 'GET', queryStringParameters: queryStringParameters }
+    const response = await handler(event)
+    expect(response.statusCode).to.equal(httpStatus.BAD_REQUEST)
+  })
 })

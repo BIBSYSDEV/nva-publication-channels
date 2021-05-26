@@ -57,7 +57,7 @@ const getProblemInstance = (event) => {
   return 'queryStringParameters' in event ? `${event.path}?${event.queryStringParameters}` : event.path
 }
 
-const hasQueryParameters = (event) => 'queryStringParameters' in event && event.queryStringParameters !== undefined
+const hasQueryParameters = (event) => Object.prototype.hasOwnProperty.call(event, 'queryStringParameters') && (event.queryStringParameters !== null || (Array.isArray(event.queryStringParameters) && event.queryStringParameters.length))
 
 const isValidRequest = (event) => routes.includes(event.path) && isGetMethod(event) && hasValidQuery(event)
 
@@ -86,7 +86,7 @@ const problemsWithGetMethod = event => hasQueryParameters(event) ? createBadRequ
 const hasValidQueryParameters = (event) => {
   const querySpec = [{ name: 'query', required: true }, { name: 'year', required: false }, { name: 'start', required: false }]
   const queryStringKeys = Object.keys(event.queryStringParameters)
-  return isValidParameterName(queryStringKeys, querySpec) && hasRequiredParameters(queryStringKeys, querySpec)
+  return isValidParameterName(queryStringKeys, querySpec) && hasRequiredParameters(queryStringKeys, querySpec) && hasValidParameterValues(event.queryStringParameters)
 }
 
 const isValidParameterName = (actualKeys, querySpec) => actualKeys.every(key => querySpec.map(param => param.name).includes(key))
@@ -95,3 +95,5 @@ const hasRequiredParameters = (actualKeys, querySpec) => {
   const required = querySpec.filter(param => param.required === true).map(param => param.name)
   return required.every(item => actualKeys.includes(item))
 }
+
+const hasValidParameterValues = queryStringParameters => Object.values(queryStringParameters).length === Object.keys(queryStringParameters).length && Object.values(queryStringParameters).length === Object.values(queryStringParameters).filter(value => value !== undefined).filter(value => value !== null).map(value => ' ' + value).filter(value => value.length > 1).length
