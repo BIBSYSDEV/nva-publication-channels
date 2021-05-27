@@ -106,6 +106,12 @@ You can find more information and examples about filtering Lambda function logs 
 the [SAM CLI Documentation](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-logging.html)
 .
 
+## Development
+
+Node environment management is delegated to [Volta](https://volta.sh)
+
+To manage your node environment, follow Volta's [getting started](https://docs.volta.sh/guide/getting-started) instructions. 
+
 ## Tests
 
 Tests are defined in the `src/tests` folder in this project. Use NPM to install
