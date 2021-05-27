@@ -11,7 +11,9 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v2
 
+    - name: Setup Cloud Formation Linter with Latest Version
+      uses: scottbrenner/cfn-lint-action@v2
+
     - name: cfn-lint
-      uses: scottbrenner/cfn-lint-action@main
       run: |
         -c \"cat template.yaml | sed '/CODEBUILD_RESOLVED_SOURCE_VERSION/d' | cfn-lint -\"
