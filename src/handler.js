@@ -1,16 +1,22 @@
 const ProblemDocument = require('http-problem-details').ProblemDocument
 const httpStatus = require('http-status-codes')
 const logger = require('pino')({ useLevelLabels: true })
+const requestgenerator = require('./requestgenerator')
 
 logger.info('Logger initialized')
 
 const routes = ['/journal', '/publisher']
 
-exports.handler = async (event, context) => {
+const handler = async (event, context) => {
   if (isInvalidEvent(event)) {
     return errorResponse(createInternalServerErrorDetails(), event)
   }
-  return isValidRequest(event) ? responseWithEmptyBody() : errorResponse(createErrorDetails(event), event)
+  return isValidRequest(event) ? returnQueryResponse(event) : errorResponse(createErrorDetails(event), event)
+}
+
+function returnQueryResponse (event) {
+  const nsdRequest = new requestgenerator.NsdRequest(event).getRequest()
+  return performQuery(event, nsdRequest)
 }
 
 const errorResponse = (response, event) => {
@@ -33,14 +39,14 @@ const errorResponse = (response, event) => {
   }
 }
 
-const responseWithEmptyBody = () => {
+const responseWithBody = (body) => {
   return {
     statusCode: 200,
     headers: {
       'Content-Type': 'application/json'
     },
     isBase64Encoded: false,
-    body: '{}'
+    body: body === undefined ? '{}' : JSON.stringify(body)
   }
 }
 
@@ -99,3 +105,13 @@ const hasRequiredParameters = (actualKeys, querySpec) => {
 const cleanValuesLength = queryStringParameters => Object.values(queryStringParameters).filter(value => value !== undefined).filter(value => value !== null).map(value => value.toString()).filter(value => value !== '').length
 
 const hasValidParameterValues = queryStringParameters => Object.values(queryStringParameters).length === Object.keys(queryStringParameters).length && Object.values(queryStringParameters).length === cleanValuesLength(queryStringParameters)
+
+// const channelRegistryUri = 'https://api.nsd.no/dbhapitjener/Tabeller/hentJSONTabellData'
+
+async function performQuery (request) {
+  // const nsdResponse = await axios.post(channelRegistryUri, request)
+  const nsdResponse = { data: {} } // This is to replaced with line over
+  return responseWithBody(nsdResponse.data)
+}
+
+module.exports = { handler }
