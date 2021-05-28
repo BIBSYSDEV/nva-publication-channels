@@ -4,7 +4,7 @@ const handler = require('../../handler')
 const chai = require('chai')
 const expect = chai.expect
 const httpStatus = require('http-status-codes')
-
+const fs = require('fs')
 const nock = require('nock')
 
 const isValidParameterName = (actualKeys, querySpec) => actualKeys.every(key => querySpec.map(param => param.name).includes(key))
@@ -23,10 +23,18 @@ const hasValidQueryParameters = (requestBody) => {
   return valid
 }
 
+const journalContent = fs.readFileSync('journal_response.json').toString()
+const publisherContent = fs.readFileSync('publisher_response.json').toString()
+
 nock('https://api.nsd.no', { reqheaders: { 'content-type': 'application/json;charset=utf-8' } })
   .persist()
-  .post('/dbhapitjener/Tabeller/hentJSONTabellData', body => { return hasValidQueryParameters(body) })
-  .reply(httpStatus.OK, {})
+  .post('/dbhapitjener/Tabeller/hentJSONTabellData', body => { return body.path === '/journal' && hasValidQueryParameters(body) })
+  .reply(httpStatus.OK, journalContent)
+
+nock('https://api.nsd.no', { reqheaders: { 'content-type': 'application/json;charset=utf-8' } })
+  .persist()
+  .post('/dbhapitjener/Tabeller/hentJSONTabellData', body => { return body.path === '/publisher' && hasValidQueryParameters(body) })
+  .reply(httpStatus.OK, publisherContent)
 
 // Fallback interceptor to catch invalid parameters
 nock('https://api.nsd.no/dbhapitjener/Tabeller/hentJSONTabellData')
@@ -66,11 +74,11 @@ describe("Handler verifies route /journal; path '/journal', httpMethod.GET", () 
   ['/journal', '/publisher'].map(calledPath => (
     it(`GET ${calledPath} returns 200 OK and has empty body`, async function () {
       const httpMethod = 'GET'
-      const emptyBody = '{}'
+      // const emptyBody = '{}'
       const event = { path: calledPath, httpMethod: httpMethod }
       const response = await handler.handler(event)
       expect(response.statusCode).to.equal(httpStatus.OK)
-      expect(response.body).to.equal(emptyBody)
+      // expect(response.body).to.equal(emptyBody)
     })
   ))
 })
@@ -128,17 +136,15 @@ describe('Handler verifies queryStringParameters and returns 200 with empty body
     const queryStringParameters = { query: 'query' }
     const event = { path: '/journal', httpMethod: 'GET', queryStringParameters: queryStringParameters }
     const response = await handler.handler(event)
-    const emptyBody = '{}'
     expect(response.statusCode).to.equal(httpStatus.OK)
-    expect(response.body).to.equal(emptyBody)
+    expect(response.body).to.equal(journalContent)
   })
   it('returns 200 OK and a empty body when all parameters set', async function () {
     const queryStringParameters = { query: 'query', year: 2020, start: 1 }
     const event = { path: '/journal', httpMethod: 'GET', queryStringParameters: queryStringParameters }
     const response = await handler.handler(event)
-    const emptyBody = '{}'
     expect(response.statusCode).to.equal(httpStatus.OK)
-    expect(response.body).to.equal(emptyBody)
+    expect(response.body).to.equal(journalContent)
   })
 })
 
@@ -174,6 +180,26 @@ describe('Handler returns response 200 OK when called', () => {
     it(`returns 200 OK for ${calledPath}`, async function () {
       const queryStringParameters = { query: 'Alzheimers', year: 2020, start: 1 }
       const event = { path: calledPath, httpMethod: 'GET', queryStringParameters: queryStringParameters }
+      const response = await handler.handler(event)
+      expect((await response).statusCode).to.equal(httpStatus.OK)
+    })
+  ))
+})
+
+describe('Handler returns response 200 OK and data when called', () => {
+  // nock.cleanAll();
+  ['/journal', '/publisher'].map(calledPath => (
+    it(`returns 200 OK for ${calledPath}`, async function () {
+      const queryStringParameters = {
+        query: 'Alzheimers',
+        year: 2020,
+        start: 1
+      }
+      const event = {
+        path: calledPath,
+        httpMethod: 'GET',
+        queryStringParameters: queryStringParameters
+      }
       const response = await handler.handler(event)
       expect((await response).statusCode).to.equal(httpStatus.OK)
     })
