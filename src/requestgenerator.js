@@ -1,3 +1,5 @@
+const fs = require('fs')
+
 class Requestgenerator {
   constructor (event) {
     this.request = this.createRequest(event)
@@ -24,68 +26,8 @@ class Requestgenerator {
   }
 }
 
-const queryJournalTemplate = {
-  tabell_id: 851,
-  api_versjon: 1,
-  statuslinje: 'N',
-  begrensning: 10,
-  kodetekst: 'N',
-  desimal_separator: '.',
-  variabler: [
-    'Tidsskrift id',
-    'Original tittel',
-    'Online ISSN',
-    'Print ISSN',
-    'Open Access',
-    'Språk',
-    'NPI Fagfelt',
-    'Url',
-    'Nivå 2020',
-    'Etablert år',
-    'Nedlagt år'
-  ],
-  sortBy: ['Original tittel'],
-  filter: [
-    {
-      variabel: 'Original tittel',
-      selection: {
-        filter: 'like',
-        values: [
-          '%'
-        ]
-      }
-    }
-  ]
-}
+const queryJournalTemplate = JSON.parse(fs.readFileSync('journalQueryTemplate.json').toString())
 
-const queryPublisherTemplate = {
-  tabell_id: 850,
-  api_versjon: 1,
-  statuslinje: 'N',
-  begrensning: 10,
-  kodetekst: 'N',
-  desimal_separator: '.',
-  variabler: [
-    'Original tittel',
-    'Forlag id',
-    'ISBN-prefiks',
-    'Url',
-    'Aktiv'
-  ],
-  sortBy: [
-    'Original tittel'
-  ],
-  filter: [
-    {
-      variabel: 'Original tittel',
-      selection: {
-        filter: 'like',
-        values: [
-          '%'
-        ]
-      }
-    }
-  ]
-}
+const queryPublisherTemplate = JSON.parse(fs.readFileSync('queryPublisherTemplate.json').toString())
 
 module.exports = { Requestgenerator }

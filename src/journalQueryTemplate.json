@@ -1,0 +1,33 @@
+{
+  "tabell_id": 851,
+  "api_versjon": 1,
+  "statuslinje": "N",
+  "begrensning": "10",
+  "kodetekst": "N",
+  "desimal_separator": ".",
+  "variabler": [
+    "Tidsskrift id",
+    "Original tittel",
+    "Online ISSN",
+    "Print ISSN",
+    "Open Access",
+    "Språk",
+    "NPI Fagfelt",
+    "Url",
+    "Nivå 2020",
+    "Etablert år",
+    "Nedlagt år"
+  ],
+  "sortBy": ["Original tittel"],
+  "filter": [
+    {
+      "variabel": "Original tittel",
+      "selection": {
+        "filter": "like",
+        "values": [
+          "%"
+        ]
+      }
+    }
+  ]
+}

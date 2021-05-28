@@ -187,19 +187,10 @@ describe('Handler returns response 200 OK when called', () => {
 })
 
 describe('Handler returns response 200 OK and data when called', () => {
-  // nock.cleanAll();
   ['/journal', '/publisher'].map(calledPath => (
     it(`returns 200 OK for ${calledPath}`, async function () {
-      const queryStringParameters = {
-        query: 'Alzheimers',
-        year: 2020,
-        start: 1
-      }
-      const event = {
-        path: calledPath,
-        httpMethod: 'GET',
-        queryStringParameters: queryStringParameters
-      }
+      const queryStringParameters = { query: 'Alzheimers', year: 2020, start: 1 }
+      const event = { path: calledPath, httpMethod: 'GET', queryStringParameters: queryStringParameters }
       const response = await handler.handler(event)
       expect((await response).statusCode).to.equal(httpStatus.OK)
     })
