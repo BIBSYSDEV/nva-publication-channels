@@ -5,6 +5,35 @@ const chai = require('chai')
 const expect = chai.expect
 const httpStatus = require('http-status-codes')
 
+const nock = require('nock')
+
+const isValidParameterName = (actualKeys, querySpec) => actualKeys.every(key => querySpec.map(param => param.name).includes(key))
+
+const hasRequiredParameters = (actualKeys, querySpec) => {
+  const required = querySpec.filter(param => param.required === true).map(param => param.name)
+  return required.every(item => actualKeys.includes(item))
+}
+
+const hasValidQueryParameters = (requestBody) => {
+  const querySpec = [{ name: 'query', required: true }, { name: 'year', required: false }, { name: 'start', required: false }]
+  if (requestBody.queryStringKeys === undefined) return true
+  const queryStringKeys = Object.keys(requestBody.queryStringParameters)
+  const valid = isValidParameterName(queryStringKeys, querySpec) && hasRequiredParameters(queryStringKeys, querySpec)
+  console.log(`hasValidQueryParameters(${requestBody}) -> ${valid}`)
+  return valid
+}
+
+nock('https://api.nsd.no', { reqheaders: { 'content-type': 'application/json;charset=utf-8' } })
+  .persist()
+  .post('/dbhapitjener/Tabeller/hentJSONTabellData', body => { return hasValidQueryParameters(body) })
+  .reply(httpStatus.OK, {})
+
+// Fallback interceptor to catch invalid parameters
+nock('https://api.nsd.no/dbhapitjener/Tabeller/hentJSONTabellData')
+  .persist()
+  .post('')
+  .reply(httpStatus.INTERNAL_SERVER_ERROR, {})
+
 describe('Handler throws error when called', () => {
   it('verifies response is error 500 and  has Internal Server Error message', async function () {
     const event = { failing: 'call' }

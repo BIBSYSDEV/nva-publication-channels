@@ -51,7 +51,7 @@ const queryJournalTemplate = {
       selection: {
         filter: 'like',
         values: [
-          'Alzheimer%'
+          '%'
         ]
       }
     }
@@ -81,11 +81,11 @@ const queryPublisherTemplate = {
       selection: {
         filter: 'like',
         values: [
-          'T%'
+          '%'
         ]
       }
     }
   ]
 }
 
-module.exports = { NsdRequest: Requestgenerator }
+module.exports = { Requestgenerator }
