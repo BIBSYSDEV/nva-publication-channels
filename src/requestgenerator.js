@@ -1,6 +1,6 @@
 const fs = require('fs')
 
-class Requestgenerator {
+class Request {
   constructor (event) {
     this.request = this.createRequest(event)
   }
@@ -30,4 +30,4 @@ const queryJournalTemplate = JSON.parse(fs.readFileSync('journalQueryTemplate.js
 
 const queryPublisherTemplate = JSON.parse(fs.readFileSync('queryPublisherTemplate.json').toString())
 
-module.exports = { Requestgenerator }
+module.exports = { Request }
