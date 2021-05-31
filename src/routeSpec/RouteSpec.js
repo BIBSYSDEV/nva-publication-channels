@@ -1,7 +1,7 @@
 'use strict'
 const QueryParameter = require('./QueryParameter')
 const _VALID_METHODS = ['CONNECT', 'DELETE', 'GET', 'HEAD', 'OPTIONS', 'PATCH', 'POST', 'PUT', 'TRACE']
-const _URI_SEGMENT_REGEX = '([a-zA-Z0-9\\$\\-_\\@\\.&\\+\\-\\!*"\'\\(\\)\\,](\\%[0-9]{2})?)+'
+const _URI_SEGMENT_REGEX = '([a-zA-Z0-9\\$\\-_\\@\\.&\\+\\-\\!*"\'\\(\\)\\,](\\%[0-9a-fA-F]{2})?)+'
 const _PATH_PARAM_REGEX = `^${_URI_SEGMENT_REGEX}$`
 const _PATH_REGEX = `^\\/${_URI_SEGMENT_REGEX}$`
 const isValidPathDefinition = paths => paths.every(path => path.match(_PATH_REGEX))
