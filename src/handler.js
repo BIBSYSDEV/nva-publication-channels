@@ -1,7 +1,7 @@
 const ProblemDocument = require('http-problem-details').ProblemDocument
 const httpStatus = require('http-status-codes')
 const logger = require('pino')({ useLevelLabels: true })
-const requestGenerator = require('./requestgenerator')
+const requestGenerator = require('./Request')
 const client = require('./client')
 
 logger.info('Logger initialized')

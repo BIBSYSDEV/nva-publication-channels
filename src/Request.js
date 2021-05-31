@@ -11,12 +11,7 @@ class Request {
 
   createRequest (event) {
     const params = event.queryStringParameters
-    let template
-    if (event.path === '/journal') {
-      template = queryJournalTemplate
-    } else {
-      template = queryPublisherTemplate
-    }
+    const template = event.path === '/journal' ? readTemplate('query_journal_template.json') : readTemplate('query_publisher_template.json')
     let filterValue = '%'
     if (params !== undefined && params.query !== undefined) {
       filterValue = '%' + params.query + '%'
@@ -25,9 +20,6 @@ class Request {
     return template
   }
 }
-
-const queryJournalTemplate = JSON.parse(fs.readFileSync('journalQueryTemplate.json').toString())
-
-const queryPublisherTemplate = JSON.parse(fs.readFileSync('queryPublisherTemplate.json').toString())
+const readTemplate = (path) => JSON.parse(fs.readFileSync(path).toString())
 
 module.exports = { Request }

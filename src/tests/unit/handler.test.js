@@ -74,7 +74,6 @@ describe("Handler verifies route /journal; path '/journal', httpMethod.GET", () 
   ['/journal', '/publisher'].map(calledPath => (
     it(`GET ${calledPath} returns 200 OK and has empty body`, async function () {
       const httpMethod = 'GET'
-      // const emptyBody = '{}'
       const event = { path: calledPath, httpMethod: httpMethod }
       const response = await handler.handler(event)
       expect(response.statusCode).to.equal(httpStatus.OK)

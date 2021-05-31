@@ -9,11 +9,11 @@ const responseWithBody = (body) => {
       'Content-Type': 'application/json'
     },
     isBase64Encoded: false,
-    body: body === undefined ? '{}' : JSON.stringify(body)
+    body: JSON.stringify(body) || '{}'
   }
 }
 
-async function performQuery (request) {
+const performQuery = async request => {
   const nsdResponse = await axios.post(channelRegistryUri, request)
   return responseWithBody(nsdResponse.data)
 }
