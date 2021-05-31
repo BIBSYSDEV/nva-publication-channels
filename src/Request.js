@@ -10,16 +10,26 @@ class Request {
   }
 
   createRequest (event) {
-    const params = event.queryStringParameters
-    const template = event.path === '/journal' ? readTemplate('query_journal_template.json') : readTemplate('query_publisher_template.json')
-    let filterValue = '%'
-    if (params !== undefined && params.query !== undefined) {
-      filterValue = '%' + params.query + '%'
-    }
-    template.filter[0].selection.values[0] = filterValue
-    return template
+    const template = isJournalQuery(event) ? readTemplate('query_journal_template.json') : readTemplate('query_publisher_template.json')
+    const wrappedSearchValue = hasQueryParameters(event) ? addWildcardCharacterBeforeAndAfterSearchTerm(event) : SQL_WILDCARD_CHARACTER
+    return updateQueryValuesInSearchTemplate(template, wrappedSearchValue)
   }
 }
+
+const SQL_WILDCARD_CHARACTER = '%'
+const FIRST_FILTER_INDEX = 0
+const FIRST_VALUE_INDEX = 0
+
+const hasQueryParameters = event => event.queryStringParameters !== undefined && event.queryStringParameters.query !== undefined
+
+const updateQueryValuesInSearchTemplate = (template, filterValue) => {
+  template.filter[FIRST_FILTER_INDEX].selection.values[FIRST_VALUE_INDEX] = filterValue
+  return template
+}
+
+const addWildcardCharacterBeforeAndAfterSearchTerm = event => SQL_WILDCARD_CHARACTER + event.queryStringParameters.query + SQL_WILDCARD_CHARACTER
+const isJournalQuery = event => event.path === '/journal'
+
 const readTemplate = (path) => JSON.parse(fs.readFileSync(path).toString())
 
 module.exports = { Request }

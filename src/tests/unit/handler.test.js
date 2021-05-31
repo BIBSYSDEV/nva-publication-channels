@@ -5,44 +5,21 @@ const chai = require('chai')
 const expect = chai.expect
 const httpStatus = require('http-status-codes')
 const fs = require('fs')
-const nock = require('nock')
-
-const isValidParameterName = (actualKeys, querySpec) => actualKeys.every(key => querySpec.map(param => param.name).includes(key))
-
-const hasRequiredParameters = (actualKeys, querySpec) => {
-  const required = querySpec.filter(param => param.required === true).map(param => param.name)
-  return required.every(item => actualKeys.includes(item))
-}
-
-const hasValidQueryParameters = (requestBody) => {
-  const querySpec = [{ name: 'query', required: true }, { name: 'year', required: false }, { name: 'start', required: false }]
-  if (requestBody.queryStringKeys === undefined) return true
-  const queryStringKeys = Object.keys(requestBody.queryStringParameters)
-  const valid = isValidParameterName(queryStringKeys, querySpec) && hasRequiredParameters(queryStringKeys, querySpec)
-  console.log(`hasValidQueryParameters(${requestBody}) -> ${valid}`)
-  return valid
-}
-
+const httpServerMock = require('nock')
 const journalContent = fs.readFileSync('journal_response.json').toString()
 const publisherContent = fs.readFileSync('publisher_response.json').toString()
 
-nock('https://api.nsd.no', { reqheaders: { 'content-type': 'application/json;charset=utf-8' } })
+httpServerMock('https://api.nsd.no', { reqheaders: { 'content-type': 'application/json;charset=utf-8' } })
   .persist()
   .post('/dbhapitjener/Tabeller/hentJSONTabellData', body => { return body.path === '/journal' && hasValidQueryParameters(body) })
   .reply(httpStatus.OK, journalContent)
 
-nock('https://api.nsd.no', { reqheaders: { 'content-type': 'application/json;charset=utf-8' } })
+httpServerMock('https://api.nsd.no', { reqheaders: { 'content-type': 'application/json;charset=utf-8' } })
   .persist()
   .post('/dbhapitjener/Tabeller/hentJSONTabellData', body => { return body.path === '/publisher' && hasValidQueryParameters(body) })
   .reply(httpStatus.OK, publisherContent)
 
-// Fallback interceptor to catch invalid parameters
-nock('https://api.nsd.no/dbhapitjener/Tabeller/hentJSONTabellData')
-  .persist()
-  .post('')
-  .reply(httpStatus.INTERNAL_SERVER_ERROR, {})
-
-describe('Handler throws error when called', () => {
+describe('Handler throws error when called without path', () => {
   it('verifies response is error 500 and  has Internal Server Error message', async function () {
     const event = { failing: 'call' }
     const response = await handler.handler(event)
@@ -77,14 +54,13 @@ describe("Handler verifies route /journal; path '/journal', httpMethod.GET", () 
       const event = { path: calledPath, httpMethod: httpMethod }
       const response = await handler.handler(event)
       expect(response.statusCode).to.equal(httpStatus.OK)
-      // expect(response.body).to.equal(emptyBody)
     })
   ))
 })
 
 describe('Handler throws 405 when httpMethod is not GET', () => {
   ['HEAD', 'POST', 'PUT', 'DELETE', 'CONNECT', 'OPTIONS', 'TRACE', 'PATCH'].map(calledMethod => (
-    it(`httpmMethod ${calledMethod} returns 405`, async function () {
+    it(`httpMethod ${calledMethod} returns 405`, async function () {
       const httpMethod = calledMethod
       const event = { path: '/journal', httpMethod: httpMethod }
       const response = await handler.handler(event)
@@ -195,3 +171,19 @@ describe('Handler returns response 200 OK and data when called', () => {
     })
   ))
 })
+
+const isValidParameterName = (actualKeys, querySpec) => actualKeys.every(key => querySpec.map(param => param.name).includes(key))
+
+const hasRequiredParameters = (actualKeys, querySpec) => {
+  const required = querySpec.filter(param => param.required === true).map(param => param.name)
+  return required.every(item => actualKeys.includes(item))
+}
+
+const hasValidQueryParameters = (requestBody) => {
+  const querySpec = [{ name: 'query', required: true }, { name: 'year', required: false }, { name: 'start', required: false }]
+  if (requestBody.queryStringKeys === undefined) return true
+  const queryStringKeys = Object.keys(requestBody.queryStringParameters)
+  const valid = isValidParameterName(queryStringKeys, querySpec) && hasRequiredParameters(queryStringKeys, querySpec)
+  console.log(`hasValidQueryParameters(${requestBody}) -> ${valid}`)
+  return valid
+}
