@@ -28,7 +28,11 @@ class Routes {
     const queryMatches = pathParamsMatches.filter(spec => this._hasQueryParams(event, spec))
     if (queryMatches < 1) throw new Error('Bad Request')
 
-    return (queryMatches.length === 1) ? pathMatches[0] : (() => { throw new Error('Internal server error') })()
+    if (queryMatches.length !== 1) {
+      throw new Error('Internal server error')
+    }
+
+    return pathMatches[0]
   }
 
   _hasPath (event, route) {

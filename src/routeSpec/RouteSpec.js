@@ -4,14 +4,14 @@ const _VALID_METHODS = ['CONNECT', 'DELETE', 'GET', 'HEAD', 'OPTIONS', 'PATCH', 
 const _URI_SEGMENT_REGEX = '([a-zA-Z0-9\\$\\-_\\@\\.&\\+\\-\\!*"\'\\(\\)\\,](\\%[0-9a-fA-F]{2})?)+'
 const _PATH_PARAM_REGEX = `^${_URI_SEGMENT_REGEX}$`
 const _PATH_REGEX = `^\\/${_URI_SEGMENT_REGEX}$`
-const isValidPathDefinition = paths => paths.every(path => path.match(_PATH_REGEX))
-const isValidMethodDefinition = methods => methods.every(method => _VALID_METHODS.includes(method.toUpperCase()))
+const allPathsAreValid = paths => paths.every(path => path.match(_PATH_REGEX))
+const allMethodsAreValid = methods => methods.every(method => _VALID_METHODS.includes(method.toUpperCase()))
 const isValidPathParametersDefinition = pathParameters => pathParameters.every(param => param.match(_PATH_PARAM_REGEX))
 const isValidQueryParametersDefinition = queryParameters => queryParameters.every(param => param instanceof QueryParameter)
-const getPaths = paths => isValidPathDefinition(paths) ? paths : false
-const getMethods = methods => isValidMethodDefinition(methods) ? methods.map(method => method.toUpperCase()) : false
-const getPathParameters = pathParameters => isValidPathParametersDefinition(pathParameters) ? pathParameters : false
-const getQueryParameters = queryParameters => isValidQueryParametersDefinition(queryParameters) ? queryParameters : false
+const getPaths = paths => allPathsAreValid(paths) ? paths : () => { throw new Error('Invalid paths definition') }
+const getMethods = methods => allMethodsAreValid(methods) ? methods.map(method => method.toUpperCase()) : () => { throw new Error('Invalid methods definition') }
+const getPathParameters = pathParameters => isValidPathParametersDefinition(pathParameters) ? pathParameters : () => { throw new Error('Bad path parameters definition') }
+const getQueryParameters = queryParameters => isValidQueryParametersDefinition(queryParameters) ? queryParameters : () => { throw new Error('Bad query parameters definition') }
 
 class RouteSpec {
   /**
@@ -22,10 +22,10 @@ class RouteSpec {
    * @param {Array.<QueryParameter>} queryParameters
    */
   constructor (paths, methods, pathParameters, queryParameters) {
-    this._paths = getPaths(paths) || (() => { throw new Error('Invalid paths definition') })()
-    this._methods = getMethods(methods) || (() => { throw new Error('Invalid methods definition') })()
-    this._pathParameters = getPathParameters(pathParameters || []) || (() => { throw new Error('Bad path parameters definition') })()
-    this._queryParameters = getQueryParameters(queryParameters || []) || (() => { throw new Error('Bad query parameters definition') })()
+    this._paths = getPaths(paths)
+    this._methods = getMethods(methods)
+    this._pathParameters = getPathParameters(pathParameters || [])
+    this._queryParameters = getQueryParameters(queryParameters || [])
   }
 
   get queryParameters () {
