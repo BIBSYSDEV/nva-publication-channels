@@ -8,10 +8,10 @@ const allPathsAreValid = paths => paths.every(path => path.match(_PATH_REGEX))
 const allMethodsAreValid = methods => methods.every(method => _VALID_METHODS.includes(method.toUpperCase()))
 const isValidPathParametersDefinition = pathParameters => pathParameters.every(param => param.match(_PATH_PARAM_REGEX))
 const isValidQueryParametersDefinition = queryParameters => queryParameters.every(param => param instanceof QueryParameter)
-const getPaths = paths => allPathsAreValid(paths) ? paths : () => { throw new Error('Invalid paths definition') }
-const getMethods = methods => allMethodsAreValid(methods) ? methods.map(method => method.toUpperCase()) : () => { throw new Error('Invalid methods definition') }
-const getPathParameters = pathParameters => isValidPathParametersDefinition(pathParameters) ? pathParameters : () => { throw new Error('Bad path parameters definition') }
-const getQueryParameters = queryParameters => isValidQueryParametersDefinition(queryParameters) ? queryParameters : () => { throw new Error('Bad query parameters definition') }
+const getPaths = paths => allPathsAreValid(paths) ? paths : (() => { throw new Error('Invalid paths definition') })()
+const getMethods = methods => allMethodsAreValid(methods) ? methods.map(method => method.toUpperCase()) : (() => { throw new Error('Invalid methods definition') })()
+const getPathParameters = pathParameters => isValidPathParametersDefinition(pathParameters) ? pathParameters : (() => { throw new Error('Bad path parameters definition') })()
+const getQueryParameters = queryParameters => isValidQueryParametersDefinition(queryParameters) ? queryParameters : (() => { throw new Error('Bad query parameters definition') })()
 
 class RouteSpec {
   /**
