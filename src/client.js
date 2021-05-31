@@ -18,4 +18,4 @@ const performQuery = async request => {
   return responseWithBody(nsdResponse.data)
 }
 
-module.exports = { performQuery }
+module.exports = { performQuery, responseWithBody }

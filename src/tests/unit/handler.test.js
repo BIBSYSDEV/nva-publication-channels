@@ -161,17 +161,6 @@ describe('Handler returns response 200 OK when called', () => {
   ))
 })
 
-describe('Handler returns response 200 OK and data when called', () => {
-  ['/journal', '/publisher'].map(calledPath => (
-    it(`returns 200 OK for ${calledPath}`, async function () {
-      const queryStringParameters = { query: 'Alzheimers', year: 2020, start: 1 }
-      const event = { path: calledPath, httpMethod: 'GET', queryStringParameters: queryStringParameters }
-      const response = await handler.handler(event)
-      expect((await response).statusCode).to.equal(httpStatus.OK)
-    })
-  ))
-})
-
 const isValidParameterName = (actualKeys, querySpec) => actualKeys.every(key => querySpec.map(param => param.name).includes(key))
 
 const hasRequiredParameters = (actualKeys, querySpec) => {
