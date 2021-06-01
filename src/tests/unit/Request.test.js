@@ -7,13 +7,15 @@ describe('Testing getter and setter in Request class for code coverage', () => {
     const queryParameters = { path: '/journal', queryStringParameters: { query: 'query' } }
     const nsdRequest = new requestGenerator.Request(queryParameters)
     const request = nsdRequest.request
-    expect(request.tabell_id).to.equal(851)
+    const TABLE_ID_FOUND_IN_TEMPLATE_FILE = 851
+    expect(request.tabell_id).to.equal(TABLE_ID_FOUND_IN_TEMPLATE_FILE)
   })
   it('testing setter in request ', async function () {
     const queryParameters = { path: '/journal', queryStringParameters: { query: 'query' } }
     const nsdRequest = new requestGenerator.Request(queryParameters)
-    nsdRequest.request = { tabell_id: 123 }
+    const TABLE_ID_FOUND_IN_TEMPLATE_FILE = 123
+    nsdRequest.request = { tabell_id: TABLE_ID_FOUND_IN_TEMPLATE_FILE }
     const request = nsdRequest.request
-    expect(request.tabell_id).to.equal(123)
+    expect(request.tabell_id).to.equal(TABLE_ID_FOUND_IN_TEMPLATE_FILE)
   })
 })
