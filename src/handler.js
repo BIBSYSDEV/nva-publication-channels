@@ -2,7 +2,7 @@ const ProblemDocument = require('http-problem-details').ProblemDocument
 const httpStatus = require('http-status-codes')
 const logger = require('pino')({ useLevelLabels: true })
 const requestGenerator = require('./Request')
-const client = require('./client')
+const nsdClient = require('./NsdPublicationChannelRegistryClient')
 
 logger.info('Logger initialized')
 
@@ -17,7 +17,7 @@ const handler = async (event, context) => {
 
 function returnQueryResponse (event) {
   const nsdRequest = new requestGenerator.Request(event).get
-  return client.performQuery(event, nsdRequest)
+  return nsdClient.performQuery(event, nsdRequest)
 }
 
 const errorResponse = (response, event) => {

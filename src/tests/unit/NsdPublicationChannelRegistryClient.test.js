@@ -1,6 +1,6 @@
 'use strict'
 
-const client = require('../../client')
+const client = require('../../NsdPublicationChannelRegistryClient')
 const chai = require('chai')
 const expect = chai.expect
 
