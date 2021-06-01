@@ -6,8 +6,8 @@
   "scripts": {
     "lint": "eslint . --ext .js",
     "lint:fix": "npm run lint -- --fix",
-    "mocha": "mocha --full-trace tests/unit/",
-    "test": "npm run lint && mocha tests/unit/",
+    "mocha": "mocha --full-trace \"tests/unit/**/*.js\"",
+    "test": "npm run lint && npm run mocha",
     "integ-test": "run lint && mocha tests/integration/",
     "coverage": "nyc --reporter=cobertura --reporter=text --reporter=html npm run test"
   },
