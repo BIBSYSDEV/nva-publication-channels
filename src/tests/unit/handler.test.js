@@ -6,17 +6,19 @@ const expect = chai.expect
 const httpStatus = require('http-status-codes')
 const fs = require('fs')
 const httpServerMock = require('nock')
-const journalContent = fs.readFileSync('journal_response.json').toString()
-const publisherContent = fs.readFileSync('publisher_response.json').toString()
+const journalContent = fs.readFileSync('tests/unit/journal_response.json').toString()
+const publisherContent = fs.readFileSync('tests/unit/publisher_response.json').toString()
 
-httpServerMock('https://api.nsd.no', { reqheaders: { 'content-type': 'application/json;charset=utf-8' } })
+const NsdServerAddress = 'https://api.nsd.no'
+const NsdQueryPath = '/dbhapitjener/Tabeller/hentJSONTabellData'
+httpServerMock(NsdServerAddress, { reqheaders: { 'content-type': 'application/json;charset=utf-8' } })
   .persist()
-  .post('/dbhapitjener/Tabeller/hentJSONTabellData', body => { return body.path === '/journal' && hasValidQueryParameters(body) })
+  .post(NsdQueryPath, body => { return body.path === '/journal' && hasValidQueryParameters(body) })
   .reply(httpStatus.OK, journalContent)
 
-httpServerMock('https://api.nsd.no', { reqheaders: { 'content-type': 'application/json;charset=utf-8' } })
+httpServerMock(NsdServerAddress, { reqheaders: { 'content-type': 'application/json;charset=utf-8' } })
   .persist()
-  .post('/dbhapitjener/Tabeller/hentJSONTabellData', body => { return body.path === '/publisher' && hasValidQueryParameters(body) })
+  .post(NsdQueryPath, body => { return body.path === '/publisher' && hasValidQueryParameters(body) })
   .reply(httpStatus.OK, publisherContent)
 
 describe('Handler throws error when called without path', () => {
