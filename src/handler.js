@@ -16,7 +16,7 @@ const handler = async (event, context) => {
 }
 
 function returnQueryResponse (event) {
-  const nsdRequest = new requestGenerator.Request(event).getRequest()
+  const nsdRequest = new requestGenerator.Request(event).get
   return client.performQuery(event, nsdRequest)
 }
 

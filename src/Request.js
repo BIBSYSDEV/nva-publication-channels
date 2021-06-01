@@ -2,11 +2,15 @@ const fs = require('fs')
 
 class Request {
   constructor (event) {
-    this.request = this.createRequest(event)
+    this._request = this.createRequest(event)
   }
 
-  getRequest () {
-    return this.request
+  get request () {
+    return this._request
+  }
+
+  set request (request) {
+    this._request = request
   }
 
   createRequest (event) {
