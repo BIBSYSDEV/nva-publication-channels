@@ -6,12 +6,13 @@ const _PATH_PARAM_REGEX = `^${_URI_SEGMENT_REGEX}$`
 const _PATH_REGEX = `^\\/${_URI_SEGMENT_REGEX}$`
 const allPathsAreValid = paths => paths.every(path => path.match(_PATH_REGEX))
 const allMethodsAreValid = methods => methods.every(method => _VALID_METHODS.includes(method.toUpperCase()))
-const isValidPathParametersDefinition = pathParameters => pathParameters.every(param => param.match(_PATH_PARAM_REGEX))
-const isValidQueryParametersDefinition = queryParameters => queryParameters.every(param => param instanceof QueryParameter)
+const convertNullToArray = input => (input === null || input === undefined) ? [] : input
+const isValidPathParametersDefinition = pathParameters => convertNullToArray(pathParameters).every(param => param.match(_PATH_PARAM_REGEX))
+const isValidQueryParametersDefinition = queryParameters => convertNullToArray(queryParameters).every(param => param instanceof QueryParameter)
 const getPaths = paths => allPathsAreValid(paths) ? paths : (() => { throw new Error('Invalid paths definition') })()
 const getMethods = methods => allMethodsAreValid(methods) ? methods.map(method => method.toUpperCase()) : (() => { throw new Error('Invalid methods definition') })()
-const getPathParameters = pathParameters => isValidPathParametersDefinition(pathParameters) ? pathParameters : (() => { throw new Error('Bad path parameters definition') })()
-const getQueryParameters = queryParameters => isValidQueryParametersDefinition(queryParameters) ? queryParameters : (() => { throw new Error('Bad query parameters definition') })()
+const getPathParameters = pathParameters => isValidPathParametersDefinition(pathParameters) ? convertNullToArray(pathParameters) : (() => { throw new Error('Bad path parameters definition') })()
+const getQueryParameters = queryParameters => isValidQueryParametersDefinition(queryParameters) ? convertNullToArray(queryParameters) : (() => { throw new Error('Bad query parameters definition') })()
 
 class RouteSpec {
   /**
@@ -24,8 +25,8 @@ class RouteSpec {
   constructor (paths, methods, pathParameters, queryParameters) {
     this._paths = getPaths(paths)
     this._methods = getMethods(methods)
-    this._pathParameters = getPathParameters(pathParameters || [])
-    this._queryParameters = getQueryParameters(queryParameters || [])
+    this._pathParameters = getPathParameters(pathParameters)
+    this._queryParameters = getQueryParameters(queryParameters)
   }
 
   get queryParameters () {
