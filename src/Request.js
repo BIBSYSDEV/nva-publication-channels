@@ -1,5 +1,8 @@
 const fs = require('fs')
 
+const journalTemplate = 'queryTemplates/query_journal_template.json'
+const publisherTemplate = 'queryTemplates/query_publisher_template.json'
+
 class Request {
   constructor (event) {
     this._request = this.createRequest(event)
@@ -14,7 +17,7 @@ class Request {
   }
 
   createRequest (event) {
-    const template = isJournalQuery(event) ? readTemplate('query_journal_template.json') : readTemplate('query_publisher_template.json')
+    const template = isJournalQuery(event) ? readTemplate(journalTemplate) : readTemplate(publisherTemplate)
     const wrappedSearchValue = hasQueryParameters(event) ? addWildcardCharacterBeforeAndAfterSearchTerm(event) : SQL_WILDCARD_CHARACTER
     return updateQueryValuesInSearchTemplate(template, wrappedSearchValue)
   }
