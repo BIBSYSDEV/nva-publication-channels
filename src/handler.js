@@ -1,16 +1,23 @@
 const ProblemDocument = require('http-problem-details').ProblemDocument
 const httpStatus = require('http-status-codes')
 const logger = require('pino')({ useLevelLabels: true })
+const requestGenerator = require('./Request')
+const nsdClient = require('./NsdPublicationChannelRegistryClient')
 
 logger.info('Logger initialized')
 
 const routes = ['/journal', '/publisher']
 
-exports.handler = async (event, context) => {
+const handler = async (event, context) => {
   if (isInvalidEvent(event)) {
     return errorResponse(createInternalServerErrorDetails(), event)
   }
-  return isValidRequest(event) ? responseWithEmptyBody() : errorResponse(createErrorDetails(event), event)
+  return isValidRequest(event) ? returnQueryResponse(event) : errorResponse(createErrorDetails(event), event)
+}
+
+function returnQueryResponse (event) {
+  const nsdRequest = new requestGenerator.Request(event).get
+  return nsdClient.performQuery(event, nsdRequest)
 }
 
 const errorResponse = (response, event) => {
@@ -30,17 +37,6 @@ const errorResponse = (response, event) => {
         }
       )
     )
-  }
-}
-
-const responseWithEmptyBody = () => {
-  return {
-    statusCode: 200,
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    isBase64Encoded: false,
-    body: '{}'
   }
 }
 
@@ -99,3 +95,5 @@ const hasRequiredParameters = (actualKeys, querySpec) => {
 const cleanValuesLength = queryStringParameters => Object.values(queryStringParameters).filter(value => value !== undefined).filter(value => value !== null).map(value => value.toString()).filter(value => value !== '').length
 
 const hasValidParameterValues = queryStringParameters => Object.values(queryStringParameters).length === Object.keys(queryStringParameters).length && Object.values(queryStringParameters).length === cleanValuesLength(queryStringParameters)
+
+module.exports = { handler }
