@@ -126,7 +126,7 @@ describe('Invalid events are recognized', () => {
   it('returns Error when path is not matched', async function () {
     const event = { path: '/publisher' }
     const routes = new Routes([_SIMPLE_ROUTE_SPEC])
-    expect(() => routes.matches(event)).to.throw('Not Found')
+    expect(() => routes.matches(event)).to.throw('The resource \'/publisher\' was not found')
   })
   it('returns Error when method is not matched', async function () {
     [{ spec: _SIMPLE_ROUTE_SPEC, event: { path: '/journal', httpMethod: 'POST' } }, { spec: new RouteSpec('/journal', 'GET', ['id', 'year'], null, _VALID_TEMPLATE), event: { path: '/journal', httpMethod: 'POST', pathParameters: { id: 213123, year: 2020 } } }].forEach(pair => {
@@ -137,7 +137,7 @@ describe('Invalid events are recognized', () => {
   it('returns Error when path parameter is not matched', async function () {
     const event = { path: '/journal', httpMethod: 'GET', pathParameters: [{ mean: 'hats' }] }
     const routes = new Routes([_SIMPLE_ROUTE_SPEC])
-    expect(() => routes.matches(event)).to.throw('Not Found')
+    expect(() => routes.matches(event)).to.throw('The resource \'/journal/hats\' was not found')
   })
   it('returns Error when query parameter is unrecognized', async function () {
     const event = { path: '/journal', httpMethod: 'GET', pathParameters: null, queryStringParameters: { mean: 'hats' } }
