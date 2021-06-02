@@ -30,7 +30,10 @@ describe('Invalid paths are rejected', () => {
 
 describe('Invalid path parameters are rejected', () => {
   it('throws error when a path parameters contain illegal characters', async function () {
-    expect(() => new RouteSpec('/ok', 'GET', [':wrong'], [], _VALID_TEMPLATE)).to.throw('Bad path parameters definition')
+    const invalidPath = [':wrong']
+    const error = () => new RouteSpec('/ok', 'GET', invalidPath, [], _VALID_TEMPLATE)
+    const expected = `Bad path parameters definition: ${JSON.stringify(invalidPath)}. The paths should be valid URI segments`
+    expect(error).to.throw(expected)
   })
 })
 
