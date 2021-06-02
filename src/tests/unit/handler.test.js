@@ -163,6 +163,17 @@ describe('Handler returns response 200 OK when called', () => {
   ))
 })
 
+describe('Handler returns response 200 OK when called with NULL queryStringParameters', () => {
+  ['/journal', '/publisher'].map(calledPath => (
+    it(`returns 200 OK for ${calledPath}`, async function () {
+      const queryStringParameters = null
+      const event = { path: calledPath, httpMethod: 'GET', queryStringParameters: queryStringParameters }
+      const response = await handler.handler(event)
+      expect((await response).statusCode).to.equal(httpStatus.OK)
+    })
+  ))
+})
+
 const isValidParameterName = (actualKeys, querySpec) => actualKeys.every(key => querySpec.map(param => param.name).includes(key))
 
 const hasRequiredParameters = (actualKeys, querySpec) => {
