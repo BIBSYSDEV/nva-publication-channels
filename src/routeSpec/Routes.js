@@ -36,7 +36,7 @@ class Routes {
   }
 
   _hasPath (event, route) {
-    return !!route.paths.includes(event.path)
+    return route.path === event.path
   }
 
   _hasMethod (event, route) {
