@@ -60,7 +60,10 @@ describe('Invalid methods are rejected', () => {
 
 describe('Invalid query parameter definitions are rejected', () => {
   it('throws error when a query parameter is badly defined', async function () {
-    expect(() => new RouteSpec('/ok', 'POST', [], [{ figs: 10 }], _VALID_TEMPLATE)).to.throw('Bad query parameters definition')
+    const invalidQueryParameters = [{ figs: 10 }]
+    const error = () => new RouteSpec('/ok', 'POST', [], invalidQueryParameters, _VALID_TEMPLATE)
+    const expected = `Invalid query parameters definition: ${JSON.stringify(invalidQueryParameters)}. Should be an array of QueryParameters`
+    expect(error).to.throw(expected)
   })
 })
 
