@@ -1,7 +1,7 @@
 class NotFoundError extends Error {
   constructor (event) {
-    const pathParameters = event.pathParameters
-      ? event.pathParameters.map(param => Object.values(param)).map(param => '/' + param)
+    const pathParameters = event.pathParameters instanceof Object && !Array.isArray(event.pathParameters)
+      ? Object.values(event.pathParameters).map(param => '/' + param).join('')
       : ''
     super(`The resource '${event.path + pathParameters}' was not found`)
     this.name = this.constructor.name
