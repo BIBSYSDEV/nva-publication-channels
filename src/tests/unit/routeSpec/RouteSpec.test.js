@@ -122,6 +122,38 @@ describe('Valid events are recognized', () => {
   })
 })
 
+describe('Unknown paths throw not found errors', () => {
+  it('returns NotFoundError when event path is not found and path params are undefined', function () {
+    const event = { path: '/invalid', httpMethod: 'GET' }
+    const routes = new Routes([_SIMPLE_ROUTE_SPEC])
+    const error = () => routes.matches(event)
+    expect(error).to.throw('The resource \'/invalid\' was not found')
+  })
+  it('returns NotFoundError when event path is not found and path params are null', function () {
+    const event = { path: '/invalid', httpMethod: 'GET', pathParameters: null }
+    const routes = new Routes([_SIMPLE_ROUTE_SPEC])
+    const error = () => routes.matches(event)
+    expect(error).to.throw('The resource \'/invalid\' was not found')
+  })
+  it('returns NotFoundError when event path is not found and path params are an empty object', function () {
+    const event = { path: '/invalid', httpMethod: 'GET', pathParameters: {} }
+    const routes = new Routes([_SIMPLE_ROUTE_SPEC])
+    const error = () => routes.matches(event)
+    expect(error).to.throw('The resource \'/invalid\' was not found')
+  })
+  it('returns NotFoundError when event path is not found and path params are an object', function () {
+    const event = { path: '/invalid', httpMethod: 'GET', pathParameters: { id: 12311, year: 2021 } }
+    const routes = new Routes([_SIMPLE_ROUTE_SPEC])
+    const error = () => routes.matches(event)
+    expect(error).to.throw('The resource \'/invalid/12311/2021\' was not found')
+  })
+  it('returns Error when path exists, but single path parameter is not found', async function () {
+    const event = { path: '/journal', httpMethod: 'GET', pathParameters: { id: 'hats' } }
+    const routes = new Routes([_SIMPLE_ROUTE_SPEC])
+    expect(() => routes.matches(event)).to.throw('The resource \'/journal/hats\' was not found')
+  })
+})
+
 describe('Unknown event methods throw errors', () => {
   it('returns MethodNotAllowedError when event contains undefined path parameters', async function () {
     const eventWithNullPathParams = { path: '/journal', httpMethod: 'POST' }
