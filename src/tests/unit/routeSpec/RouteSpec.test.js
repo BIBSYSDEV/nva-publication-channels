@@ -8,6 +8,8 @@ const expect = chai.expect
 
 const _VALID_TEMPLATE = 'queryTemplates/query_journal_template.json'
 const _SIMPLE_ROUTE_SPEC = new RouteSpec('/journal', 'GET', [], [], _VALID_TEMPLATE)
+const _INVALID_PATH_NO_SLASH = 'noSlash'
+const _INVALID_PATH_TWO_SLASHES = '//twoSlashes'
 
 describe('Valid route specs are validated', () => {
   it('returns true when a spec is matched', async function () {
@@ -17,10 +19,10 @@ describe('Valid route specs are validated', () => {
 
 describe('Invalid paths are rejected', () => {
   it('throws error when a path does not start with a slash', async function () {
-    expect(() => new RouteSpec('noSlash', 'GET', [], [], _VALID_TEMPLATE)).to.throw('Invalid path definition')
+    expect(() => new RouteSpec(_INVALID_PATH_NO_SLASH, 'GET', [], [], _VALID_TEMPLATE)).to.throw('Invalid path definition: ' + _INVALID_PATH_NO_SLASH)
   })
   it('throws error when a path starts with two slashes', async function () {
-    expect(() => new RouteSpec('//twoSlashes', 'GET', [], [], _VALID_TEMPLATE)).to.throw('Invalid path definition')
+    expect(() => new RouteSpec(_INVALID_PATH_TWO_SLASHES, 'GET', [], [], _VALID_TEMPLATE)).to.throw('Invalid path definition: ' + _INVALID_PATH_TWO_SLASHES)
   })
 })
 

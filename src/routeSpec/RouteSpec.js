@@ -1,6 +1,7 @@
 'use strict'
 const QueryParameter = require('./QueryParameter')
 const fs = require('fs')
+const PathDefinitionError = require('../errors/PathDefinitionError')
 const _VALID_METHODS = ['CONNECT', 'DELETE', 'GET', 'HEAD', 'OPTIONS', 'PATCH', 'POST', 'PUT', 'TRACE']
 const _URI_SEGMENT_REGEX = '([a-zA-Z0-9\\$\\-_\\@\\.&\\+\\-\\!*"\'\\(\\)\\,](\\%[0-9a-fA-F]{2})?)+'
 const _PATH_PARAM_REGEX = `^${_URI_SEGMENT_REGEX}$`
@@ -10,7 +11,7 @@ const methodIsValid = method => _VALID_METHODS.includes(method.toUpperCase())
 const convertNullToArray = input => (input === null || input === undefined) ? [] : input
 const isValidPathParametersDefinition = pathParameters => convertNullToArray(pathParameters).every(param => param.match(_PATH_PARAM_REGEX))
 const isValidQueryParametersDefinition = queryParameters => convertNullToArray(queryParameters).every(param => param instanceof QueryParameter)
-const getPath = path => pathsIsValid(path) ? path : (() => { throw new Error('Invalid path definition') })()
+const getPath = path => pathsIsValid(path) ? path : (() => { throw new PathDefinitionError('Invalid path definition: ' + path) })()
 const getMethod = method => methodIsValid(method) ? method.toUpperCase() : (() => { throw new Error('Invalid method definition') })()
 const getPathParameters = pathParameters => isValidPathParametersDefinition(pathParameters) ? convertNullToArray(pathParameters) : (() => { throw new Error('Bad path parameters definition') })()
 const getQueryParameters = queryParameters => isValidQueryParametersDefinition(queryParameters) ? convertNullToArray(queryParameters) : (() => { throw new Error('Bad query parameters definition') })()
