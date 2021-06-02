@@ -19,10 +19,10 @@ describe('Valid route specs are validated', () => {
 
 describe('Invalid paths are rejected', () => {
   it('throws error when a path does not start with a slash', async function () {
-    expect(() => new RouteSpec(_INVALID_PATH_NO_SLASH, 'GET', [], [], _VALID_TEMPLATE)).to.throw('Invalid path definition: ' + _INVALID_PATH_NO_SLASH)
+    expect(() => new RouteSpec(_INVALID_PATH_NO_SLASH, 'GET', [], [], _VALID_TEMPLATE)).to.throw(`Invalid path definition: ${_INVALID_PATH_NO_SLASH}. The path should begin with a slash and be a valid URI segment`)
   })
   it('throws error when a path starts with two slashes', async function () {
-    expect(() => new RouteSpec(_INVALID_PATH_TWO_SLASHES, 'GET', [], [], _VALID_TEMPLATE)).to.throw('Invalid path definition: ' + _INVALID_PATH_TWO_SLASHES)
+    expect(() => new RouteSpec(_INVALID_PATH_TWO_SLASHES, 'GET', [], [], _VALID_TEMPLATE)).to.throw(`Invalid path definition: ${_INVALID_PATH_TWO_SLASHES}. The path should begin with a slash and be a valid URI segment`)
   })
 })
 
