@@ -6,7 +6,8 @@ const QueryParameter = require('../../../routeSpec/QueryParameter')
 const chai = require('chai')
 const expect = chai.expect
 
-const _SIMPLE_ROUTE_SPEC = new RouteSpec('/journal', 'GET', [], [])
+const _VALID_TEMPLATE = 'queryTemplates/query_journal_template.json'
+const _SIMPLE_ROUTE_SPEC = new RouteSpec('/journal', 'GET', [], [], _VALID_TEMPLATE)
 
 describe('Valid route specs are validated', () => {
   it('returns true when a spec is matched', async function () {
@@ -16,22 +17,22 @@ describe('Valid route specs are validated', () => {
 
 describe('Invalid paths are rejected', () => {
   it('throws error when a path does not start with a slash', async function () {
-    expect(() => new RouteSpec('noSlash', 'GET', [], [])).to.throw('Invalid path definition')
+    expect(() => new RouteSpec('noSlash', 'GET', [], [], _VALID_TEMPLATE)).to.throw('Invalid path definition')
   })
   it('throws error when a path starts with two slashes', async function () {
-    expect(() => new RouteSpec('//twoSlashes', 'GET', [], [])).to.throw('Invalid path definition')
+    expect(() => new RouteSpec('//twoSlashes', 'GET', [], [], _VALID_TEMPLATE)).to.throw('Invalid path definition')
   })
 })
 
 describe('Invalid path parameters are rejected', () => {
   it('throws error when a path parameters contain illegal characters', async function () {
-    expect(() => new RouteSpec('/ok', 'GET', [':wrong'], [])).to.throw('Bad path parameters definition')
+    expect(() => new RouteSpec('/ok', 'GET', [':wrong'], [], _VALID_TEMPLATE)).to.throw('Bad path parameters definition')
   })
 })
 
 describe('Null path parameters are converted to array', () => {
   it('returns array when path parameters are null', async function () {
-    const pathParameters = new RouteSpec('/ok', 'GET', null, []).pathParameters
+    const pathParameters = new RouteSpec('/ok', 'GET', null, [], _VALID_TEMPLATE).pathParameters
     expect(pathParameters).to.be.instanceof(Array)
     expect(pathParameters).to.have.length(0)
   })
@@ -39,7 +40,7 @@ describe('Null path parameters are converted to array', () => {
 
 describe('Null query parameters are converted to array', () => {
   it('returns array when query parameters are null', async function () {
-    const queryParameters = new RouteSpec('/ok', 'GET', [], null).queryParameters
+    const queryParameters = new RouteSpec('/ok', 'GET', [], null, _VALID_TEMPLATE).queryParameters
     expect(queryParameters).to.be.instanceof(Array)
     expect(queryParameters).to.have.length(0)
   })
@@ -47,13 +48,26 @@ describe('Null query parameters are converted to array', () => {
 
 describe('Invalid methods are rejected', () => {
   it('throws error when a method is unrecognized', async function () {
-    expect(() => new RouteSpec('/ok', 'PORT', [], [])).to.throw('Invalid method definition')
+    expect(() => new RouteSpec('/ok', 'PORT', [], [], _VALID_TEMPLATE)).to.throw('Invalid method definition')
   })
 })
 
 describe('Invalid query parameter definitions are rejected', () => {
   it('throws error when a query parameter is badly defined', async function () {
-    expect(() => new RouteSpec('/ok', 'POST', [], [{ figs: 10 }])).to.throw('Bad query parameters definition')
+    expect(() => new RouteSpec('/ok', 'POST', [], [{ figs: 10 }], _VALID_TEMPLATE)).to.throw('Bad query parameters definition')
+  })
+})
+
+describe('Valid templates are validated', async function () {
+  it('returns true when a spec is validated', () => {
+    expect(_SIMPLE_ROUTE_SPEC.template).to.include(_VALID_TEMPLATE)
+  })
+})
+
+describe('Invalid templates are rejected', async function () {
+  it('throws error when a spec is contains a template that does not exist', () => {
+    const _INVALID_TEMPLATE = 'not_exist.json'
+    expect(() => new RouteSpec('/ok', 'GET', [], [], _INVALID_TEMPLATE)).to.throw('Bad template definition: ' + _INVALID_TEMPLATE)
   })
 })
 
@@ -80,7 +94,7 @@ describe('Valid events are recognized', () => {
   })
   it('returns true when path parameters are matched', () => {
     const event = { path: '/journal', httpMethod: 'GET', pathParameters: { hello: 'pounce', doggy: 'bland' } }
-    const routeSpec = new RouteSpec('/journal', 'GET', ['hello', 'doggy'], [])
+    const routeSpec = new RouteSpec('/journal', 'GET', ['hello', 'doggy'], [], _VALID_TEMPLATE)
     const routes = new Routes([routeSpec])
     const matches = routes.matches(event)
     expect(matches).to.be.instanceof(RouteSpec)
@@ -88,7 +102,7 @@ describe('Valid events are recognized', () => {
   })
   it('returns true when query parameters are matched', () => {
     const event = { path: '/journal', httpMethod: 'GET', pathParameters: null, queryStringParameters: { hats: 'yes', suit: '44' } }
-    const routeSpec = new RouteSpec('/journal', 'GET', [], [new QueryParameter('hats', true), new QueryParameter('suit', false)])
+    const routeSpec = new RouteSpec('/journal', 'GET', [], [new QueryParameter('hats', true), new QueryParameter('suit', false)], _VALID_TEMPLATE)
     const routes = new Routes([routeSpec])
     const matches = routes.matches(event)
     expect(matches).to.be.instanceof(RouteSpec)
@@ -103,7 +117,7 @@ describe('Invalid events are recognized', () => {
     expect(() => routes.matches(event)).to.throw('Not Found')
   })
   it('returns Error when method is not matched', async function () {
-    [{ spec: _SIMPLE_ROUTE_SPEC, event: { path: '/journal', httpMethod: 'POST' } }, { spec: new RouteSpec('/journal', 'GET', ['id', 'year'], null), event: { path: '/journal', httpMethod: 'POST', pathParameters: { id: 213123, year: 2020 } } }].forEach(pair => {
+    [{ spec: _SIMPLE_ROUTE_SPEC, event: { path: '/journal', httpMethod: 'POST' } }, { spec: new RouteSpec('/journal', 'GET', ['id', 'year'], null, _VALID_TEMPLATE), event: { path: '/journal', httpMethod: 'POST', pathParameters: { id: 213123, year: 2020 } } }].forEach(pair => {
       const routes = new Routes([pair.spec])
       expect(() => routes.matches(pair.event)).to.throw('Method Not Allowed')
     })
