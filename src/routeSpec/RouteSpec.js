@@ -9,7 +9,7 @@ const allMethodsAreValid = methods => methods.every(method => _VALID_METHODS.inc
 const convertNullToArray = input => (input === null || input === undefined) ? [] : input
 const isValidPathParametersDefinition = pathParameters => convertNullToArray(pathParameters).every(param => param.match(_PATH_PARAM_REGEX))
 const isValidQueryParametersDefinition = queryParameters => convertNullToArray(queryParameters).every(param => param instanceof QueryParameter)
-const getPath = path => pathsIsValid(path) ? path : (() => { throw new Error('Invalid paths definition') })()
+const getPath = path => pathsIsValid(path) ? path : (() => { throw new Error('Invalid path definition') })()
 const getMethods = methods => allMethodsAreValid(methods) ? methods.map(method => method.toUpperCase()) : (() => { throw new Error('Invalid methods definition') })()
 const getPathParameters = pathParameters => isValidPathParametersDefinition(pathParameters) ? convertNullToArray(pathParameters) : (() => { throw new Error('Bad path parameters definition') })()
 const getQueryParameters = queryParameters => isValidQueryParametersDefinition(queryParameters) ? convertNullToArray(queryParameters) : (() => { throw new Error('Bad query parameters definition') })()
