@@ -1,6 +1,7 @@
 'use strict'
 
 const NotFoundError = require('../errors/NotFoundError')
+const MethodNotAllowedError = require('../errors/MethodNotAllowedError')
 
 class Routes {
   /**
@@ -22,7 +23,7 @@ class Routes {
     if (pathMatches.length < 1) throw new NotFoundError(event)
 
     const methodMatches = pathMatches.filter(spec => this._hasMethod(event, spec))
-    if (methodMatches.length < 1) throw new Error('Method Not Allowed')
+    if (methodMatches.length < 1) throw new MethodNotAllowedError(event)
 
     const pathParamsMatches = methodMatches.filter(spec => this._hasPathParams(event, spec))
     if (pathParamsMatches.length < 1) throw new NotFoundError(event)

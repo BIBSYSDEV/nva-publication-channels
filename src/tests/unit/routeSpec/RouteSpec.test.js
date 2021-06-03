@@ -154,17 +154,36 @@ describe('Unknown paths throw not found errors', () => {
   })
 })
 
+describe('Unknown event methods throw errors', () => {
+  it('returns MethodNotAllowedError when event contains undefined path parameters', async function () {
+    const eventWithNullPathParams = { path: '/journal', httpMethod: 'POST' }
+    const routes = new Routes([_SIMPLE_ROUTE_SPEC])
+    const error = () => routes.matches(eventWithNullPathParams)
+    const expected = `Method 'POST' not allowed for resource '${eventWithNullPathParams.path}'`
+    expect(error).to.throw(expected)
+  })
+  it('returns MethodNotAllowedError when event contains empty array path parameters', function () {
+    const eventWithEmptyArrayPathParams = { path: '/journal', httpMethod: 'POST' }
+    const routes = new Routes([_SIMPLE_ROUTE_SPEC])
+    const error = () => routes.matches(eventWithEmptyArrayPathParams)
+    const expected = `Method 'POST' not allowed for resource '${eventWithEmptyArrayPathParams.path}'`
+    expect(error).to.throw(expected)
+  })
+  it('returns a MethodNotAllowedError when the method is not allowed', async function () {
+    const complexSpec = new RouteSpec('/journal', 'GET', ['id', 'year'], null, _VALID_TEMPLATE)
+    const eventWithPathParams = { path: '/journal', httpMethod: 'POST', pathParameters: { id: 213123, year: 2020 } }
+    const routes = new Routes([complexSpec])
+    const expected = 'Method \'POST\' not allowed for resource \'/journal/213123/2020\''
+    const error = () => routes.matches(eventWithPathParams)
+    expect(error).to.throw(expected)
+  })
+})
+
 describe('Invalid events are recognized', () => {
   it('returns Error when path is not matched', async function () {
     const event = { path: '/publisher' }
     const routes = new Routes([_SIMPLE_ROUTE_SPEC])
     expect(() => routes.matches(event)).to.throw('The resource \'/publisher\' was not found')
-  })
-  it('returns Error when method is not matched', async function () {
-    [{ spec: _SIMPLE_ROUTE_SPEC, event: { path: '/journal', httpMethod: 'POST' } }, { spec: new RouteSpec('/journal', 'GET', ['id', 'year'], null, _VALID_TEMPLATE), event: { path: '/journal', httpMethod: 'POST', pathParameters: { id: 213123, year: 2020 } } }].forEach(pair => {
-      const routes = new Routes([pair.spec])
-      expect(() => routes.matches(pair.event)).to.throw('Method Not Allowed')
-    })
   })
   it('returns Error when query parameter is unrecognized', async function () {
     const event = { path: '/journal', httpMethod: 'GET', pathParameters: null, queryStringParameters: { mean: 'hats' } }
