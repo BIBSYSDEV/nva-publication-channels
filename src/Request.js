@@ -27,7 +27,7 @@ const SQL_WILDCARD_CHARACTER = '%'
 const FIRST_FILTER_INDEX = 0
 const FIRST_VALUE_INDEX = 0
 
-const hasQueryParameters = event => event.queryStringParameters !== undefined && event.queryStringParameters.query !== undefined
+const hasQueryParameters = (event) => !!event.queryStringParameters && !!event.queryStringParameters.query
 
 const updateQueryValuesInSearchTemplate = (template, filterValue) => {
   template.filter[FIRST_FILTER_INDEX].selection.values[FIRST_VALUE_INDEX] = filterValue
