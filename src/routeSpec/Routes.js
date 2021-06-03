@@ -3,6 +3,7 @@
 const NotFoundError = require('../errors/NotFoundError')
 const MethodNotAllowedError = require('../errors/MethodNotAllowedError')
 const BadRequestError = require('../errors/BadRequestError')
+const InternalServerError = require('../errors/InternalServerError')
 
 class Routes {
   /**
@@ -33,7 +34,7 @@ class Routes {
     if (queryMatches < 1) throw new BadRequestError(event, pathParamsMatches[0])
 
     if (queryMatches.length !== 1) {
-      throw new Error('Internal server error')
+      throw new InternalServerError()
     }
 
     return pathMatches[0]

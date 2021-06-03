@@ -202,18 +202,10 @@ describe('Bad requests are recognized', () => {
   })
 })
 
-describe('Invalid events are recognized', () => {
-  it('returns Error when path is not matched', async function () {
-    const event = { path: '/publisher' }
-    const routes = new Routes([_SIMPLE_ROUTE_SPEC])
-    expect(() => routes.matches(event)).to.throw('The resource \'/publisher\' was not found')
-  })
-})
-
 describe('Misconfiguration causes generic errors', () => {
   it('returns Error when multiple routes match input', () => {
     const event = { path: '/journal', httpMethod: 'GET', pathParameters: null, queryStringParameters: [] }
     const routes = new Routes([_SIMPLE_ROUTE_SPEC, _SIMPLE_ROUTE_SPEC])
-    expect(() => routes.matches(event)).to.throw('Internal server error')
+    expect(() => routes.matches(event)).to.throw('Internal server error. Contact site administrator')
   })
 })
