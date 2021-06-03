@@ -40,7 +40,7 @@ class Routes {
   }
 
   _hasMethod (event, route) {
-    return route.methods.includes(event.httpMethod)
+    return route.method === event.httpMethod.toUpperCase()
   }
 
   _hasPathParams (event, spec) {
