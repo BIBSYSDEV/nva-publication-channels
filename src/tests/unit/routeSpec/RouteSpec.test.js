@@ -4,6 +4,7 @@ const RouteSpec = require('../../../routeSpec/RouteSpec')
 const Routes = require('../../../routeSpec/Routes')
 const QueryParameter = require('../../../routeSpec/QueryParameter')
 const chai = require('chai')
+const VALID_METHODS = require('../../../routeSpec/Constants')
 const expect = chai.expect
 
 const _VALID_TEMPLATE = 'queryTemplates/query_journal_template.json'
@@ -51,7 +52,9 @@ describe('Null query parameters are converted to array', () => {
 
 describe('Invalid methods are rejected', () => {
   it('throws error when a method is unrecognized', async function () {
-    expect(() => new RouteSpec('/ok', 'PORT', [], [], _VALID_TEMPLATE)).to.throw('Invalid method definition')
+    const invalidMethod = 'PORT'
+    const error = () => new RouteSpec('/ok', invalidMethod, [], [], _VALID_TEMPLATE)
+    expect(error).to.throw(`Invalid method definition: ${invalidMethod}. Valid methods: ${VALID_METHODS.toString()}`)
   })
 })
 
