@@ -4,6 +4,7 @@ const fs = require('fs')
 const PathDefinitionError = require('../errors/PathDefinitionError')
 const VALID_METHODS = require('./Constants')
 const MethodDefinitionError = require('../errors/MethodDefinitionError')
+const QueryParameterDefinitionError = require('../errors/QueryParameterDefinitionError')
 const _URI_SEGMENT_REGEX = '([a-zA-Z0-9\\$\\-_\\@\\.&\\+\\-\\!*"\'\\(\\)\\,](\\%[0-9a-fA-F]{2})?)+'
 const _PATH_PARAM_REGEX = `^${_URI_SEGMENT_REGEX}$`
 const _PATH_REGEX = `^\\/${_URI_SEGMENT_REGEX}$`
@@ -15,7 +16,7 @@ const isValidQueryParametersDefinition = queryParameters => convertNullToArray(q
 const getPath = path => pathsIsValid(path) ? path : (() => { throw new PathDefinitionError(path) })()
 const getMethod = method => methodIsValid(method) ? method.toUpperCase() : (() => { throw new MethodDefinitionError(method) })()
 const getPathParameters = pathParameters => isValidPathParametersDefinition(pathParameters) ? convertNullToArray(pathParameters) : (() => { throw new Error('Bad path parameters definition') })()
-const getQueryParameters = queryParameters => isValidQueryParametersDefinition(queryParameters) ? convertNullToArray(queryParameters) : (() => { throw new Error('Bad query parameters definition') })()
+const getQueryParameters = queryParameters => isValidQueryParametersDefinition(queryParameters) ? convertNullToArray(queryParameters) : (() => { throw new QueryParameterDefinitionError(queryParameters) })()
 const getTemplate = template => fs.existsSync(template) ? template : (() => { throw new Error('Bad template definition: ' + template) })()
 
 class RouteSpec {
