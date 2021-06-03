@@ -179,16 +179,34 @@ describe('Unknown event methods throw errors', () => {
   })
 })
 
+describe('Bad requests are recognized', () => {
+  it('returns BadRequestError when query parameter is unrecognized', async function () {
+    const event = { path: '/journal', httpMethod: 'GET', pathParameters: null, queryStringParameters: { mean: 'hats' } }
+    const routes = new Routes([_SIMPLE_ROUTE_SPEC])
+    const expected = 'Bad request for resource \'/journal\', allowed query parameters: [], provided: ["mean"].'
+    expect(() => routes.matches(event)).to.throw(expected)
+  })
+  it('returns BadRequestError when required query parameter is missing', async function () {
+    const event = { path: '/journal', httpMethod: 'GET', pathParameters: null, queryStringParameters: { year: '2021' } }
+    const queryParams = [new QueryParameter('query', true), new QueryParameter('year', false)]
+    const routes = new Routes([new RouteSpec('/journal', 'GET', [], queryParams, _VALID_TEMPLATE)])
+    const expected = 'Bad request for resource \'/journal\', missing required parameter(s) ["query"]'
+    expect(() => routes.matches(event)).to.throw(expected)
+  })
+  it('returns BadRequestError when route has path parameters and required query parameter is missing', async function () {
+    const event = { path: '/journal', httpMethod: 'GET', pathParameters: { id: 123, year: 2021 }, queryStringParameters: { year: '2021' } }
+    const queryParams = [new QueryParameter('query', true), new QueryParameter('year', false)]
+    const routes = new Routes([new RouteSpec('/journal', 'GET', ['id', 'year'], queryParams, _VALID_TEMPLATE)])
+    const expected = 'Bad request for resource \'/journal/123/2021\', missing required parameter(s) ["query"]'
+    expect(() => routes.matches(event)).to.throw(expected)
+  })
+})
+
 describe('Invalid events are recognized', () => {
   it('returns Error when path is not matched', async function () {
     const event = { path: '/publisher' }
     const routes = new Routes([_SIMPLE_ROUTE_SPEC])
     expect(() => routes.matches(event)).to.throw('The resource \'/publisher\' was not found')
-  })
-  it('returns Error when query parameter is unrecognized', async function () {
-    const event = { path: '/journal', httpMethod: 'GET', pathParameters: null, queryStringParameters: { mean: 'hats' } }
-    const routes = new Routes([_SIMPLE_ROUTE_SPEC])
-    expect(() => routes.matches(event)).to.throw('Bad Request')
   })
 })
 
