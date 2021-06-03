@@ -1,5 +1,7 @@
 'use strict'
 
+const NotFoundError = require('../errors/NotFoundError')
+
 class Routes {
   /**
    * Declares all of the Route specifications for the application
@@ -17,13 +19,13 @@ class Routes {
    */
   matches (event) {
     const pathMatches = this._routeSpecs.filter(spec => this._hasPath(event, spec))
-    if (pathMatches.length < 1) throw new Error('Not Found')
+    if (pathMatches.length < 1) throw new NotFoundError(event)
 
     const methodMatches = pathMatches.filter(spec => this._hasMethod(event, spec))
     if (methodMatches.length < 1) throw new Error('Method Not Allowed')
 
     const pathParamsMatches = methodMatches.filter(spec => this._hasPathParams(event, spec))
-    if (pathParamsMatches.length < 1) throw new Error('Not Found')
+    if (pathParamsMatches.length < 1) throw new NotFoundError(event)
 
     const queryMatches = pathParamsMatches.filter(spec => this._hasQueryParams(event, spec))
     if (queryMatches < 1) throw new Error('Bad Request')
