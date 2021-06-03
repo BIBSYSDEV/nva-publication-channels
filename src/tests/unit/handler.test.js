@@ -12,13 +12,12 @@ const publisherContent = fs.readFileSync('tests/unit/publisher_response.json').t
 const NsdServerAddress = 'https://api.nsd.no'
 const NsdQueryPath = '/dbhapitjener/Tabeller/hentJSONTabellData'
 httpServerMock(NsdServerAddress, { reqheaders: { 'content-type': 'application/json;charset=utf-8' } })
-  .persist()
-  .post(NsdQueryPath, body => { return body.path === '/journal' && hasValidQueryParameters(body) })
+  .persist().post(NsdQueryPath, body => { return body.tabell_id === 851 })
   .reply(httpStatus.OK, journalContent)
 
 httpServerMock(NsdServerAddress, { reqheaders: { 'content-type': 'application/json;charset=utf-8' } })
   .persist()
-  .post(NsdQueryPath, body => { return body.path === '/publisher' && hasValidQueryParameters(body) })
+  .post(NsdQueryPath, body => { return body.tabell_id === 850 })
   .reply(httpStatus.OK, publisherContent)
 
 describe('Handler throws error when called without path', () => {
@@ -163,18 +162,13 @@ describe('Handler returns response 200 OK when called', () => {
   ))
 })
 
-const isValidParameterName = (actualKeys, querySpec) => actualKeys.every(key => querySpec.map(param => param.name).includes(key))
-
-const hasRequiredParameters = (actualKeys, querySpec) => {
-  const required = querySpec.filter(param => param.required === true).map(param => param.name)
-  return required.every(item => actualKeys.includes(item))
-}
-
-const hasValidQueryParameters = (requestBody) => {
-  const querySpec = [{ name: 'query', required: true }, { name: 'year', required: false }, { name: 'start', required: false }]
-  if (requestBody.queryStringKeys === undefined) return true
-  const queryStringKeys = Object.keys(requestBody.queryStringParameters)
-  const valid = isValidParameterName(queryStringKeys, querySpec) && hasRequiredParameters(queryStringKeys, querySpec)
-  console.log(`hasValidQueryParameters(${requestBody}) -> ${valid}`)
-  return valid
-}
+describe('Handler returns response 200 OK when called with NULL queryStringParameters', () => {
+  ['/journal', '/publisher'].map(calledPath => (
+    it(`returns 200 OK for ${calledPath}`, async function () {
+      const queryStringParameters = null
+      const event = { path: calledPath, httpMethod: 'GET', queryStringParameters: queryStringParameters }
+      const response = await handler.handler(event)
+      expect((await response).statusCode).to.equal(httpStatus.OK)
+    })
+  ))
+})

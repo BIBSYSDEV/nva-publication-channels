@@ -15,10 +15,7 @@ const handler = async (event, context) => {
   return isValidRequest(event) ? returnQueryResponse(event) : errorResponse(createErrorDetails(event), event)
 }
 
-function returnQueryResponse (event) {
-  const nsdRequest = new requestGenerator.Request(event).get
-  return nsdClient.performQuery(event, nsdRequest)
-}
+const returnQueryResponse = (event) => nsdClient.performQuery(new requestGenerator.Request(event).request)
 
 const errorResponse = (response, event) => {
   return {
