@@ -15,7 +15,7 @@ const handler = async (event, context) => {
   return isValidRequest(event) ? returnQueryResponse(event) : errorResponse(createErrorDetails(event), event)
 }
 
-const returnQueryResponse = (event) => nsdClient.performQuery(new requestGenerator.Request(event).request)
+const returnQueryResponse = (event) => nsdClient.performQuery(new requestGenerator.Request(event).request, event.path, event.queryStringParameters.year)
 
 const errorResponse = (response, event) => {
   return {
@@ -74,7 +74,7 @@ const createBadRequestDetails = (event) => {
 
 const createErrorDetails = (event) => isGetMethod(event) ? problemsWithGetMethod(event) : createMethodNotAllowedDetails(event)
 
-const problemsWithGetMethod = event => hasQueryParameters(event) ? createBadRequestDetails(event) : createNotFoundDetails(event)
+const problemsWithGetMethod = event => !routes.includes(event.path) ? createNotFoundDetails(event) : createBadRequestDetails(event)
 
 const hasValidQueryParameters = (event) => {
   const querySpec = [{ name: 'query', required: true }, { name: 'year', required: false }, { name: 'start', required: false }]
