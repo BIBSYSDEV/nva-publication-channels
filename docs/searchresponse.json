@@ -1,0 +1,23 @@
+{
+  "@context": {
+    "@vocab": "https://nva.unit.no/publication-channel#",
+    "id": "@id",
+    "type": "@type",
+    "graph": "@graph",
+    "value": "@value",
+    "language": "@language",
+    "tags": {
+      "@id": "tag",
+      "@container": "@set"
+    },
+    "isbnList": {
+      "@id": "isbn",
+      "@container": "@set"
+    },
+    "contributors": {
+      "@id": "contributor",
+      "@container": "@set"
+    }
+  },
+  "@type": "PublicationRequest"
+}

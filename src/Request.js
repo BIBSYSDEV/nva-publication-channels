@@ -18,7 +18,7 @@ class Request {
 
   createRequest (event) {
     const template = isJournalQuery(event) ? readTemplate(journalTemplate) : readTemplate(publisherTemplate)
-    const wrappedSearchValue = hasQueryParameters(event) ? addWildcardCharacterBeforeAndAfterSearchTerm(event) : SQL_WILDCARD_CHARACTER
+    const wrappedSearchValue = addWildcardCharacterBeforeAndAfterSearchTerm(event)
     return updateQueryValuesInSearchTemplate(template, wrappedSearchValue)
   }
 }
@@ -26,9 +26,6 @@ class Request {
 const SQL_WILDCARD_CHARACTER = '%'
 const FIRST_FILTER_INDEX = 0
 const FIRST_VALUE_INDEX = 0
-
-const hasQueryParameters = (event) => !!event.queryStringParameters && !!event.queryStringParameters.query
-
 const updateQueryValuesInSearchTemplate = (template, filterValue) => {
   template.filter[FIRST_FILTER_INDEX].selection.values[FIRST_VALUE_INDEX] = filterValue
   return template

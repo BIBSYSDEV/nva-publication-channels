@@ -1,24 +1,28 @@
 'use strict'
-
+const chaiJson = require('chai-json-equal')
 const handler = require('../../handler')
 const chai = require('chai')
+chai.use(chaiJson)
 const expect = chai.expect
 const httpStatus = require('http-status-codes')
 const fs = require('fs')
 const httpServerMock = require('nock')
-const journalContent = fs.readFileSync('tests/unit/journal_response.json').toString()
-const publisherContent = fs.readFileSync('tests/unit/publisher_response.json').toString()
+const journalRemoteResponseData = fs.readFileSync('tests/unit/journal_response.json').toString()
+const publisherRemoteResponseData = fs.readFileSync('tests/unit/publisher_response.json').toString()
+
+const journalContent = fs.readFileSync('tests/unit/api_journal_response.json').toString()
+const publisherContent = fs.readFileSync('tests/unit/api_publisher_response.json').toString()
 
 const NsdServerAddress = 'https://api.nsd.no'
 const NsdQueryPath = '/dbhapitjener/Tabeller/hentJSONTabellData'
 httpServerMock(NsdServerAddress, { reqheaders: { 'content-type': 'application/json;charset=utf-8' } })
   .persist().post(NsdQueryPath, body => { return body.tabell_id === 851 })
-  .reply(httpStatus.OK, journalContent)
+  .reply(httpStatus.OK, journalRemoteResponseData)
 
 httpServerMock(NsdServerAddress, { reqheaders: { 'content-type': 'application/json;charset=utf-8' } })
   .persist()
   .post(NsdQueryPath, body => { return body.tabell_id === 850 })
-  .reply(httpStatus.OK, publisherContent)
+  .reply(httpStatus.OK, publisherRemoteResponseData)
 
 describe('Handler throws error when called without path', () => {
   it('verifies response is error 500 and  has Internal Server Error message', async function () {
@@ -52,7 +56,8 @@ describe("Handler verifies route /journal; path '/journal', httpMethod.GET", () 
   ['/journal', '/publisher'].map(calledPath => (
     it(`GET ${calledPath} returns 200 OK and has empty body`, async function () {
       const httpMethod = 'GET'
-      const event = { path: calledPath, httpMethod: httpMethod }
+      const queryStringParameters = { query: 'query', year: 2020 }
+      const event = { path: calledPath, httpMethod: httpMethod, queryStringParameters: queryStringParameters }
       const response = await handler.handler(event)
       expect(response.statusCode).to.equal(httpStatus.OK)
     })
@@ -91,15 +96,16 @@ describe('Handler throws error when called with queryStringParameters', () => {
 })
 
 describe("Handler sets different 'Content-type' in respnse headers", () => {
+  const queryStringParameters = { query: 'query', year: 2020 }
   it("returns 'Content-Type' 'application/json' when responsecode is 200", async function () {
-    const event = { path: '/journal', httpMethod: 'GET' }
+    const event = { path: '/journal', httpMethod: 'GET', queryStringParameters: queryStringParameters }
     const response = await handler.handler(event)
     expect(response.statusCode).to.equal(httpStatus.OK)
     expect(response.headers).to.have.property('Content-Type')
     expect(response.headers['Content-Type']).to.equal('application/json')
   })
   it("returns 'Content-Type' 'application/problem+json' when error occurs", async function () {
-    const event = { path: '/jornal', httpMethod: 'GET' }
+    const event = { path: '/jornal', httpMethod: 'GET', queryStringParameters: queryStringParameters }
     const response = await handler.handler(event)
     expect(response.statusCode).to.equal(httpStatus.NOT_FOUND)
     expect(response.headers).to.have.property('Content-Type')
@@ -109,18 +115,22 @@ describe("Handler sets different 'Content-type' in respnse headers", () => {
 
 describe('Handler verifies queryStringParameters and returns 200 with empty body when called with specified queryStringParameters', () => {
   it('Returns 200 OK and a empty body when only "query" parameter is set', async function () {
-    const queryStringParameters = { query: 'query' }
+    const queryStringParameters = { query: 'query', year: 2020 }
     const event = { path: '/journal', httpMethod: 'GET', queryStringParameters: queryStringParameters }
     const response = await handler.handler(event)
     expect(response.statusCode).to.equal(httpStatus.OK)
-    expect(response.body).to.equal(journalContent)
+    const expected = JSON.parse(response.body)
+    const actual = JSON.parse(journalContent)
+    expect(expected).to.jsonEqual(actual)
   })
   it('returns 200 OK and a empty body when all parameters set', async function () {
     const queryStringParameters = { query: 'query', year: 2020, start: 1 }
-    const event = { path: '/journal', httpMethod: 'GET', queryStringParameters: queryStringParameters }
+    const event = { path: '/publisher', httpMethod: 'GET', queryStringParameters: queryStringParameters }
     const response = await handler.handler(event)
     expect(response.statusCode).to.equal(httpStatus.OK)
-    expect(response.body).to.equal(journalContent)
+    const expected = JSON.parse(response.body)
+    const actual = JSON.parse(publisherContent)
+    expect(expected).to.jsonEqual(actual)
   })
 })
 
@@ -155,17 +165,6 @@ describe('Handler returns response 200 OK when called', () => {
   ['/journal', '/publisher'].map(calledPath => (
     it(`returns 200 OK for ${calledPath}`, async function () {
       const queryStringParameters = { query: 'Alzheimers', year: 2020, start: 1 }
-      const event = { path: calledPath, httpMethod: 'GET', queryStringParameters: queryStringParameters }
-      const response = await handler.handler(event)
-      expect((await response).statusCode).to.equal(httpStatus.OK)
-    })
-  ))
-})
-
-describe('Handler returns response 200 OK when called with NULL queryStringParameters', () => {
-  ['/journal', '/publisher'].map(calledPath => (
-    it(`returns 200 OK for ${calledPath}`, async function () {
-      const queryStringParameters = null
       const event = { path: calledPath, httpMethod: 'GET', queryStringParameters: queryStringParameters }
       const response = await handler.handler(event)
       expect((await response).statusCode).to.equal(httpStatus.OK)

@@ -1,0 +1,34 @@
+[
+  {
+    "@context": "https://bibsysdev.github.io/src/publication-channel/channel-context.json",
+    "id": "https://nva.unit.no/publicationchannel/journal/437524/2020",
+    "type": "Journal",
+    "identifier": "437524",
+    "name": "Alzheimer Disease and Associated Disorders",
+    "onlineIssn": "1546-4156",
+    "printIssn": "0893-0341",
+    "openAccess": null,
+    "language": null,
+    "npiDomain": "Nevrologi",
+    "website": "https://journals.lww.com/alzheimerjournal",
+    "level": "1",
+    "active": true,
+    "publisher": null
+  },
+  {
+    "@context": "https://bibsysdev.github.io/src/publication-channel/channel-context.json",
+    "id": "https://nva.unit.no/publicationchannel/journal/477804/2020",
+    "type": "Journal",
+    "identifier": "477804",
+    "name": "Alzheimer's & Dementia",
+    "onlineIssn": "1552-5279",
+    "printIssn": "1552-5260",
+    "openAccess": null,
+    "language": "Engelsk",
+    "npiDomain": "Nevrologi",
+    "website": "https://alz-journals.onlinelibrary.wiley.com/journal/15525279",
+    "level": "1",
+    "active": true,
+    "publisher": "https://nva.unit.no/publicationchannel/publisher/495045"
+  }
+]
