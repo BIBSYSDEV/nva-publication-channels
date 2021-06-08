@@ -1,8 +1,8 @@
-const ProblemDocument = require('http-problem-details').ProblemDocument
 const httpStatus = require('http-status-codes')
 const logger = require('pino')({ useLevelLabels: true })
 const requestGenerator = require('./Request')
 const nsdClient = require('./NsdPublicationChannelRegistryClient')
+const ErrorResponse = require('./response/ErrorResponse')
 
 logger.info('Logger initialized')
 
@@ -10,45 +10,18 @@ const routes = ['/journal', '/publisher']
 
 const handler = async (event, context) => {
   if (isInvalidEvent(event)) {
-    return errorResponse(createInternalServerErrorDetails(), event)
+    return new ErrorResponse(createInternalServerErrorDetails(), event)
   }
-  return isValidRequest(event) ? returnQueryResponse(event) : errorResponse(createErrorDetails(event), event)
+  return isValidRequest(event) ? returnQueryResponse(event) : new ErrorResponse(createErrorDetails(event), event)
 }
 
 const returnQueryResponse = (event) => nsdClient.performQuery(new requestGenerator.Request(event).request, event.path, event.queryStringParameters.year)
-
-const errorResponse = (response, event) => {
-  return {
-    statusCode: response.code,
-    headers: {
-      'Content-Type': 'application/problem+json',
-      'x-amzn-ErrorType': response.code
-    },
-    isBase64Encoded: false,
-    body: JSON.stringify(
-      new ProblemDocument(
-        {
-          status: response.code,
-          detail: response.message,
-          instance: getProblemInstance(event)
-        }
-      )
-    )
-  }
-}
 
 const isInvalidEvent = (event) => !(hasPath(event) && 'httpMethod' in event)
 
 const isGetMethod = (event) => event.httpMethod.toUpperCase() === 'GET'
 
 const hasPath = (event) => 'path' in event
-
-const getProblemInstance = (event) => {
-  if (!hasPath(event)) {
-    return 'Undefined path'
-  }
-  return 'queryStringParameters' in event ? `${event.path}?${event.queryStringParameters}` : event.path
-}
 
 const hasQueryParameters = (event) => Object.prototype.hasOwnProperty.call(event, 'queryStringParameters') && (event.queryStringParameters !== null)
 

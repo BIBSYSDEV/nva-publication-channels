@@ -15,6 +15,12 @@ const publisherContent = fs.readFileSync('tests/unit/api_publisher_response.json
 
 const NsdServerAddress = 'https://api.nsd.no'
 const NsdQueryPath = '/dbhapitjener/Tabeller/hentJSONTabellData'
+
+httpServerMock(NsdServerAddress, { reqheaders: { 'content-type': 'application/json;charset=utf-8' } })
+  .persist()
+  .post(NsdQueryPath, body => { return JSON.stringify(body).includes('not-to-be-found') })
+  .reply(httpStatus.NO_CONTENT, '')
+
 httpServerMock(NsdServerAddress, { reqheaders: { 'content-type': 'application/json;charset=utf-8' } })
   .persist().post(NsdQueryPath, body => { return body.tabell_id === 851 })
   .reply(httpStatus.OK, journalRemoteResponseData)
@@ -168,6 +174,17 @@ describe('Handler returns response 200 OK when called', () => {
       const event = { path: calledPath, httpMethod: 'GET', queryStringParameters: queryStringParameters }
       const response = await handler.handler(event)
       expect((await response).statusCode).to.equal(httpStatus.OK)
+    })
+  ))
+})
+
+describe('Handler returns response 404 Not Found when called with correct query which gives 0 hits', () => {
+  ['/journal', '/publisher'].map(calledPath => (
+    it(`returns 404 Not found for ${calledPath}`, async function () {
+      const queryStringParameters = { query: 'not-to-be-found', year: 2020, start: 1 }
+      const event = { path: calledPath, httpMethod: 'GET', queryStringParameters: queryStringParameters }
+      const response = await handler.handler(event)
+      expect((await response).statusCode).to.equal(httpStatus.NOT_FOUND)
     })
   ))
 })
