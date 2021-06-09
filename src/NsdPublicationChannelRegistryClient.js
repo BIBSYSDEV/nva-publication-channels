@@ -1,5 +1,6 @@
 const channelRegistryUri = 'https://api.nsd.no/dbhapitjener/Tabeller/hentJSONTabellData'
 const ErrorResponse = require('./response/ErrorResponse')
+const httpStatus = require('http-status-codes')
 
 const axios = require('axios')
 const RemoteJournalResponse = require('./response/RemoteJournalResponse')
@@ -19,7 +20,7 @@ const extractHits = (year, type, body) => {
 const responseWithBody = (body, type, year) => {
   const response = (body.length > 0) ? extractHits(year, type, body) : '[]'
   return {
-    statusCode: 200,
+    statusCode: httpStatus.OK,
     headers: {
       'Content-Type': 'application/json'
     },
@@ -31,8 +32,8 @@ const responseWithBody = (body, type, year) => {
 const performQuery = async (request) => {
   const type = request.path.substr(1, request.path.length)
   const nsdResponse = await axios.post(channelRegistryUri, request.nsdRequest)
-  if (nsdResponse.status === 204 && request.hasPathParameters) {
-    return new ErrorResponse({ code: 404, message: 'Not Found' }, { path: request.path })
+  if (nsdResponse.status === httpStatus.NO_CONTENT && request.hasPathParameters) {
+    return new ErrorResponse({ code: httpStatus.NOT_FOUND, message: 'Not Found' }, { path: request.path })
   }
   return responseWithBody(nsdResponse.data, type, request.queryStringParameters.year)
 }
