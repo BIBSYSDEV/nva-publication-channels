@@ -1,6 +1,6 @@
 const httpStatus = require('http-status-codes')
 const logger = require('pino')({ useLevelLabels: true })
-const requestGenerator = require('./Request')
+const Request = require('./Request')
 const nsdClient = require('./NsdPublicationChannelRegistryClient')
 const ErrorResponse = require('./response/ErrorResponse')
 
@@ -15,7 +15,7 @@ const handler = async (event, context) => {
   return isValidRequest(event) ? returnQueryResponse(event) : new ErrorResponse(createErrorDetails(event), event)
 }
 
-const returnQueryResponse = (event) => nsdClient.performQuery(new requestGenerator.Request(event).request, event.path, event.queryStringParameters.year)
+const returnQueryResponse = (event) => nsdClient.performQuery(new Request(event))
 
 const isInvalidEvent = (event) => !(hasPath(event) && 'httpMethod' in event)
 
@@ -25,7 +25,9 @@ const hasPath = (event) => 'path' in event
 
 const hasQueryParameters = (event) => Object.prototype.hasOwnProperty.call(event, 'queryStringParameters') && (event.queryStringParameters !== null)
 
-const isValidRequest = (event) => routes.includes(event.path) && isGetMethod(event) && hasValidQuery(event)
+const isValidRequest = (event) => isGetByPid(event) || (routes.includes(event.path) && isGetMethod(event) && hasValidQuery(event))
+
+const isGetByPid = (event) => !!event.pathParameters
 
 const hasValidQuery = (event) => !hasQueryParameters(event) || hasValidQueryParameters(event)
 

@@ -18,6 +18,11 @@ const NsdQueryPath = '/dbhapitjener/Tabeller/hentJSONTabellData'
 
 httpServerMock(NsdServerAddress, { reqheaders: { 'content-type': 'application/json;charset=utf-8' } })
   .persist()
+  .post(NsdQueryPath, body => { return JSON.stringify(body).includes('__IDENTIFIER__') })
+  .reply(httpStatus.NO_CONTENT, '')
+
+httpServerMock(NsdServerAddress, { reqheaders: { 'content-type': 'application/json;charset=utf-8' } })
+  .persist()
   .post(NsdQueryPath, body => { return JSON.stringify(body).includes('not-to-be-found') })
   .reply(httpStatus.NO_CONTENT, '')
 
@@ -178,11 +183,21 @@ describe('Handler returns response 200 OK when called', () => {
   ))
 })
 
-describe('Handler returns response 404 Not Found when called with correct query which gives 0 hits', () => {
+describe('Handler returns response 200 OK when called with correct query which gives 0 hits', () => {
   ['/journal', '/publisher'].map(calledPath => (
-    it(`returns 404 Not found for ${calledPath}`, async function () {
+    it(`returns 200 OK for ${calledPath}`, async function () {
       const queryStringParameters = { query: 'not-to-be-found', year: 2020, start: 1 }
       const event = { path: calledPath, httpMethod: 'GET', queryStringParameters: queryStringParameters }
+      const response = await handler.handler(event)
+      expect((await response).statusCode).to.equal(httpStatus.OK)
+    })
+  ))
+})
+
+describe('Handler returns response 404 Not Found when called with path parameters with 0 hits', () => {
+  ['/journal/12345/1000', '/publisher/54321/1000'].map(calledPath => (
+    it(`returns 404 Not found for ${calledPath}`, async function () {
+      const event = { path: calledPath, httpMethod: 'GET', pathParameters: { pid: '123231' } }
       const response = await handler.handler(event)
       expect((await response).statusCode).to.equal(httpStatus.NOT_FOUND)
     })

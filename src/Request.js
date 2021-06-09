@@ -5,15 +5,26 @@ const publisherTemplate = 'queryTemplates/query_publisher_template.json'
 
 class Request {
   constructor (event) {
-    this._request = this.createRequest(event)
+    this._hasPathParameters = !!event.pathParameters
+    this._path = event.path
+    this._queryStringParameters = event.queryStringParameters
+    this._nsdrequest = this.createRequest(event)
   }
 
-  get request () {
-    return this._request
+  get nsdRequest () {
+    return this._nsdrequest
   }
 
-  set request (request) {
-    this._request = request
+  get hasPathParameters () {
+    return this._hasPathParameters
+  }
+
+  get queryStringParameters () {
+    return this._queryStringParameters
+  }
+
+  get path () {
+    return this._path
   }
 
   createRequest (event) {
@@ -31,9 +42,13 @@ const updateQueryValuesInSearchTemplate = (template, filterValue) => {
   return template
 }
 
-const addWildcardCharacterBeforeAndAfterSearchTerm = event => SQL_WILDCARD_CHARACTER + event.queryStringParameters.query + SQL_WILDCARD_CHARACTER
+const addWildcardCharacterBeforeAndAfterSearchTerm = (event) => {
+  return (event.queryStringParameters && event.queryStringParameters.query)
+    ? SQL_WILDCARD_CHARACTER + event.queryStringParameters.query + SQL_WILDCARD_CHARACTER
+    : '__IDENTIFIER__'
+}
 const isJournalQuery = event => event.path === '/journal'
 
 const readTemplate = (path) => JSON.parse(fs.readFileSync(path).toString())
 
-module.exports = { Request }
+module.exports = Request

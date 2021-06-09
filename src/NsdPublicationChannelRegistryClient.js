@@ -17,7 +17,7 @@ const extractHits = (year, type, body) => {
 }
 
 const responseWithBody = (body, type, year) => {
-  const response = extractHits(year, type, body)
+  const response = (body.length > 0) ? extractHits(year, type, body) : '[]'
   return {
     statusCode: 200,
     headers: {
@@ -28,13 +28,13 @@ const responseWithBody = (body, type, year) => {
   }
 }
 
-const performQuery = async (request, path, year) => {
-  const type = path.substr(1, path.length)
-  const nsdResponse = await axios.post(channelRegistryUri, request)
-  if (nsdResponse.status === 204) {
-    return new ErrorResponse({ code: 404, message: 'Not Found' }, { path: path })
+const performQuery = async (request) => {
+  const type = request.path.substr(1, request.path.length)
+  const nsdResponse = await axios.post(channelRegistryUri, request.nsdRequest)
+  if (nsdResponse.status === 204 && request.hasPathParameters) {
+    return new ErrorResponse({ code: 404, message: 'Not Found' }, { path: request.path })
   }
-  return responseWithBody(nsdResponse.data, type, year)
+  return responseWithBody(nsdResponse.data, type, request.queryStringParameters.year)
 }
 
 module.exports = {
