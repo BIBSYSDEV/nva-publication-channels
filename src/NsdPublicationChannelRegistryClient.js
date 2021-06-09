@@ -31,16 +31,10 @@ const responseWithBody = (body, type, year) => {
 const performQuery = async (request, path, year) => {
   const type = path.substr(1, path.length)
   const nsdResponse = await axios.post(channelRegistryUri, request)
-  if (nsdResponse.status === 200) {
-    return responseWithBody(nsdResponse.data, type, year)
-  } else {
-    if (nsdResponse.status === 204) {
-      return new ErrorResponse({
-        code: 404,
-        message: 'Not Found'
-      }, { path: path })
-    }
+ if (nsdResponse.status === 204) {
+    return new ErrorResponse({ code: 404, message: 'Not Found' }, { path: path })
   }
+  return responseWithBody(nsdResponse.data, type, year)
 }
 
 module.exports = {
