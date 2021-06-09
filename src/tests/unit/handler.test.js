@@ -39,10 +39,10 @@ describe('Handler throws error when called without path', () => {
   it('verifies response is error 500 and  has Internal Server Error message', async function () {
     const event = { failing: 'call' }
     const response = await handler.handler(event)
-    expect(response.statusCode).to.equal(500)
+    expect(response.statusCode).to.equal(httpStatus.INTERNAL_SERVER_ERROR)
     const responseBody = JSON.parse(response.body)
     expect(responseBody.instance).to.equal('Undefined path')
-    expect(responseBody.status).to.equal(500)
+    expect(responseBody.status).to.equal(httpStatus.INTERNAL_SERVER_ERROR)
     expect(responseBody.detail).to.equal('Your request cannot be processed at this time due to an internal server error')
     expect(responseBody.title).to.equal('Internal Server Error')
     expect(responseBody.type).to.equal('about:blank')
@@ -53,10 +53,10 @@ describe('Handler returns 404 when illegal route is called', () => {
   const calledPath = '/non-existent'
   it(`return 404 when ${calledPath} is called`, async function () {
     const response = await handler.handler({ path: calledPath, httpMethod: 'GET' })
-    expect(response.statusCode).to.equal(404)
+    expect(response.statusCode).to.equal(httpStatus.NOT_FOUND)
     const responseBody = JSON.parse(response.body)
     expect(responseBody.instance).to.equal(calledPath)
-    expect(responseBody.status).to.equal(404)
+    expect(responseBody.status).to.equal(httpStatus.NOT_FOUND)
     expect(responseBody.detail).to.equal(`The requested resource ${calledPath} could not be found`)
     expect(responseBody.title).to.equal('Not Found')
     expect(responseBody.type).to.equal('about:blank')
@@ -83,7 +83,7 @@ describe('Handler throws 405 when httpMethod is not GET', () => {
       const response = await handler.handler(event)
       const responseBody = JSON.parse(response.body)
       expect(responseBody.instance).to.equal('/journal')
-      expect(responseBody.status).to.equal(405)
+      expect(responseBody.status).to.equal(httpStatus.METHOD_NOT_ALLOWED)
       expect(responseBody.detail).to.equal(`The requested http method  ${calledMethod} is not supported`)
       expect(responseBody.title).to.equal('Method Not Allowed')
       expect(responseBody.type).to.equal('about:blank')
@@ -96,10 +96,10 @@ describe('Handler throws error when called with queryStringParameters', () => {
     const queryStringParameters = 'sample.query.string.parameter'
     const event = { path: '/journal', httpMethod: 'GET', queryStringParameters: queryStringParameters }
     const response = await handler.handler(event)
-    expect(response.statusCode).to.equal(400)
+    expect(response.statusCode).to.equal(httpStatus.BAD_REQUEST)
     const responseBody = JSON.parse(response.body)
     expect(responseBody.instance).to.equal(`/journal?${queryStringParameters}`)
-    expect(responseBody.status).to.equal(400)
+    expect(responseBody.status).to.equal(httpStatus.BAD_REQUEST)
     expect(responseBody.detail).to.equal(`Your request cannot be processed because the supplied parameter(s) ${queryStringParameters} cannot be understood`)
     expect(responseBody.title).to.equal('Bad Request')
     expect(responseBody.type).to.equal('about:blank')
