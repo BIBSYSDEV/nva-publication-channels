@@ -18,6 +18,11 @@ const NsdQueryPath = '/dbhapitjener/Tabeller/hentJSONTabellData'
 
 httpServerMock(NsdServerAddress, { reqheaders: { 'content-type': 'application/json;charset=utf-8' } })
   .persist()
+  .post(NsdQueryPath, body => { return JSON.stringify(body).includes('throw-remote-error') })
+  .reply(httpStatus.BAD_GATEWAY, '')
+
+httpServerMock(NsdServerAddress, { reqheaders: { 'content-type': 'application/json;charset=utf-8' } })
+  .persist()
   .post(NsdQueryPath, body => { return JSON.stringify(body).includes('__IDENTIFIER__') })
   .reply(httpStatus.NO_CONTENT, '')
 
@@ -200,6 +205,18 @@ describe('Handler returns response 404 Not Found when called with path parameter
       const event = { path: calledPath, httpMethod: 'GET', pathParameters: { pid: '123231' } }
       const response = await handler.handler(event)
       expect((await response).statusCode).to.equal(httpStatus.NOT_FOUND)
+    })
+  ))
+})
+
+describe('Handler returns response 502 when remote server is unavailable', () => {
+  ['/journal', '/publisher'].map(calledPath => (
+    it(`returns 502 for ${calledPath}`, async function () {
+      const queryStringParameters = { query: 'throw-remote-error', year: 2020, start: 1 }
+      const event = { path: calledPath, httpMethod: 'GET', queryStringParameters: queryStringParameters }
+      const response = await handler.handler(event)
+      expect((response).statusCode).to.equal(httpStatus.BAD_GATEWAY)
+      expect((response).body).to.contain('Your request cannot be processed at this time due to an upstream error')
     })
   ))
 })
