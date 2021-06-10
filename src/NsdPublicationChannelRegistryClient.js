@@ -36,7 +36,13 @@ const handleRemoteResponse = (nsdResponse, request, type) => {
   return responseWithBody(nsdResponse.data, type, request.queryStringParameters.year)
 }
 
-const handleError = (error, request) => { console.log(error); return new ErrorResponse({ code: httpStatus.BAD_GATEWAY, message: 'Your request cannot be processed at this time due to an upstream error' }, { path: request.path }) }
+const handleError = (error, request) => {
+  return error.response.status === httpStatus.BAD_GATEWAY
+    ? new ErrorResponse({ code: httpStatus.BAD_GATEWAY, message: 'Your request cannot be processed at this time due to an upstream error' }, { path: request.path })
+    : error.response.status === httpStatus.GATEWAY_TIMEOUT
+      ? new ErrorResponse({ code: httpStatus.GATEWAY_TIMEOUT, message: 'Your request cannot be processed at this time because the upstream server response took too long' }, { path: request.path })
+      : new ErrorResponse({ code: error.response.status, message: error.response.statusText }, { path: request.path })
+}
 
 const performQuery = async (request) => {
   const type = request.path.substr(1, request.path.length)
