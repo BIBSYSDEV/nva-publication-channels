@@ -23,6 +23,11 @@ httpServerMock(NsdServerAddress, { reqheaders: { 'content-type': 'application/js
 
 httpServerMock(NsdServerAddress, { reqheaders: { 'content-type': 'application/json;charset=utf-8' } })
   .persist()
+  .post(NsdQueryPath, body => { return JSON.stringify(body).includes('throw-remote-error-504') })
+  .reply(httpStatus.GATEWAY_TIMEOUT, '')
+
+httpServerMock(NsdServerAddress, { reqheaders: { 'content-type': 'application/json;charset=utf-8' } })
+  .persist()
   .post(NsdQueryPath, body => { return JSON.stringify(body).includes('throw-remote-error-500') })
   .reply(httpStatus.INTERNAL_SERVER_ERROR, '')
 
@@ -221,5 +226,19 @@ describe('Handler returns error when remote call fails', () => {
     const response = await handler.handler(event)
     expect(response.statusCode).to.equal(httpStatus.BAD_GATEWAY)
     expect(response.body).to.contain('Your request cannot be processed at this time due to an upstream error')
+  })
+  it('response 504 when remote server timeout', async function () {
+    const queryStringParameters = { query: 'throw-remote-error-504', year: 2020, start: 1 }
+    const event = { path: '/journal', httpMethod: 'GET', queryStringParameters: queryStringParameters }
+    const response = await handler.handler(event)
+    expect(response.statusCode).to.equal(httpStatus.GATEWAY_TIMEOUT)
+    expect(response.body).to.contain('Your request cannot be processed at this time because the upstream server response took too long')
+  })
+  it('Handler echoes remote error', async function () {
+    const queryStringParameters = { query: 'throw-remote-error-500', year: 2020, start: 1 }
+    const event = { path: '/journal', httpMethod: 'GET', queryStringParameters: queryStringParameters }
+    const response = await handler.handler(event)
+    expect(response.statusCode).to.equal(httpStatus.INTERNAL_SERVER_ERROR)
+    expect(response.body).to.contain('Internal Server Error')
   })
 })
