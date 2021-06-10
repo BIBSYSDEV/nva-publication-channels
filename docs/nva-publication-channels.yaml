@@ -78,7 +78,7 @@ paths:
           $ref: '#/components/responses/404'
         500:
           $ref: '#/components/responses/500'
-  /journal/{pid}:
+  /journal/{pid}/{year}:
     get:
       x-amazon-apigateway-integration:
         uri:
@@ -99,6 +99,13 @@ paths:
           type: string
           pattern: '^[0-9]+$'
         example: '495216'
+      - name: year
+        in: path
+        description: year for journal data
+        required: true
+        schema:
+          type: integer
+        example: '1910'
       responses:
         200:
           description: successful operation

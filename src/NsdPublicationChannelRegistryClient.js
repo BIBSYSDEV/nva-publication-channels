@@ -29,13 +29,20 @@ const responseWithBody = (body, type, year) => {
   }
 }
 
-const performQuery = async (request) => {
-  const type = request.path.substr(1, request.path.length)
-  const nsdResponse = await axios.post(channelRegistryUri, request.nsdRequest)
+const handleRemoteResponse = (nsdResponse, request, type) => {
   if (nsdResponse.status === httpStatus.NO_CONTENT && request.hasPathParameters) {
     return new ErrorResponse({ code: httpStatus.NOT_FOUND, message: 'Not Found' }, { path: request.path })
   }
   return responseWithBody(nsdResponse.data, type, request.queryStringParameters.year)
+}
+
+const handleError = (error, request) => { console.log(error); return new ErrorResponse({ code: httpStatus.BAD_GATEWAY, message: 'Your request cannot be processed at this time due to an upstream error' }, { path: request.path }) }
+
+const performQuery = async (request) => {
+  const type = request.path.substr(1, request.path.length)
+  return await axios.post(channelRegistryUri, request.nsdRequest)
+    .then((nsdResponse) => { return handleRemoteResponse(nsdResponse, request, type) })
+    .catch((error) => { return handleError(error, request) })
 }
 
 module.exports = {
