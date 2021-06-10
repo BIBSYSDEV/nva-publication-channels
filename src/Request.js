@@ -7,7 +7,7 @@ class Request {
   constructor (event) {
     this._hasPathParameters = !!event.pathParameters
     this._path = event.path
-    this._queryStringParameters = event.queryStringParameters
+    this._queryStringParameters = event.queryParameters
     this._nsdrequest = this.createRequest(event)
   }
 
@@ -43,8 +43,8 @@ const updateQueryValuesInSearchTemplate = (template, filterValue) => {
 }
 
 const addWildcardCharacterBeforeAndAfterSearchTerm = (event) => {
-  return (event.queryStringParameters && event.queryStringParameters.query)
-    ? SQL_WILDCARD_CHARACTER + event.queryStringParameters.query + SQL_WILDCARD_CHARACTER
+  return (event.queryParameters && event.queryParameters.query)
+    ? SQL_WILDCARD_CHARACTER + event.queryParameters.query + SQL_WILDCARD_CHARACTER
     : '__IDENTIFIER__'
 }
 const isJournalQuery = event => event.path === '/journal'
