@@ -59,7 +59,10 @@ const isPublisherSearch = (request) => {
       request.queryParameters.isValid === true
 }
 
-const returnQueryResponse = (event) => nsdClient.performQuery(new Request(event))
+const returnQueryResponse = (event) => {
+  const requests = new Request(event)
+  return nsdClient.performQuery(requests, event.path)
+}
 
 const isGetMethod = (httpMethod) => httpMethod === 'GET'
 
