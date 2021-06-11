@@ -34,6 +34,7 @@ const journalProjection = (variable) => [
 ]
 
 const publisherProjection = (variable) => [
+  variable.PUBLISHER_ID,
   variable.ORIGINAL_TITLE,
   variable.LEVEL,
   variable.WEBSITE,
