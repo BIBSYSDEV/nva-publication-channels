@@ -12,9 +12,21 @@ const publisherRemoteResponseData = fs.readFileSync('tests/unit/publisher_respon
 
 const journalContent = fs.readFileSync('tests/unit/api_journal_response.json').toString()
 const publisherContent = fs.readFileSync('tests/unit/api_publisher_response.json').toString()
+const singleJournalContent = fs.readFileSync('tests/unit/single_journal.json').toString()
+const singlePublisherContent = fs.readFileSync('tests/unit/single_publisher.json').toString()
 
 const NsdServerAddress = 'https://api.nsd.no'
 const NsdQueryPath = '/dbhapitjener/Tabeller/hentJSONTabellData'
+
+httpServerMock(NsdServerAddress, { reqheaders: { 'content-type': 'application/json;charset=utf-8' } })
+  .persist()
+  .post(NsdQueryPath, body => { return /journal-1/.test(JSON.stringify(body)) })
+  .reply(httpStatus.OK, singleJournalContent)
+
+httpServerMock(NsdServerAddress, { reqheaders: { 'content-type': 'application/json;charset=utf-8' } })
+  .persist()
+  .post(NsdQueryPath, body => { return JSON.stringify(body).includes('publisher-1') })
+  .reply(httpStatus.OK, singlePublisherContent)
 
 httpServerMock(NsdServerAddress, { reqheaders: { 'content-type': 'application/json;charset=utf-8' } })
   .persist()
@@ -241,5 +253,20 @@ describe('Handler returns error when remote call fails', () => {
     const response = await handler.handler(event)
     expect(response.statusCode).to.equal(httpStatus.INTERNAL_SERVER_ERROR)
     expect(response.body).to.contain('Internal Server Error')
+  })
+})
+
+describe('Handler returns response 200 OK when found', () => {
+  it('returns 200 OK for /journal', async function () {
+    const event = { path: '/journal', httpMethod: 'GET', pathParameters: { id: 'journal-1', year: '2020' } }
+    const response = await handler.handler(event)
+    expect((await response).statusCode).to.equal(httpStatus.OK)
+    expect(response.body).to.contain('journal-1')
+  })
+  it('returns 200 OK for /publisher', async function () {
+    const event = { path: '/publisher', httpMethod: 'GET', pathParameters: { id: 'publisher-1', year: '2020' } }
+    const response = await handler.handler(event)
+    expect((await response).statusCode).to.equal(httpStatus.OK)
+    expect(response.body).to.contain('publisher-1')
   })
 })

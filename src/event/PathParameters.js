@@ -1,7 +1,7 @@
 'use strict'
 
-const hasId = parameters => 'id' in parameters && parameters.id instanceof String
-const hasYear = parameters => 'year' in parameters && parameters.year instanceof String
+const hasId = parameters => 'id' in parameters && typeof parameters.id === 'string'
+const hasYear = parameters => 'year' in parameters && typeof parameters.year === 'string'
 const validateId = parameters => hasId(parameters) ? parameters.id : undefined
 const validateYear = parameters => hasYear(parameters) ? parameters.year : undefined
 
@@ -22,6 +22,10 @@ class PathParameters {
 
   get original () {
     return this._original
+  }
+
+  get isValid () {
+    return this._id !== undefined && this._year !== undefined
   }
 }
 

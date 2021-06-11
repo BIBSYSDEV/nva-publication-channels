@@ -9,7 +9,7 @@ class Request {
   constructor (event) {
     this._hasPathParameters = !!event.pathParameters
     this._path = event.path
-    this._queryStringParameters = event.queryParameters
+    this._year = event.pathParameters !== undefined ? event.pathParameters.year : event.queryParameters.year
     this._nsdrequest = this.createRequest(event)
   }
 
@@ -21,8 +21,8 @@ class Request {
     return this._hasPathParameters
   }
 
-  get queryStringParameters () {
-    return this._queryStringParameters
+  get year () {
+    return this._year
   }
 
   get path () {

@@ -33,7 +33,7 @@ const handleRemoteResponse = (nsdResponse, request, type) => {
   if (nsdResponse.status === httpStatus.NO_CONTENT && request.hasPathParameters) {
     return new ErrorResponse({ code: httpStatus.NOT_FOUND, message: 'Not Found' }, { path: request.path })
   }
-  return responseWithBody(nsdResponse.data, type, request.queryStringParameters.year)
+  return responseWithBody(nsdResponse.data, type, request.year)
 }
 
 const handleError = (error, request) => {
