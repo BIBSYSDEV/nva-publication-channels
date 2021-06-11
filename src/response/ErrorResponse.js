@@ -20,7 +20,7 @@ class ErrorResponse {
   }
 
   _getProblemInstance (event) {
-    return this._hasPath(event) ? 'queryStringParameters' in event ? `${event.path}?${event.queryStringParameters}` : event.path : 'Undefined path'
+    return event.path ? `${event.fullPath}` : 'Undefined path'
   }
 
   _hasPath (event) {
