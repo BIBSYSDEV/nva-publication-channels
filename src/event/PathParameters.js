@@ -20,12 +20,14 @@ class PathParameters {
     return this._year
   }
 
-  get original () {
-    return this._original
-  }
-
   get isValid () {
     return this._id !== undefined && this._year !== undefined
+  }
+
+  get pathParameterString () {
+    return Object.entries(this._original)
+      .map(([key, value]) => `/${value}`)
+      .join()
   }
 }
 

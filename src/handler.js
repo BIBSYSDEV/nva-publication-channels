@@ -5,6 +5,8 @@ const nsdClient = require('./NsdPublicationChannelRegistryClient')
 const ErrorResponse = require('./response/ErrorResponse')
 const Event = require('./event/Event')
 const NullQueryParameters = require('./event/NullQueryParameters')
+const NullPathParameters = require('./event/NullPathParameters')
+const PathParameters = require('./event/PathParameters')
 
 logger.info('Logger initialized')
 
@@ -31,7 +33,7 @@ const handler = async (event, context) => {
 const isSingleJournalRequest = (request) => {
   return isGetMethod(request.httpMethod) &&
     request.path === '/journal' &&
-    request.pathParameters &&
+    request.pathParameters instanceof PathParameters &&
     request.pathParameters.isValid &&
     request.queryParameters instanceof NullQueryParameters
 }
@@ -39,7 +41,6 @@ const isSingleJournalRequest = (request) => {
 const isSinglePublisherRequest = (request) => {
   return isGetMethod(request.httpMethod) &&
       request.path === '/publisher' &&
-      request.pathParameters &&
       request.pathParameters.isValid &&
       request.queryParameters instanceof NullQueryParameters
 }
@@ -47,16 +48,14 @@ const isSinglePublisherRequest = (request) => {
 const isJournalSearch = (request) => {
   return isGetMethod(request.httpMethod) &&
     request.path === '/journal' &&
-    request.pathParameters === undefined &&
-    request.queryParameters &&
+    request.pathParameters instanceof NullPathParameters &&
     request.queryParameters.isValid === true
 }
 
 const isPublisherSearch = (request) => {
   return isGetMethod(request.httpMethod) &&
       request.path === '/publisher' &&
-      request.pathParameters === undefined &&
-      request.queryParameters &&
+      request.pathParameters instanceof NullPathParameters &&
       request.queryParameters.isValid === true
 }
 

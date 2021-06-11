@@ -159,7 +159,7 @@ describe("Handler sets different 'Content-type' in respnse headers", () => {
 
 describe('Handler verifies queryStringParameters and returns 200 with empty body when called with specified queryStringParameters', () => {
   it('Returns 200 OK and a empty body when only "query" parameter is set', async function () {
-    const queryStringParameters = { query: 'query', year: 2020 }
+    const queryStringParameters = { query: 'query', year: '2020' }
     const event = { path: '/journal', httpMethod: 'GET', queryStringParameters: queryStringParameters }
     const response = await handler.handler(event)
     expect(response.statusCode).to.equal(httpStatus.OK)
@@ -168,7 +168,7 @@ describe('Handler verifies queryStringParameters and returns 200 with empty body
     expect(expected).to.jsonEqual(actual)
   })
   it('returns 200 OK and a empty body when all parameters set', async function () {
-    const queryStringParameters = { query: 'query', year: 2020 }
+    const queryStringParameters = { query: 'query', year: '2020' }
     const event = { path: '/publisher', httpMethod: 'GET', queryStringParameters: queryStringParameters }
     const response = await handler.handler(event)
     expect(response.statusCode).to.equal(httpStatus.OK)

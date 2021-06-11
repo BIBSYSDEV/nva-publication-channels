@@ -7,9 +7,9 @@ const PublisherExactMatch = require('./queryTemplates/PublisherExactMatch')
 
 class Request {
   constructor (event) {
-    this._hasPathParameters = !!event.pathParameters
+    this._hasPathParameters = event.pathParameters.isValid
     this._path = event.path
-    this._year = event.pathParameters !== undefined ? event.pathParameters.year : event.queryParameters.year
+    this._year = event.pathParameters.isValid ? event.pathParameters.year : event.queryParameters.year
     this._nsdrequest = this.createRequest(event)
   }
 
@@ -31,11 +31,11 @@ class Request {
 
   createRequest (event) {
     const path = event.path
-    const query = event.queryParameters !== undefined ? event.queryParameters.query : undefined
-    const yearAsQueryParameter = event.queryParameters !== undefined ? event.queryParameters.year : undefined
-    const yearAsPathParameter = event.pathParameters !== undefined ? event.pathParameters.year : undefined
+    const query = event.queryParameters.query
+    const yearAsQueryParameter = event.queryParameters.year
+    const yearAsPathParameter = event.pathParameters.year
     const year = yearAsQueryParameter !== undefined ? yearAsQueryParameter : yearAsPathParameter
-    const id = event.pathParameters !== undefined ? event.pathParameters.id : undefined
+    const id = event.pathParameters.id
     // TODO: implement size query parameter
     const size = 10
 
