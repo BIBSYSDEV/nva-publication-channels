@@ -40,7 +40,7 @@ class Request {
     const size = 10
 
     const templates = []
-    if (isIssnSearch(query)) {
+    if (isIssnSearch(path, query, year)) {
       templates.push(new JournalIssnSearch(IssnType.ONLINE, query, year, size),
         new JournalIssnSearch(IssnType.PRINT, query, year, size))
     } else if (isJournalSearch(path, query, year)) {

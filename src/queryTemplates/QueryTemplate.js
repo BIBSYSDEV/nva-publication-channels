@@ -10,7 +10,7 @@ class QueryTemplate {
      * @param {number} size
      * @returns {QueryTemplate}
      */
-  constructor (table, filter, variables, sortBy, size = 10) {
+  constructor (table, filter, variables, sortBy, size) {
     return {
       tabell_id: table,
       api_versjon: 1,

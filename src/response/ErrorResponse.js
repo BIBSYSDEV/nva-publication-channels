@@ -20,11 +20,7 @@ class ErrorResponse {
   }
 
   _getProblemInstance (event) {
-    return event.path ? `${event.fullPath}` : 'Undefined path'
-  }
-
-  _hasPath (event) {
-    return !!event.path
+    return event.fullPath
   }
 }
 

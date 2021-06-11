@@ -17,7 +17,7 @@ class JournalIssnSearch {
    * @param {Number} size
    * @returns {QueryTemplate}
    */
-  constructor (query, issnType, year, size) {
+  constructor (issnType, query, year, size) {
     const selection = new Selection(FilterType.ITEM, [query])
     const variable = variableSet(year)
     const typeVariable = issnType === IssnType.PRINT ? variable.PRINT_ISSN : variable.ONLINE_ISSN
