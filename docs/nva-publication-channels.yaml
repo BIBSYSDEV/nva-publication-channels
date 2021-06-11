@@ -49,13 +49,6 @@ paths:
         schema:
           type: integer
         example: 2921
-      - name: start
-        in: query
-        description: First position for record in response
-        required: false
-        schema:
-          type: integer
-        example: 1
       responses:
         200:
           description: successful operation
@@ -76,8 +69,16 @@ paths:
           $ref: '#/components/responses/400'
         404:
           $ref: '#/components/responses/404'
+        405:
+          $ref: '#/components/responses/405'
+        406:
+          $ref: '#/components/responses/406'
         500:
           $ref: '#/components/responses/500'
+        502:
+          $ref: '#/components/responses/502'
+        504:
+          $ref: '#/components/responses/504'
   /journal/{pid}/{year}:
     get:
       x-amazon-apigateway-integration:
@@ -126,8 +127,16 @@ paths:
           $ref: '#/components/responses/400'
         404:
           $ref: '#/components/responses/404'
+        405:
+          $ref: '#/components/responses/405'
+        406:
+          $ref: '#/components/responses/406'
         500:
           $ref: '#/components/responses/500'
+        502:
+          $ref: '#/components/responses/502'
+        504:
+          $ref: '#/components/responses/504'
   /publisher:
     get:
       x-amazon-apigateway-integration:
@@ -155,13 +164,6 @@ paths:
         schema:
           type: integer
         example: 2921
-      - name: start
-        in: query
-        description: First position for record in response
-        required: false
-        schema:
-          type: integer
-        example: 1
       responses:
         200:
           description: successful operation
@@ -182,8 +184,16 @@ paths:
           $ref: '#/components/responses/400'
         404:
           $ref: '#/components/responses/404'
+        405:
+          $ref: '#/components/responses/405'
+        406:
+          $ref: '#/components/responses/406'
         500:
           $ref: '#/components/responses/500'
+        502:
+          $ref: '#/components/responses/502'
+        504:
+          $ref: '#/components/responses/504'
   /publisher/{pid}/{year}:
     get:
       x-amazon-apigateway-integration:
@@ -232,12 +242,20 @@ paths:
           $ref: '#/components/responses/400'
         404:
           $ref: '#/components/responses/404'
+        405:
+          $ref: '#/components/responses/405'
+        406:
+          $ref: '#/components/responses/406'
         500:
           $ref: '#/components/responses/500'
+        502:
+          $ref: '#/components/responses/502'
+        504:
+          $ref: '#/components/responses/504'
 components:
   responses:
     400:
-      description: Invalid ID supplied
+      description: Bad Request
       content:
         application/problem+json:
           schema:
@@ -248,8 +266,32 @@ components:
         application/problem+json:
           schema:
             $ref: '#/components/schemas/Problem'
+    405:
+      description: Method Not Allowed
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+    406:
+      description: Not Acceptable
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
     500:
       description: Internal Server Error
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+    502:
+      description: Bad Gateway
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+    504:
+      description: Gateway Timeout
       content:
         application/problem+json:
           schema:
