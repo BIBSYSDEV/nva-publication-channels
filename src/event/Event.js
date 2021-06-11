@@ -27,10 +27,6 @@ class Event {
     return this._queryParameters
   }
 
-  set queryParameters (value) {
-    this._queryParameters = value
-  }
-
   get pathParameters () {
     return this._pathParameters
   }
