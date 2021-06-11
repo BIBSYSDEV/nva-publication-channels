@@ -11,7 +11,7 @@ class QueryParameters {
   constructor (parameters) {
     this._query = validateQuery(parameters)
     this._year = validateYear(parameters)
-    this._original = parameters != null ? parameters : undefined
+    this._original = parameters
     this._hasUnknown = Object.keys(parameters).filter(item => !allowedParameters.includes(item)).length !== 0
   }
 
@@ -28,9 +28,7 @@ class QueryParameters {
   }
 
   get queryParameterString () {
-    return this._original !== undefined
-      ? '?' + Object.entries(this.original).map(([key, value]) => `${key}=${value}`).join('&')
-      : ''
+    return '?' + Object.entries(this.original).map(([key, value]) => `${key}=${value}`).join('&')
   }
 
   get isValid () {

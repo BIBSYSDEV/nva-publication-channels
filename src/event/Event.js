@@ -2,6 +2,7 @@
 
 const PathParameters = require('./PathParameters')
 const QueryParameters = require('./QueryParameters')
+const NullQueryParameters = require('./NullQueryParameters')
 const isString = candidate => typeof candidate === 'string'
 const validatePath = event => 'path' in event && isString(event.path) ? event.path : undefined
 const validateMethod = event => 'httpMethod' in event && isString(event.httpMethod)
@@ -13,7 +14,9 @@ const isObject = candidate => candidate instanceof Object && !Array.isArray(cand
 const isValidPathParameters = event => 'pathParameters' in event && isObject(event.pathParameters)
 const validatePathParameters = event => isValidPathParameters(event) ? new PathParameters(event.pathParameters) : undefined
 const isValidQueryParameters = event => 'queryStringParameters' in event && isObject(event.queryStringParameters)
-const validateQueryParameters = event => isValidQueryParameters(event) ? new QueryParameters(event.queryStringParameters) : undefined
+const validateQueryParameters = event => isValidQueryParameters(event)
+  ? new QueryParameters(event.queryStringParameters)
+  : new NullQueryParameters()
 
 class Event {
   constructor (event) {
@@ -45,9 +48,9 @@ class Event {
         .map(([key, value]) => `/${value}`)
         .join()
       : ''
-    const queryParamsString = this._queryParameters !== undefined
-      ? this._queryParameters.queryParameterString
-      : ''
+
+    const queryParamsString = this._queryParameters.queryParameterString
+
     return this._path
       ? this._path + pathParamsString + queryParamsString
       : 'Undefined path'

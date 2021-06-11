@@ -4,6 +4,7 @@ const Request = require('./Request')
 const nsdClient = require('./NsdPublicationChannelRegistryClient')
 const ErrorResponse = require('./response/ErrorResponse')
 const Event = require('./event/Event')
+const NullQueryParameters = require('./event/NullQueryParameters')
 
 logger.info('Logger initialized')
 
@@ -32,7 +33,7 @@ const isSingleJournalRequest = (request) => {
     request.path === '/journal' &&
     request.pathParameters &&
     request.pathParameters.isValid &&
-    request.queryParameters === undefined
+    request.queryParameters instanceof NullQueryParameters
 }
 
 const isSinglePublisherRequest = (request) => {
@@ -40,7 +41,7 @@ const isSinglePublisherRequest = (request) => {
       request.path === '/publisher' &&
       request.pathParameters &&
       request.pathParameters.isValid &&
-      request.queryParameters === undefined
+      request.queryParameters instanceof NullQueryParameters
 }
 
 const isJournalSearch = (request) => {
