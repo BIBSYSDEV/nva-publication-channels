@@ -12,9 +12,26 @@ const publisherRemoteResponseData = fs.readFileSync('tests/unit/publisher_respon
 
 const journalContent = fs.readFileSync('tests/unit/api_journal_response.json').toString()
 const publisherContent = fs.readFileSync('tests/unit/api_publisher_response.json').toString()
-
+const singleJournalContent = fs.readFileSync('tests/unit/single_journal.json').toString()
+const singlePublisherContent = fs.readFileSync('tests/unit/single_publisher.json').toString()
+const journalIssnRemoteResponseData = fs.readFileSync('tests/unit/issn_journal_response.json').toString()
 const NsdServerAddress = 'https://api.nsd.no'
 const NsdQueryPath = '/dbhapitjener/Tabeller/hentJSONTabellData'
+
+httpServerMock(NsdServerAddress, { reqheaders: { 'content-type': 'application/json;charset=utf-8' } })
+  .persist()
+  .post(NsdQueryPath, body => { return /journal-1/.test(JSON.stringify(body)) })
+  .reply(httpStatus.OK, singleJournalContent)
+
+httpServerMock(NsdServerAddress, { reqheaders: { 'content-type': 'application/json;charset=utf-8' } })
+  .persist()
+  .post(NsdQueryPath, body => { return JSON.stringify(body).includes('publisher-1') })
+  .reply(httpStatus.OK, singlePublisherContent)
+
+httpServerMock(NsdServerAddress, { reqheaders: { 'content-type': 'application/json;charset=utf-8' } })
+  .persist()
+  .post(NsdQueryPath, body => { return /2328-0700/.test(JSON.stringify(body)) })
+  .reply(httpStatus.OK, journalIssnRemoteResponseData)
 
 httpServerMock(NsdServerAddress, { reqheaders: { 'content-type': 'application/json;charset=utf-8' } })
   .persist()
@@ -42,7 +59,7 @@ httpServerMock(NsdServerAddress, { reqheaders: { 'content-type': 'application/js
   .reply(httpStatus.NO_CONTENT, '')
 
 httpServerMock(NsdServerAddress, { reqheaders: { 'content-type': 'application/json;charset=utf-8' } })
-  .persist().post(NsdQueryPath, body => { return body.tabell_id === 851 })
+  .persist().post(NsdQueryPath, body => { return body.tabell_id === 851 && body.filter[0].selection.values[0] })
   .reply(httpStatus.OK, journalRemoteResponseData)
 
 httpServerMock(NsdServerAddress, { reqheaders: { 'content-type': 'application/json;charset=utf-8' } })
@@ -142,7 +159,7 @@ describe("Handler sets different 'Content-type' in respnse headers", () => {
 
 describe('Handler verifies queryStringParameters and returns 200 with empty body when called with specified queryStringParameters', () => {
   it('Returns 200 OK and a empty body when only "query" parameter is set', async function () {
-    const queryStringParameters = { query: 'query', year: 2020 }
+    const queryStringParameters = { query: 'query', year: '2020' }
     const event = { path: '/journal', httpMethod: 'GET', queryStringParameters: queryStringParameters }
     const response = await handler.handler(event)
     expect(response.statusCode).to.equal(httpStatus.OK)
@@ -151,7 +168,7 @@ describe('Handler verifies queryStringParameters and returns 200 with empty body
     expect(expected).to.jsonEqual(actual)
   })
   it('returns 200 OK and a empty body when all parameters set', async function () {
-    const queryStringParameters = { query: 'query', year: 2020 }
+    const queryStringParameters = { query: 'query', year: '2020' }
     const event = { path: '/publisher', httpMethod: 'GET', queryStringParameters: queryStringParameters }
     const response = await handler.handler(event)
     expect(response.statusCode).to.equal(httpStatus.OK)
@@ -185,6 +202,13 @@ describe('Handler returns bad request when error in query ', () => {
     const event = { path: '/journal', httpMethod: 'GET', queryStringParameters: queryStringParameters }
     const response = await handler.handler(event)
     expect(response.statusCode).to.equal(httpStatus.BAD_REQUEST)
+  })
+  it('returns 400 Bad Request when value of query string parameters is null', async function () {
+    const queryStringParameters = null
+    const event = { path: '/journal', httpMethod: 'GET', queryStringParameters: queryStringParameters }
+    const response = await handler.handler(event)
+    expect(response.statusCode).to.equal(httpStatus.BAD_REQUEST)
+    expect(JSON.parse(response.body).instance).to.equal('/journal')
   })
 })
 
@@ -241,5 +265,29 @@ describe('Handler returns error when remote call fails', () => {
     const response = await handler.handler(event)
     expect(response.statusCode).to.equal(httpStatus.INTERNAL_SERVER_ERROR)
     expect(response.body).to.contain('Internal Server Error')
+  })
+})
+
+describe('Handler returns response 200 OK when found', () => {
+  it('returns 200 OK for /journal', async function () {
+    const event = { path: '/journal', httpMethod: 'GET', pathParameters: { id: 'journal-1', year: '2020' } }
+    const response = await handler.handler(event)
+    expect((await response).statusCode).to.equal(httpStatus.OK)
+    expect(response.body).to.contain('journal-1')
+  })
+  it('returns 200 OK for /publisher', async function () {
+    const event = { path: '/publisher', httpMethod: 'GET', pathParameters: { id: 'publisher-1', year: '2020' } }
+    const response = await handler.handler(event)
+    expect((await response).statusCode).to.equal(httpStatus.OK)
+    expect(response.body).to.contain('publisher-1')
+  })
+})
+
+describe('Handler returns 200 OK when searching for ISSNs', () => {
+  it('returns 200 OK when an ISSN match is found', async () => {
+    const event = { path: '/journal', httpMethod: 'GET', queryStringParameters: { query: '2328-0700', year: '2020' } }
+    const response = await handler.handler(event)
+    expect((await response).statusCode).to.equal(httpStatus.OK)
+    expect(response.body).to.contain('2328-0700')
   })
 })

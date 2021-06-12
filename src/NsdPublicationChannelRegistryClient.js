@@ -33,7 +33,7 @@ const handleRemoteResponse = (nsdResponse, request, type) => {
   if (nsdResponse.status === httpStatus.NO_CONTENT && request.hasPathParameters) {
     return new ErrorResponse({ code: httpStatus.NOT_FOUND, message: 'Not Found' }, { path: request.path })
   }
-  return responseWithBody(nsdResponse.data, type, request.queryStringParameters.year)
+  return responseWithBody(nsdResponse.data, type, request.year)
 }
 
 const handleError = (error, request) => {
@@ -45,8 +45,11 @@ const handleError = (error, request) => {
 }
 
 const performQuery = async (request) => {
-  const type = request.path.substr(1, request.path.length)
-  return await axios.post(channelRegistryUri, request.nsdRequest)
+  const path = request.path
+  const type = path.substr(1, path.length)
+  // TODO: Fix ISSN case where we have two requests
+  const currentRequest = request.requests[0]
+  return await axios.post(channelRegistryUri, currentRequest)
     .then((nsdResponse) => { return handleRemoteResponse(nsdResponse, request, type) })
     .catch((error) => { return handleError(error, request) })
 }

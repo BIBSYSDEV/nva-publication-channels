@@ -4,6 +4,9 @@ const Request = require('./Request')
 const nsdClient = require('./NsdPublicationChannelRegistryClient')
 const ErrorResponse = require('./response/ErrorResponse')
 const Event = require('./event/Event')
+const NullQueryParameters = require('./event/NullQueryParameters')
+const NullPathParameters = require('./event/NullPathParameters')
+const PathParameters = require('./event/PathParameters')
 
 logger.info('Logger initialized')
 
@@ -30,36 +33,36 @@ const handler = async (event, context) => {
 const isSingleJournalRequest = (request) => {
   return isGetMethod(request.httpMethod) &&
     request.path === '/journal' &&
-    request.pathParameters &&
+    request.pathParameters instanceof PathParameters &&
     request.pathParameters.isValid &&
-    request.queryParameters === undefined
+    request.queryParameters instanceof NullQueryParameters
 }
 
 const isSinglePublisherRequest = (request) => {
   return isGetMethod(request.httpMethod) &&
       request.path === '/publisher' &&
-      request.pathParameters &&
       request.pathParameters.isValid &&
-      request.queryParameters === undefined
+      request.queryParameters instanceof NullQueryParameters
 }
 
 const isJournalSearch = (request) => {
   return isGetMethod(request.httpMethod) &&
     request.path === '/journal' &&
-    request.pathParameters === undefined &&
-    request.queryParameters &&
+    request.pathParameters instanceof NullPathParameters &&
     request.queryParameters.isValid === true
 }
 
 const isPublisherSearch = (request) => {
   return isGetMethod(request.httpMethod) &&
       request.path === '/publisher' &&
-      request.pathParameters === undefined &&
-      request.queryParameters &&
+      request.pathParameters instanceof NullPathParameters &&
       request.queryParameters.isValid === true
 }
 
-const returnQueryResponse = (event) => nsdClient.performQuery(new Request(event))
+const returnQueryResponse = (event) => {
+  const requests = new Request(event)
+  return nsdClient.performQuery(requests, event.path)
+}
 
 const isGetMethod = (httpMethod) => httpMethod === 'GET'
 
