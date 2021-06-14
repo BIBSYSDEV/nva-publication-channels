@@ -68,15 +68,15 @@ httpServerMock(NsdServerAddress, { reqheaders: { 'content-type': 'application/js
   .reply(httpStatus.OK, publisherRemoteResponseData)
 
 describe('Handler throws error when called without path', () => {
-  it('verifies response is error 500 and  has Internal Server Error message', async function () {
-    const event = { failing: 'call' }
+  it('verifies response is error 404 and has Not Found message', async function () {
+    const event = { failing: 'call', httpMethod: 'GET' }
     const response = await handler.handler(event)
-    expect(response.statusCode).to.equal(httpStatus.INTERNAL_SERVER_ERROR)
+    expect(response.statusCode).to.equal(httpStatus.NOT_FOUND)
     const responseBody = JSON.parse(response.body)
     expect(responseBody.instance).to.equal('Undefined path')
-    expect(responseBody.status).to.equal(httpStatus.INTERNAL_SERVER_ERROR)
-    expect(responseBody.detail).to.equal('Your request cannot be processed at this time due to an internal server error')
-    expect(responseBody.title).to.equal('Internal Server Error')
+    expect(responseBody.status).to.equal(httpStatus.NOT_FOUND)
+    expect(responseBody.detail).to.equal('The requested resource Undefined path could not be found')
+    expect(responseBody.title).to.equal('Not Found')
     expect(responseBody.type).to.equal('about:blank')
   })
 })
@@ -235,11 +235,21 @@ describe('Handler returns response 200 OK when called with correct query which g
 })
 
 describe('Handler returns response 404 Not Found when called with path parameters with 0 hits', () => {
-  ['/journal/12345/1000', '/publisher/54321/1000'].map(calledPath => (
+  ['/journal/iiiii/yyyy', '/publisher/iiiii/yyyy'].map(calledPath => (
     it(`returns 404 Not found for ${calledPath}`, async function () {
-      const event = { path: calledPath, httpMethod: 'GET', pathParameters: { pid: '123231' } }
+      const event = { path: calledPath, httpMethod: 'GET', pathParameters: { id: 'iiiii', year: 'yyyy' } }
       const response = await handler.handler(event)
       expect((await response).statusCode).to.equal(httpStatus.NOT_FOUND)
+    })
+  ))
+})
+
+describe('Handler returns response 400 Not Found when called with missing path parameters ', () => {
+  ['/journal/iiiii', '/publisher/iiiii'].map(calledPath => (
+    it(`returns 400 Bad Request for ${calledPath}`, async function () {
+      const event = { path: calledPath, httpMethod: 'GET', pathParameters: { id: 'iiiii' } }
+      const response = await handler.handler(event)
+      expect((await response).statusCode).to.equal(httpStatus.BAD_REQUEST)
     })
   ))
 })
