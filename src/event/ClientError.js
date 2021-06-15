@@ -2,7 +2,6 @@
 class ClientError extends Error {
   constructor (request, pathParameters, queryParameters) {
     super()
-    this._isValid = false
     this._path = request.path
     this._httpMethod = request.httpMethod
     this._pathParameters = pathParameters
@@ -23,10 +22,6 @@ class ClientError extends Error {
 
   get httpMethod () {
     return this._httpMethod
-  }
-
-  get isValid () {
-    return this._isValid
   }
 
   get fullPath () {
