@@ -7,7 +7,6 @@ const Event = require('./event/Event')
 const NullQueryParameters = require('./event/NullQueryParameters')
 const NullPathParameters = require('./event/NullPathParameters')
 const PathParameters = require('./event/PathParameters')
-const ClientError = require('./event/ClientError')
 
 logger.info('Logger initialized')
 
@@ -30,7 +29,6 @@ const handler = async (event, context) => {
   } catch (clientError) {
     return new ErrorResponse(createErrorDetails(clientError), clientError)
   }
-
 }
 
 const isSingleJournalRequest = (request) => {
