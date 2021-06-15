@@ -29,7 +29,7 @@ class Event {
     this._pathParameters = validatePathParameters(event)
     this._queryParameters = validateQueryParameters(event)
     if (!(this.queryParameters.isValid || this.pathParameters.isValid)) {
-      return new ClientError(event, this.pathParameters, this.queryParameters)
+      throw new ClientError(event, this.pathParameters, this.queryParameters)
     }
   }
 

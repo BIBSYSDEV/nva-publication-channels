@@ -14,21 +14,23 @@ logger.info('Logger initialized')
 const routes = ['/journal', '/publisher']
 
 const handler = async (event, context) => {
-  const request = new Event(event)
-  if (request instanceof ClientError) {
-    return new ErrorResponse(createErrorDetails(request), request)
+  try {
+    const request = new Event(event)
+    if (isSingleJournalRequest(request)) {
+      return returnQueryResponse(request)
+    } else if (isSinglePublisherRequest(request)) {
+      return returnQueryResponse(request)
+    } else if (isJournalSearch(request)) {
+      return returnQueryResponse(request)
+    } else if (isPublisherSearch(request)) {
+      return returnQueryResponse(request)
+    } else {
+      return new ErrorResponse(createErrorDetails(request), request)
+    }
+  } catch (clientError) {
+    return new ErrorResponse(createErrorDetails(clientError), clientError)
   }
-  if (isSingleJournalRequest(request)) {
-    return returnQueryResponse(request)
-  } else if (isSinglePublisherRequest(request)) {
-    return returnQueryResponse(request)
-  } else if (isJournalSearch(request)) {
-    return returnQueryResponse(request)
-  } else if (isPublisherSearch(request)) {
-    return returnQueryResponse(request)
-  } else {
-    return new ErrorResponse(createErrorDetails(request), request)
-  }
+
 }
 
 const isSingleJournalRequest = (request) => {
@@ -80,10 +82,6 @@ const createMethodNotAllowedDetails = (event) => {
     message: `The requested http method  ${event.httpMethod} is not supported`
   }
 }
-
-// const createInternalServerErrorDetails = () => {
-//   return { code: httpStatus.INTERNAL_SERVER_ERROR, message: 'Your request cannot be processed at this time due to an internal server error' }
-// }
 
 const createBadRequestDetails = (event) => {
   return {

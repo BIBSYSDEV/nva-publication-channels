@@ -1,6 +1,7 @@
 
-class ClientError {
+class ClientError extends Error {
   constructor (request, pathParameters, queryParameters) {
+    super()
     this._isValid = false
     this._path = request.path
     this._httpMethod = request.httpMethod
