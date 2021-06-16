@@ -50,16 +50,10 @@ class Event {
   }
 
   get fullPath () {
-    // const pathParamsString = this._pathParameters.pathParameterString
     const queryParamsString = this._queryParameters.queryParameterString
-
     return this._path
       ? this._path + queryParamsString
       : 'Undefined path'
-  }
-
-  get isValid () {
-    return this._path !== null && this._httpMethod !== null
   }
 }
 

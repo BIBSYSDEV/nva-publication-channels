@@ -103,14 +103,10 @@ const problemsWithGetMethod = (event) => {
     return createNotFoundDetails(event)
   } else if ((event.path === undefined) || (isQueryRequest(event) || missingParameters(event))) {
     return createBadRequestDetails(event)
-  } else if (event.pathParameters.isValid) {
-    return createNotFoundDetails(event)
   } else if (!(event.pathParameters instanceof NullPathParameters) && !(event.pathParameters.isValid)) {
     return createBadRequestDetails(event)
   } else if (event.path === undefined || !(routes.includes(event.path))) {
     return createNotFoundDetails(event)
-  } else {
-    return createBadRequestDetails(event)
   }
 }
 
