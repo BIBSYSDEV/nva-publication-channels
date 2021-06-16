@@ -56,8 +56,8 @@ class Request {
   }
 }
 
-const requestForJournal = (path) => path === '/journal'
-const requestForPublisher = (path) => path === '/publisher'
+const requestForJournal = (path) => path.startsWith('/journal')
+const requestForPublisher = (path) => path.startsWith('/publisher')
 
 const issnRegex = /^[0-9]{4}-[0-9]{4}$/
 const isIssnSearch = (path, query, year) => isJournalSearch(path, query, year) && issnRegex.test(query)

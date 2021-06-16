@@ -33,7 +33,7 @@ const handler = async (event, context) => {
 
 const isSingleJournalRequest = (request) => {
   return isGetMethod(request.httpMethod) &&
-    request.path === '/journal' &&
+    request.path.startsWith('/journal/') &&
     request.pathParameters instanceof PathParameters &&
     request.pathParameters.isValid &&
     request.queryParameters instanceof NullQueryParameters
@@ -41,7 +41,7 @@ const isSingleJournalRequest = (request) => {
 
 const isSinglePublisherRequest = (request) => {
   return isGetMethod(request.httpMethod) &&
-    request.path === '/publisher' &&
+    request.path.startsWith('/publisher/') &&
     request.pathParameters.isValid &&
     request.queryParameters instanceof NullQueryParameters
 }
