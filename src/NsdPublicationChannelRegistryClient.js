@@ -17,23 +17,23 @@ const extractHits = (year, type, body) => {
   return response
 }
 
-const responseWithBody = (body, type, year) => {
+const responseWithBody = (body, type, year, accept) => {
   const response = (body.length > 0) ? extractHits(year, type, body) : '[]'
   return {
     statusCode: httpStatus.OK,
     headers: {
-      'Content-Type': 'application/json'
+      'Content-Type': accept
     },
     isBase64Encoded: false,
     body: JSON.stringify(response)
   }
 }
 
-const handleRemoteResponse = (nsdResponse, request, type) => {
+const handleRemoteResponse = (nsdResponse, request, type, accept) => {
   if (nsdResponse.status === httpStatus.NO_CONTENT && request.hasPathParameters) {
     return new ErrorResponse({ code: httpStatus.NOT_FOUND, message: 'Not Found' }, { path: request.path, fullPath: request.path })
   }
-  return responseWithBody(nsdResponse.data, type, request.year)
+  return responseWithBody(nsdResponse.data, type, request.year, accept)
 }
 
 const handleError = (error, request) => {
@@ -44,14 +44,14 @@ const handleError = (error, request) => {
       : new ErrorResponse({ code: error.response.status, message: error.response.statusText }, { path: request.path })
 }
 
-const performQuery = async (request) => {
+const performQuery = async (request, accept) => {
   const path = request.path
   const secondIndexOfSlash = path.indexOf('/', 1) > 0 ? path.indexOf('/', 1) : path.length
   const type = path.slice(1, secondIndexOfSlash)
   // TODO: Fix ISSN case where we have two requests
   const currentRequest = request.requests[0]
   return await axios.post(channelRegistryUri, currentRequest)
-    .then((nsdResponse) => { return handleRemoteResponse(nsdResponse, request, type) })
+    .then((nsdResponse) => { return handleRemoteResponse(nsdResponse, request, type, accept) })
     .catch((error) => { return handleError(error, request) })
 }
 

@@ -28,9 +28,14 @@ class Event {
     this._httpMethod = validateMethod(event)
     this._pathParameters = validatePathParameters(event)
     this._queryParameters = validateQueryParameters(event)
+    this._acceptType = event.headers.accept
     if (!(this.queryParameters.isValid || this.pathParameters.isValid)) {
       throw new ClientError(event, this.pathParameters, this.queryParameters)
     }
+  }
+
+  get acceptType () {
+    return this._acceptType
   }
 
   get queryParameters () {
