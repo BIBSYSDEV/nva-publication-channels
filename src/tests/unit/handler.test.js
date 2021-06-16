@@ -29,7 +29,7 @@ const nsdMockReturns = (statusCode, returnValue) => {
 
 const createTestEvent = (acceptType, httpMethod, path, pathParameters, queryParameters) => {
   return {
-    headers: { accept: acceptType },
+    headers: { Accept: acceptType },
     httpMethod: httpMethod,
     path: path,
     pathParameters: pathParameters,
@@ -40,7 +40,7 @@ const createTestEvent = (acceptType, httpMethod, path, pathParameters, queryPara
 describe('Handler throws error when called without path', () => {
   it('verifies response is error 404 and has Not Found message', async function () {
     const event = {
-      headers: { accept: 'application/json' },
+      headers: { Accept: 'application/json' },
       failing: 'call',
       httpMethod: 'GET'
     }
