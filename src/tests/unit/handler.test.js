@@ -21,7 +21,7 @@ const NsdQueryPath = '/dbhapitjener/Tabeller/hentJSONTabellData'
 const nsdMockReturns = (statusCode, returnValue) => {
   httpServerMock.cleanAll()
   httpServerMock(NsdServerAddress, { reqheaders: { 'content-type': 'application/json;charset=utf-8' } })
-    .post(NsdQueryPath, body => {
+    .post(NsdQueryPath, () => {
       return true
     })
     .reply(statusCode, returnValue)
@@ -349,5 +349,29 @@ describe('Handler returns 200 OK when searching for ISSNs', () => {
     const response = await handler.handler(event)
     expect((await response).statusCode).to.equal(httpStatus.OK)
     expect(response.body).to.contain('2328-0700')
+  })
+})
+
+describe('Handler returns status code 406 and problem+json body when accept type is not acceptable', () => {
+  const contentType = 'application/pdf'
+  const queryParameters = { query: 'irrelevant', year: '2020' }
+  const pathParameters = { id: '11111', year: '2020' }
+  const allEvents = [
+    createTestEvent(contentType, 'GET', '/journal', null, queryParameters),
+    createTestEvent(contentType, 'GET', '/journal/11111/2020', pathParameters, null),
+    createTestEvent(contentType, 'GET', '/publisher', null, queryParameters),
+    createTestEvent(contentType, 'GET', '/publisher/11111/2020', pathParameters, null)
+  ]
+  allEvents.forEach(event => {
+    it(`returns 406 when the accept header is '${contentType}'`, async () => {
+      const response = await handler.handler(event)
+      expect(response.statusCode).to.equal(httpStatus.NOT_ACCEPTABLE)
+      expect(response.headers['Content-Type']).to.equal('application/problem+json')
+      const problem = JSON.parse(response.body)
+      expect(problem.title).to.equal('Not Acceptable')
+      expect(problem.instance).to.contain(event.path)
+      expect(problem.type).to.equal('about:blank')
+      expect(problem.detail).to.equal(`Your request cannot be processed because the supplied content-type "${contentType}" cannot be understood, acceptable types: application/ld+json, application/json`)
+    })
   })
 })
