@@ -105,7 +105,7 @@ const problemsWithGetMethod = (event) => {
     return createBadRequestDetails(event)
   } else if (!(event.pathParameters instanceof NullPathParameters) && !(event.pathParameters.isValid)) {
     return createBadRequestDetails(event)
-  } else if (event.path === undefined || !(routes.includes(event.path))) {
+  } else if (!(routes.includes(event.path))) {
     return createNotFoundDetails(event)
   }
 }
