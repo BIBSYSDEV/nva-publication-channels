@@ -11,7 +11,6 @@ const PathParameters = require('./event/PathParameters')
 logger.info('Logger initialized')
 
 const routes = ['/journal', '/publisher']
-const acceptableTypes = ['application/json', 'application/ld+json']
 
 const handler = async (event, context) => {
   try {

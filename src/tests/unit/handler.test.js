@@ -27,9 +27,20 @@ const nsdMockReturns = (statusCode, returnValue) => {
     .reply(statusCode, returnValue)
 }
 
+const createTestEvent = (acceptType, httpMethod, path, pathParameters, queryParameters) => {
+  return {
+    headers: { accept: acceptType },
+    httpMethod: httpMethod,
+    path: path,
+    pathParameters: pathParameters,
+    queryStringParameters: queryParameters
+  }
+}
+
 describe('Handler throws error when called without path', () => {
   it('verifies response is error 404 and has Not Found message', async function () {
     const event = {
+      headers: { accept: 'application/json' },
       failing: 'call',
       httpMethod: 'GET'
     }
@@ -47,14 +58,8 @@ describe('Handler throws error when called without path', () => {
 describe('Handler returns 404 on unsupported path', () => {
   const calledPath = '/non-existent'
   it(`return 404 when ${calledPath} is called`, async function () {
-    const response = await handler.handler({
-      path: calledPath,
-      httpMethod: 'GET',
-      queryStringParameters: {
-        year: 2020,
-        id: 1231
-      }
-    })
+    const event = createTestEvent('application/json', 'GET', calledPath, null, { year: '2020', id: '1231' })
+    const response = await handler.handler(event)
     expect(response.statusCode).to.equal(404)
     const responseBody = JSON.parse(response.body)
     expect(responseBody.instance).to.equal(calledPath + '?year=2020&id=1231')
@@ -69,16 +74,11 @@ describe('Handler verifies GET existing paths', () => {
   ['/journal', '/publisher'].map(calledPath => (
     it(`GET ${calledPath} returns 200 OK`, async function () {
       nsdMockReturns(httpStatus.OK, journalRemoteResponseData)
-      const httpMethod = 'GET'
       const queryStringParameters = {
         query: 'query-whatever',
         year: 2020
       }
-      const event = {
-        path: calledPath,
-        httpMethod: httpMethod,
-        queryStringParameters: queryStringParameters
-      }
+      const event = createTestEvent('application/json', 'GET', calledPath, null, queryStringParameters)
       const response = await handler.handler(event)
       expect(response.statusCode).to.equal(httpStatus.OK)
       expect(response.body).to.be.a('string')
@@ -89,10 +89,7 @@ describe('Handler verifies GET existing paths', () => {
 describe('Handler throws 405 when httpMethod is not GET', () => {
   ['HEAD', 'POST', 'PUT', 'DELETE', 'CONNECT', 'OPTIONS', 'TRACE', 'PATCH'].map(calledMethod => (
     it(`httpMethod ${calledMethod} returns 405`, async function () {
-      const event = {
-        path: '/journal',
-        httpMethod: calledMethod
-      }
+      const event = createTestEvent('application/json', calledMethod, '/journal', null, null)
       const response = await handler.handler(event)
       const responseBody = JSON.parse(response.body)
       expect(responseBody.instance).to.equal('/journal')
@@ -107,11 +104,7 @@ describe('Handler throws 405 when httpMethod is not GET', () => {
 describe('Handler throws error when called with queryStringParameters', () => {
   it('verifies response is error 400 and has Bad Request problem response', async function () {
     const queryStringParameters = { 'sample.query.string.parameter': 'flox' }
-    const event = {
-      path: '/journal',
-      httpMethod: 'GET',
-      queryStringParameters: queryStringParameters
-    }
+    const event = createTestEvent('application/json', 'GET', '/journal', null, queryStringParameters)
     const response = await handler.handler(event)
     expect(response.statusCode).to.equal(httpStatus.BAD_REQUEST)
     const responseBody = JSON.parse(response.body)
@@ -130,12 +123,8 @@ describe('Handler sets different \'Content-type\' in response headers', () => {
   acceptTypes.map(acceptType => (
     it(`returns 'Content-Type' ${acceptType} when responsecode is 200`, async function () {
       nsdMockReturns(httpStatus.OK, journalRemoteResponseData)
-      const event = {
-        headers: { accept: acceptType },
-        path: '/journal',
-        httpMethod: 'GET',
-        queryStringParameters: queryStringParameters
-      }
+      const event = createTestEvent(acceptType, 'GET', '/journal', null, queryStringParameters)
+
       const response = await handler.handler(event)
       expect(response.statusCode).to.equal(httpStatus.OK)
       expect(response.headers).to.have.property('Content-Type')
@@ -150,18 +139,13 @@ describe('Handler problem+json irrespective of accecpt type headers ', () => {
   acceptTypes.map(acceptType => (
     it('returns \'Content-Type\' \'application/problem+json\' when error occurs', async function () {
       nsdMockReturns(httpStatus.NOT_FOUND, journalRemoteResponseData)
-      const event = {
-        headers: { accept: acceptType },
-        path: '/journal',
-        httpMethod: 'GET',
-        queryStringParameters: queryStringParameters
-      }
+      const event = createTestEvent(acceptType, 'GET', '/journal', null, queryStringParameters)
       const response = await handler.handler(event)
       expect(response.statusCode).to.equal(httpStatus.NOT_FOUND)
       expect(response.headers).to.have.property('Content-Type')
       expect(response.headers['Content-Type']).to.equal('application/problem+json')
     })
-    ))
+  ))
 })
 
 describe('Handler verifies queryStringParameters and returns 200 with empty body when called with specified queryStringParameters', () => {
@@ -171,12 +155,8 @@ describe('Handler verifies queryStringParameters and returns 200 with empty body
       query: 'query-journal',
       year: '2020'
     }
-    const event = {
-      headers: { accept: 'application/json' },
-      path: '/journal',
-      httpMethod: 'GET',
-      queryStringParameters: queryStringParameters
-    }
+    const event = createTestEvent('application/json', 'GET', '/journal', null, queryStringParameters)
+
     const response = await handler.handler(event)
     expect(response.statusCode).to.equal(httpStatus.OK)
     const expected = JSON.parse(response.body)
@@ -189,11 +169,8 @@ describe('Handler verifies queryStringParameters and returns 200 with empty body
       query: 'query-publisher',
       year: '2020'
     }
-    const event = {
-      path: '/publisher',
-      httpMethod: 'GET',
-      queryStringParameters: queryStringParameters
-    }
+    const event = createTestEvent('application/json', 'GET', '/publisher', null, queryStringParameters)
+
     const response = await handler.handler(event)
     expect(response.statusCode).to.equal(httpStatus.OK)
     const expected = JSON.parse(response.body)
@@ -209,11 +186,7 @@ describe('Handler returns bad request when error in query ', () => {
       year: 2020,
       start: 1
     }
-    const event = {
-      path: '/journal',
-      httpMethod: 'GET',
-      queryStringParameters: queryStringParameters
-    }
+    const event = createTestEvent('application/json', 'GET', '/journal', null, queryStringParameters)
     const response = await handler.handler(event)
     expect(response.statusCode).to.equal(httpStatus.BAD_REQUEST)
   })
@@ -225,44 +198,28 @@ describe('Handler returns bad request when error in query ', () => {
       start: 1,
       unsupportedParameter: 'error'
     }
-    const event = {
-      path: '/journal',
-      httpMethod: 'GET',
-      queryStringParameters: queryStringParameters
-    }
+    const event = createTestEvent('application/json', 'GET', '/journal', null, queryStringParameters)
     const response = await handler.handler(event)
     expect(response.statusCode).to.equal(httpStatus.BAD_REQUEST)
   })
   it('returns 400 Bad Request when value of query parameter is empty string', async function () {
     nsdMockReturns(httpStatus.BAD_REQUEST, '')
     const queryStringParameters = { query: '' }
-    const event = {
-      path: '/journal',
-      httpMethod: 'GET',
-      queryStringParameters: queryStringParameters
-    }
+    const event = createTestEvent('application/json', 'GET', '/journal', null, queryStringParameters)
     const response = await handler.handler(event)
     expect(response.statusCode).to.equal(httpStatus.BAD_REQUEST)
   })
   it('returns 400 Bad Request when value of query parameter is null', async function () {
     nsdMockReturns(httpStatus.BAD_REQUEST, '')
     const queryStringParameters = { query: null }
-    const event = {
-      path: '/journal',
-      httpMethod: 'GET',
-      queryStringParameters: queryStringParameters
-    }
+    const event = createTestEvent('application/json', 'GET', '/journal', null, queryStringParameters)
     const response = await handler.handler(event)
     expect(response.statusCode).to.equal(httpStatus.BAD_REQUEST)
   })
   it('returns 400 Bad Request when value of query string parameters is null', async function () {
     nsdMockReturns(httpStatus.BAD_REQUEST, '')
     const queryStringParameters = null
-    const event = {
-      path: '/journal',
-      httpMethod: 'GET',
-      queryStringParameters: queryStringParameters
-    }
+    const event = createTestEvent('application/json', 'GET', '/journal', null, queryStringParameters)
     const response = await handler.handler(event)
     expect(response.statusCode).to.equal(httpStatus.BAD_REQUEST)
     expect(JSON.parse(response.body).instance).to.equal('/journal')
@@ -277,11 +234,8 @@ describe('Handler returns response 200 OK when called', () => {
         query: 'query-whatever',
         year: 2020
       }
-      const event = {
-        path: calledPath,
-        httpMethod: 'GET',
-        queryStringParameters: queryStringParameters
-      }
+      const event = createTestEvent('application/json', 'GET', calledPath, null, queryStringParameters)
+
       const response = await handler.handler(event)
       expect((await response).statusCode).to.equal(httpStatus.OK)
     })
@@ -296,11 +250,7 @@ describe('Handler returns response 200 OK when called with correct query which g
         query: 'not-to-be-found',
         year: 2020
       }
-      const event = {
-        path: calledPath,
-        httpMethod: 'GET',
-        queryStringParameters: queryStringParameters
-      }
+      const event = createTestEvent('application/json', 'GET', calledPath, null, queryStringParameters)
       const response = await handler.handler(event)
       expect((await response).statusCode).to.equal(httpStatus.OK)
     })
@@ -310,14 +260,8 @@ describe('Handler returns response 200 OK when called with correct query which g
 describe('Handler returns response 404 Not Found when called with path parameters with 0 hits', () => {
   ['/journal/not-to-be-found-identifier/yyyy', '/publisher/not-to-be-found-identifier/yyyy'].map(calledPath => it(`returns 404 Not found for ${calledPath}`, async function () {
     nsdMockReturns(httpStatus.NO_CONTENT, '')
-    const event = {
-      path: calledPath,
-      httpMethod: 'GET',
-      pathParameters: {
-        id: 'not-to-be-found-identifier',
-        year: 'yyyy'
-      }
-    }
+    const pathParameters = { id: 'not-to-be-found-identifier', year: 'yyyy' }
+    const event = createTestEvent('application/json', 'GET', calledPath, pathParameters, null)
     const response = await handler.handler(event)
     expect(response.statusCode).to.equal(httpStatus.NOT_FOUND)
     expect(JSON.parse(response.body).instance).to.equal(calledPath)
@@ -327,11 +271,8 @@ describe('Handler returns response 404 Not Found when called with path parameter
 describe('Handler returns response 400 Not Found when called with missing path parameters ', () => {
   ['/journal/iiiii', '/publisher/iiiii'].map(calledPath => (
     it(`returns 400 Bad Request for ${calledPath}`, async function () {
-      const event = {
-        path: calledPath,
-        httpMethod: 'GET',
-        pathParameters: { id: 'iiiii' }
-      }
+      const pathParameters = { id: 'iiiii' }
+      const event = createTestEvent('application/json', 'GET', calledPath, pathParameters, null)
       const response = await handler.handler(event)
       expect(response.statusCode).to.equal(httpStatus.BAD_REQUEST)
       expect(JSON.parse(response.body).instance).to.equal(calledPath)
@@ -346,11 +287,7 @@ describe('Handler returns error when remote call fails', () => {
       query: 'throw-remote-error-502',
       year: 2020
     }
-    const event = {
-      path: '/journal',
-      httpMethod: 'GET',
-      queryStringParameters: queryStringParameters
-    }
+    const event = createTestEvent('application/json', 'GET', '/journal', null, queryStringParameters)
     const response = await handler.handler(event)
     expect(response.statusCode).to.equal(httpStatus.BAD_GATEWAY)
     expect(response.body).to.contain('Your request cannot be processed at this time due to an upstream error')
@@ -361,11 +298,7 @@ describe('Handler returns error when remote call fails', () => {
       query: 'throw-remote-error-504',
       year: 2020
     }
-    const event = {
-      path: '/journal',
-      httpMethod: 'GET',
-      queryStringParameters: queryStringParameters
-    }
+    const event = createTestEvent('application/json', 'GET', '/journal', null, queryStringParameters)
     const response = await handler.handler(event)
     expect(response.statusCode).to.equal(httpStatus.GATEWAY_TIMEOUT)
     expect(response.body).to.contain('Your request cannot be processed at this time because the upstream server response took too long')
@@ -376,11 +309,7 @@ describe('Handler returns error when remote call fails', () => {
       query: 'throw-remote-error-500',
       year: 2020
     }
-    const event = {
-      path: '/journal',
-      httpMethod: 'GET',
-      queryStringParameters: queryStringParameters
-    }
+    const event = createTestEvent('application/json', 'GET', '/journal', null, queryStringParameters)
     const response = await handler.handler(event)
     expect(response.statusCode).to.equal(httpStatus.INTERNAL_SERVER_ERROR)
     expect(response.body).to.contain('Internal Server Error')
@@ -392,14 +321,9 @@ describe('Handler returns response 200 OK when found', () => {
   it('returns 200 OK for /journal', async function () {
     const identifier = 'journal-1'
     nsdMockReturns(httpStatus.OK, singleJournalContent)
-    const event = {
-      path: `/journal/${identifier}/${year}`,
-      httpMethod: 'GET',
-      pathParameters: {
-        id: identifier,
-        year: year
-      }
-    }
+    const path = `/journal/${identifier}/${year}`
+    const pathParameters = { id: identifier, year: year }
+    const event = createTestEvent('application/json', 'GET', path, pathParameters, null)
     const response = await handler.handler(event)
     expect(response.statusCode).to.equal(httpStatus.OK)
     expect(response.body).to.contain(identifier)
@@ -407,14 +331,9 @@ describe('Handler returns response 200 OK when found', () => {
   it('returns 200 OK for /publisher', async function () {
     const identifier = 'publisher-1'
     nsdMockReturns(httpStatus.OK, singlePublisherContent)
-    const event = {
-      path: `/publisher/${identifier}/${year}`,
-      httpMethod: 'GET',
-      pathParameters: {
-        id: identifier,
-        year: year
-      }
-    }
+    const path = `/publisher/${identifier}/${year}`
+    const pathParameters = { id: identifier, year: year }
+    const event = createTestEvent('application/json', 'GET', path, pathParameters, null)
     const response = await handler.handler(event)
     expect((await response).statusCode).to.equal(httpStatus.OK)
     expect(response.body).to.contain(identifier)
@@ -424,14 +343,9 @@ describe('Handler returns response 200 OK when found', () => {
 describe('Handler returns 200 OK when searching for ISSNs', () => {
   it('returns 200 OK when an ISSN match is found', async () => {
     nsdMockReturns(httpStatus.OK, journalIssnRemoteResponseData)
-    const event = {
-      path: '/journal',
-      httpMethod: 'GET',
-      queryStringParameters: {
-        query: '2328-0700',
-        year: '2020'
-      }
-    }
+    const queryStringParameters = { query: '2328-0700', year: '2020' }
+    const event = createTestEvent('application/json', 'GET', '/journal', null, queryStringParameters)
+
     const response = await handler.handler(event)
     expect((await response).statusCode).to.equal(httpStatus.OK)
     expect(response.body).to.contain('2328-0700')
