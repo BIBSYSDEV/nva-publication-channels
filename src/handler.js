@@ -13,26 +13,27 @@ logger.info('Logger initialized')
 const routes = ['/journal', '/publisher']
 
 const handler = async (event, context) => {
-  const request = new Event(event)
-  if (!request.isValid) {
-    return new ErrorResponse(createInternalServerErrorDetails(), request)
-  }
-  if (isSingleJournalRequest(request)) {
-    return returnQueryResponse(request)
-  } else if (isSinglePublisherRequest(request)) {
-    return returnQueryResponse(request)
-  } else if (isJournalSearch(request)) {
-    return returnQueryResponse(request)
-  } else if (isPublisherSearch(request)) {
-    return returnQueryResponse(request)
-  } else {
-    return new ErrorResponse(createErrorDetails(request), request)
+  try {
+    const request = new Event(event)
+    if (isSingleJournalRequest(request)) {
+      return returnQueryResponse(request)
+    } else if (isSinglePublisherRequest(request)) {
+      return returnQueryResponse(request)
+    } else if (isJournalSearch(request)) {
+      return returnQueryResponse(request)
+    } else if (isPublisherSearch(request)) {
+      return returnQueryResponse(request)
+    } else {
+      return new ErrorResponse(createErrorDetails(request), request)
+    }
+  } catch (clientError) {
+    return new ErrorResponse(createErrorDetails(clientError), clientError)
   }
 }
 
 const isSingleJournalRequest = (request) => {
   return isGetMethod(request.httpMethod) &&
-    request.path === '/journal' &&
+    request.path.startsWith('/journal/') &&
     request.pathParameters instanceof PathParameters &&
     request.pathParameters.isValid &&
     request.queryParameters instanceof NullQueryParameters
@@ -40,9 +41,9 @@ const isSingleJournalRequest = (request) => {
 
 const isSinglePublisherRequest = (request) => {
   return isGetMethod(request.httpMethod) &&
-      request.path === '/publisher' &&
-      request.pathParameters.isValid &&
-      request.queryParameters instanceof NullQueryParameters
+    request.path.startsWith('/publisher/') &&
+    request.pathParameters.isValid &&
+    request.queryParameters instanceof NullQueryParameters
 }
 
 const isJournalSearch = (request) => {
@@ -54,9 +55,9 @@ const isJournalSearch = (request) => {
 
 const isPublisherSearch = (request) => {
   return isGetMethod(request.httpMethod) &&
-      request.path === '/publisher' &&
-      request.pathParameters instanceof NullPathParameters &&
-      request.queryParameters.isValid === true
+    request.path === '/publisher' &&
+    request.pathParameters instanceof NullPathParameters &&
+    request.queryParameters.isValid === true
 }
 
 const returnQueryResponse = (event) => {
@@ -67,23 +68,46 @@ const returnQueryResponse = (event) => {
 const isGetMethod = (httpMethod) => httpMethod === 'GET'
 
 const createNotFoundDetails = (event) => {
-  return { code: httpStatus.NOT_FOUND, message: `The requested resource ${event.fullPath} could not be found` }
+  return {
+    code: httpStatus.NOT_FOUND,
+    message: `The requested resource ${event.fullPath} could not be found`
+  }
 }
 
 const createMethodNotAllowedDetails = (event) => {
-  return { code: httpStatus.METHOD_NOT_ALLOWED, message: `The requested http method  ${event.httpMethod} is not supported` }
-}
-
-const createInternalServerErrorDetails = () => {
-  return { code: httpStatus.INTERNAL_SERVER_ERROR, message: 'Your request cannot be processed at this time due to an internal server error' }
+  return {
+    code: httpStatus.METHOD_NOT_ALLOWED,
+    message: `The requested http method  ${event.httpMethod} is not supported`
+  }
 }
 
 const createBadRequestDetails = (event) => {
-  return { code: httpStatus.BAD_REQUEST, message: `Your request cannot be processed because the supplied parameter(s) ${event.queryParameters.queryParameterString} cannot be understood` }
+  return {
+    code: httpStatus.BAD_REQUEST,
+    message: `Your request cannot be processed because the supplied parameter(s) ${event.queryParameters.queryParameterString} cannot be understood`
+  }
 }
 
 const createErrorDetails = (response) => isGetMethod(response.httpMethod) ? problemsWithGetMethod(response) : createMethodNotAllowedDetails(response)
 
-const problemsWithGetMethod = event => !routes.includes(event.path) ? createNotFoundDetails(event) : createBadRequestDetails(event)
+function isQueryRequest (event) {
+  return routes.includes(event.path) && !(event.queryParameters instanceof NullQueryParameters)
+}
+
+function missingParameters (event) {
+  return (event.queryParameters instanceof NullQueryParameters && event.pathParameters instanceof NullPathParameters)
+}
+
+const problemsWithGetMethod = (event) => {
+  if (event.path === undefined) {
+    return createNotFoundDetails(event)
+  } else if ((event.path === undefined) || (isQueryRequest(event) || missingParameters(event))) {
+    return createBadRequestDetails(event)
+  } else if (!(event.pathParameters instanceof NullPathParameters) && !(event.pathParameters.isValid)) {
+    return createBadRequestDetails(event)
+  } else if (!(routes.includes(event.path))) {
+    return createNotFoundDetails(event)
+  }
+}
 
 module.exports = { handler }

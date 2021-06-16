@@ -1,20 +1,20 @@
 [
   {
     "@context": "https://bibsysdev.github.io/src/publication-channel/channel-context.json",
-    "id": "https://nva.unit.no/publicationchannel/publisher/25264/2020",
+    "id": "https://nva.unit.no/publicationchannel/publisher/publisher-1/2020",
     "type": "Publisher",
     "name": "T & AD Poyser",
-    "identifier": "25264",
+    "identifier": "publisher-1",
     "website": "http://www.poyserbooks.co.uk/",
     "active": true,
     "level": "1"
   },
   {
     "@context": "https://bibsysdev.github.io/src/publication-channel/channel-context.json",
-    "id": "https://nva.unit.no/publicationchannel/publisher/19698/2020",
+    "id": "https://nva.unit.no/publicationchannel/publisher/publisher-2/2020",
     "type": "Publisher",
     "name": "T.M.C. Asser Press",
-    "identifier": "19698",
+    "identifier": "publisher-2",
     "website": "http://www.asser.nl",
     "active": true,
     "level": null

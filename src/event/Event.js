@@ -4,6 +4,7 @@ const PathParameters = require('./PathParameters')
 const QueryParameters = require('./QueryParameters')
 const NullQueryParameters = require('./NullQueryParameters')
 const NullPathParameters = require('./NullPathParameters')
+const ClientError = require('./ClientError')
 const isString = candidate => typeof candidate === 'string'
 const validatePath = event => 'path' in event && isString(event.path) ? event.path : undefined
 const validateMethod = event => 'httpMethod' in event && isString(event.httpMethod)
@@ -27,6 +28,9 @@ class Event {
     this._httpMethod = validateMethod(event)
     this._pathParameters = validatePathParameters(event)
     this._queryParameters = validateQueryParameters(event)
+    if (!(this.queryParameters.isValid || this.pathParameters.isValid)) {
+      throw new ClientError(event, this.pathParameters, this.queryParameters)
+    }
   }
 
   get queryParameters () {
@@ -46,17 +50,10 @@ class Event {
   }
 
   get fullPath () {
-    const pathParamsString = this._pathParameters.pathParameterString
-
     const queryParamsString = this._queryParameters.queryParameterString
-
     return this._path
-      ? this._path + pathParamsString + queryParamsString
+      ? this._path + queryParamsString
       : 'Undefined path'
-  }
-
-  get isValid () {
-    return this._path != null && this._httpMethod != null
   }
 }
 

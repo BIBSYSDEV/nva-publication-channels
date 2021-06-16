@@ -31,7 +31,7 @@ const responseWithBody = (body, type, year) => {
 
 const handleRemoteResponse = (nsdResponse, request, type) => {
   if (nsdResponse.status === httpStatus.NO_CONTENT && request.hasPathParameters) {
-    return new ErrorResponse({ code: httpStatus.NOT_FOUND, message: 'Not Found' }, { path: request.path })
+    return new ErrorResponse({ code: httpStatus.NOT_FOUND, message: 'Not Found' }, { path: request.path, fullPath: request.path })
   }
   return responseWithBody(nsdResponse.data, type, request.year)
 }
@@ -46,7 +46,8 @@ const handleError = (error, request) => {
 
 const performQuery = async (request) => {
   const path = request.path
-  const type = path.substr(1, path.length)
+  const secondIndexOfSlash = path.indexOf('/', 1) > 0 ? path.indexOf('/', 1) : path.length
+  const type = path.slice(1, secondIndexOfSlash)
   // TODO: Fix ISSN case where we have two requests
   const currentRequest = request.requests[0]
   return await axios.post(channelRegistryUri, currentRequest)

@@ -1,9 +1,9 @@
 [
   {
     "@context": "https://bibsysdev.github.io/src/publication-channel/channel-context.json",
-    "id": "https://nva.unit.no/publicationchannel/journal/437524/2020",
+    "id": "https://nva.unit.no/publicationchannel/journal/journal-1/2020",
     "type": "Journal",
-    "identifier": "437524",
+    "identifier": "journal-1",
     "name": "Alzheimer Disease and Associated Disorders",
     "onlineIssn": "1546-4156",
     "printIssn": "0893-0341",

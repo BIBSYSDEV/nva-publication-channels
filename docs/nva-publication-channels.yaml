@@ -79,7 +79,7 @@ paths:
           $ref: '#/components/responses/502'
         504:
           $ref: '#/components/responses/504'
-  /journal/{pid}/{year}:
+  /journal/{id}/{year}:
     get:
       x-amazon-apigateway-integration:
         uri:
@@ -92,7 +92,7 @@ paths:
       description: Returns a single Journal
       operationId: GetJournalById
       parameters:
-      - name: pid
+      - name: id
         in: path
         description: ID of journal to return
         required: true
@@ -194,7 +194,7 @@ paths:
           $ref: '#/components/responses/502'
         504:
           $ref: '#/components/responses/504'
-  /publisher/{pid}/{year}:
+  /publisher/{id}/{year}:
     get:
       x-amazon-apigateway-integration:
         uri:
@@ -207,7 +207,7 @@ paths:
       description: Returns a single Publisher
       operationId: getPublisherById
       parameters:
-      - name: pid
+      - name: id
         in: path
         description: ID of publisher to return
         required: true
