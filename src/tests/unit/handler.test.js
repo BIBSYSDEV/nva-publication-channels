@@ -100,13 +100,13 @@ describe('Handler throws error when called with queryStringParameters', () => {
 
 describe("Handler sets different 'Content-type' in response headers", () => {
   const queryStringParameters = { query: 'query-whatever', year: 2020 }
-  it("returns 'Content-Type' 'application/json' when responsecode is 200", async function () {
+  it("returns 'Content-Type' 'application/ld+json' when responsecode is 200", async function () {
     nsdMockReturns(httpStatus.OK, journalRemoteResponseData)
     const event = { path: '/journal', httpMethod: 'GET', queryStringParameters: queryStringParameters }
     const response = await handler.handler(event)
     expect(response.statusCode).to.equal(httpStatus.OK)
     expect(response.headers).to.have.property('Content-Type')
-    expect(response.headers['Content-Type']).to.equal('application/json')
+    expect(response.headers['Content-Type']).to.equal('application/ld+json')
   })
   it("returns 'Content-Type' 'application/problem+json' when error occurs", async function () {
     nsdMockReturns(httpStatus.NOT_FOUND, journalRemoteResponseData)

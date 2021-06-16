@@ -22,7 +22,7 @@ const responseWithBody = (body, type, year) => {
   return {
     statusCode: httpStatus.OK,
     headers: {
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/ld+json'
     },
     isBase64Encoded: false,
     body: JSON.stringify(response)
