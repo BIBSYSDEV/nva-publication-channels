@@ -11,8 +11,17 @@ const PathParameters = require('./event/PathParameters')
 logger.info('Logger initialized')
 
 const routes = ['/journal', '/publisher']
+const acceptTypes = ['application/json', 'application/ld+json']
 
 const handler = async (event, context) => {
+  if (!acceptTypes.includes(event.headers.accept)) {
+    const response = {
+      code: httpStatus.NOT_ACCEPTABLE,
+      message: `Your request cannot be processed because the supplied content-type "${event.headers.accept}" cannot be understood, acceptable types: application/ld+json, application/json`
+    }
+    return new ErrorResponse(response, new Event(event))
+  }
+
   try {
     const request = new Event(event)
     if (isSingleJournalRequest(request)) {
