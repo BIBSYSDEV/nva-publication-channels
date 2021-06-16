@@ -11,6 +11,7 @@ const PathParameters = require('./event/PathParameters')
 logger.info('Logger initialized')
 
 const routes = ['/journal', '/publisher']
+const acceptableTypes = ['application/json', 'application/ld+json']
 
 const handler = async (event, context) => {
   try {
@@ -61,8 +62,8 @@ const isPublisherSearch = (request) => {
 }
 
 const returnQueryResponse = (event) => {
-  const requests = new Request(event)
-  return nsdClient.performQuery(requests, event.path)
+  const request = new Request(event)
+  return nsdClient.performQuery(request, event.acceptType)
 }
 
 const isGetMethod = (httpMethod) => httpMethod === 'GET'
