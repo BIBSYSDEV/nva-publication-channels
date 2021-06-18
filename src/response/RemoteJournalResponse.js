@@ -8,7 +8,9 @@ class RemoteJournalResponse extends RemoteResponse {
     this.npiDomain = npiDomain
     this.openAccess = openAccess
     this.language = language
-    this.publisher = publisher !== undefined ? super.generateId(host, 'Publisher', publisher, null) : null
+    this.publisher = publisher !== undefined && publisher !== null && publisher.trim() !== ''
+      ? super.generateId(host, 'Publisher', publisher, year)
+      : null
   }
 }
 
