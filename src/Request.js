@@ -7,10 +7,15 @@ const PublisherExactMatch = require('./queryTemplates/PublisherExactMatch')
 
 class Request {
   constructor (event) {
+    this._domain = event.domain
     this._hasPathParameters = event.pathParameters.isValid
     this._path = event.path
     this._year = event.pathParameters.isValid ? event.pathParameters.year : event.queryParameters.year
     this._nsdrequest = this.createRequest(event)
+  }
+
+  get domain () {
+    return this._domain
   }
 
   get requests () {

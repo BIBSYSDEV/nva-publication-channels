@@ -1,8 +1,8 @@
 const RemoteResponse = require('./RemoteResponse')
 
 class RemotePublisherResponse extends RemoteResponse {
-  constructor (identifier, year, name, website, level, active) {
-    super('Publisher', identifier, year, name, website, level, active)
+  constructor (host, identifier, year, name, website, level, active) {
+    super(host, 'Publisher', identifier, year, name, website, level, active)
   }
 }
 

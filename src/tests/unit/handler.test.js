@@ -3,15 +3,15 @@ const chaiJson = require('chai-json-equal')
 const handler = require('../../handler')
 const chai = require('chai')
 chai.use(chaiJson)
+chai.use(require('chai-string'))
 const expect = chai.expect
 const httpStatus = require('http-status-codes')
 const fs = require('fs')
 const httpServerMock = require('nock')
 const journalRemoteResponseData = fs.readFileSync('tests/unit/journal_response.json').toString()
+const journalRemoteResponseDataWithPublisher = fs.readFileSync('tests/unit/journal_response_with_publisher.json').toString()
+const journalRemoteResponseDataWithoutPublisher = fs.readFileSync('tests/unit/journal_response_without_publisher.json').toString()
 const publisherRemoteResponseData = fs.readFileSync('tests/unit/publisher_response.json').toString()
-
-const journalContent = fs.readFileSync('tests/unit/api_journal_response.json').toString()
-const publisherContent = fs.readFileSync('tests/unit/api_publisher_response.json').toString()
 const singleJournalContent = fs.readFileSync('tests/unit/single_journal.json').toString()
 const singlePublisherContent = fs.readFileSync('tests/unit/single_publisher.json').toString()
 const journalIssnRemoteResponseData = fs.readFileSync('tests/unit/issn_journal_response.json').toString()
@@ -27,8 +27,9 @@ const nsdMockReturns = (statusCode, returnValue) => {
     .reply(statusCode, returnValue)
 }
 
-const createTestEvent = (acceptType, httpMethod, path, pathParameters, queryParameters) => {
+const createTestEvent = (acceptType, httpMethod, path, pathParameters, queryParameters, domainName = 'api.example.org') => {
   return {
+    domainName: domainName,
     headers: { Accept: acceptType },
     httpMethod: httpMethod,
     path: path,
@@ -159,9 +160,20 @@ describe('Handler verifies queryStringParameters and returns 200 with empty body
 
     const response = await handler.handler(event)
     expect(response.statusCode).to.equal(httpStatus.OK)
-    const expected = JSON.parse(response.body)
-    const actual = JSON.parse(journalContent)
-    expect(expected).to.jsonEqual(actual)
+    const actual = JSON.parse(response.body)
+    expect(actual[0].id).to.match(/^https:\/\/[^/]+\/journal\/journal-1\/2020$/)
+    expect(actual[0].type).to.equal('Journal')
+    expect(actual[0].identifier).to.equal('journal-1')
+    expect(actual[0].name).to.equal('Alzheimer Disease and Associated Disorders')
+    expect(actual[0].website).to.equal('https://journals.lww.com/alzheimerjournal')
+    expect(actual[0].level).to.equal('1')
+    expect(actual[0].active).to.equal(true)
+    expect(actual[0].onlineIssn).to.equal('1546-4156')
+    expect(actual[0].printIssn).to.equal('0893-0341')
+    expect(actual[0].npiDomain).to.equal('Nevrologi')
+    expect(actual[0].openAccess).to.equal(null)
+    expect(actual[0].language).to.equal(null)
+    expect(actual[0].publisher).to.equal(null)
   })
   it('returns 200 OK and a empty body when all parameters set', async function () {
     nsdMockReturns(httpStatus.OK, publisherRemoteResponseData)
@@ -173,9 +185,14 @@ describe('Handler verifies queryStringParameters and returns 200 with empty body
 
     const response = await handler.handler(event)
     expect(response.statusCode).to.equal(httpStatus.OK)
-    const expected = JSON.parse(response.body)
-    const actual = JSON.parse(publisherContent)
-    expect(expected).to.jsonEqual(actual)
+    const actual = JSON.parse(response.body)
+    expect(actual[0].id).to.match(/^https:\/\/[^/]+\/publisher\/publisher-1\/2020$/)
+    expect(actual[0].type).to.equal('Publisher')
+    expect(actual[0].identifier).to.equal('publisher-1')
+    expect(actual[0].name).to.equal('T & AD Poyser')
+    expect(actual[0].website).to.equal('http://www.poyserbooks.co.uk/')
+    expect(actual[0].level).to.equal('1')
+    expect(actual[0].active).to.equal(true)
   })
 })
 
@@ -372,6 +389,67 @@ describe('Handler returns status code 406 and problem+json body when accept type
       expect(problem.instance).to.contain(event.path)
       expect(problem.type).to.equal('about:blank')
       expect(problem.detail).to.equal(`Your request cannot be processed because the supplied content-type "${contentType}" cannot be understood, acceptable types: application/ld+json, application/json`)
+    })
+  })
+})
+
+describe('Handler returns application/ld+json with deployment path as part of id for responsedata when request is for Publisher', () => {
+  const scheme = 'https://'
+  const domain = 'no.no.nop'
+  const expectedDomainPrefix = scheme + domain
+  const contentType = 'application/ld+json'
+  const queryParameters = { query: 'irrelevant', year: '2020' }
+  const pathParameters = { id: '11111', year: '2020' }
+  const allEventsAndResponses = [
+    { event: createTestEvent(contentType, 'GET', '/publisher', null, queryParameters, domain), expectedResponse: publisherRemoteResponseData },
+    { event: createTestEvent(contentType, 'GET', '/publisher/11111/2020', pathParameters, null, domain), expectedResponse: publisherRemoteResponseData }
+  ]
+  allEventsAndResponses.forEach(event => {
+    it(`returns 200 OK and deployment path as part of id for ${event.event.path} `, async () => {
+      nsdMockReturns(httpStatus.OK, event.expectedResponse)
+      const response = await handler.handler(event.event)
+      expect(response.statusCode).to.equal(httpStatus.OK)
+      expect(response.headers['Content-Type']).to.equal('application/ld+json')
+      const hits = JSON.parse(response.body)
+      hits.forEach(hit => {
+        expect(hit.id).to.startsWith(expectedDomainPrefix)
+      })
+    })
+  })
+})
+
+describe('Handler returns application/ld+json with deployment path as part of id for responsedata for Journal', () => {
+  const scheme = 'https://'
+  const domain = 'no.no.nop'
+  const expectedDomainPrefix = scheme + domain
+  const contentType = 'application/ld+json'
+  const queryParameters = { query: 'irrelevant', year: '2020' }
+  const testEvent = createTestEvent(contentType, 'GET', '/journal', null, queryParameters, domain)
+  it(`returns 200 OK and deployment path as part of id for ${testEvent.path} when it has publisher `, async () => {
+    nsdMockReturns(httpStatus.OK, journalRemoteResponseDataWithPublisher)
+    const response = await handler.handler(testEvent)
+    expect(response.statusCode).to.equal(httpStatus.OK)
+    expect(response.headers['Content-Type']).to.equal('application/ld+json')
+    const hits = JSON.parse(response.body)
+    hits.forEach(hit => {
+      expect(hit.id).to.startsWith(expectedDomainPrefix)
+      expect(hit.publisher).to.startsWith(expectedDomainPrefix)
+    })
+  })
+  it(`returns 200 OK and deployment path as part of id for ${testEvent.path} when it does not have publisher `, async () => {
+    const publisherId = [null, undefined, '']
+    publisherId.forEach(async (publisherId) => {
+      const returnValue = journalRemoteResponseDataWithoutPublisher
+      returnValue.Utgiver = publisherId
+      nsdMockReturns(httpStatus.OK, returnValue)
+      const response = await handler.handler(testEvent)
+      expect(response.statusCode).to.equal(httpStatus.OK)
+      expect(response.headers['Content-Type']).to.equal('application/ld+json')
+      const hits = JSON.parse(response.body)
+      hits.forEach(hit => {
+        expect(hit.id).to.startsWith(expectedDomainPrefix)
+        expect(hit.publisher).to.equal(null)
+      })
     })
   })
 })
