@@ -24,6 +24,7 @@ const validateQueryParameters = event => isValidQueryParameters(event)
 
 class Event {
   constructor (event) {
+    this._domain = event.domainName
     this._path = validatePath(event)
     this._httpMethod = validateMethod(event)
     this._pathParameters = validatePathParameters(event)
@@ -32,6 +33,10 @@ class Event {
     if (!(this.queryParameters.isValid || this.pathParameters.isValid)) {
       throw new ClientError(event, this.pathParameters, this.queryParameters)
     }
+  }
+
+  get domain () {
+    return 'https://' + this._domain
   }
 
   get acceptType () {

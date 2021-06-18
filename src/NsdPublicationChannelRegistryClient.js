@@ -8,17 +8,17 @@ const RemotePublisherResponse = require('./response/RemotePublisherResponse')
 
 const isJournal = (type) => type === 'journal'
 
-const extractHits = (year, type, body) => {
+const extractHits = (host, year, type, body) => {
   const response = []
   const level = `Nivå ${year}`
   isJournal(type)
-    ? body.forEach(item => response.push(new RemoteJournalResponse(item['Tidsskrift id'], year, item['Original tittel'], item.Url, item[level], item.Aktiv, item['Online ISSN'], item['Print ISSN'], item['NPI Fagfelt'], item['Open Access'], item['Språk'], item.Utgiver)))
-    : body.forEach(item => response.push(new RemotePublisherResponse(item['Forlag id'], year, item['Original tittel'], item.Url, item[level], item.Aktiv)))
+    ? body.forEach(item => response.push(new RemoteJournalResponse(host, item['Tidsskrift id'], year, item['Original tittel'], item.Url, item[level], item.Aktiv, item['Online ISSN'], item['Print ISSN'], item['NPI Fagfelt'], item['Open Access'], item['Språk'], item.Utgiver)))
+    : body.forEach(item => response.push(new RemotePublisherResponse(host, item['Forlag id'], year, item['Original tittel'], item.Url, item[level], item.Aktiv)))
   return response
 }
 
-const responseWithBody = (body, type, year, accept) => {
-  const response = (body.length > 0) ? extractHits(year, type, body) : '[]'
+const responseWithBody = (host, body, type, year, accept) => {
+  const response = (body.length > 0) ? extractHits(host, year, type, body) : '[]'
   return {
     statusCode: httpStatus.OK,
     headers: {
@@ -33,7 +33,7 @@ const handleRemoteResponse = (nsdResponse, request, type, accept) => {
   if (nsdResponse.status === httpStatus.NO_CONTENT && request.hasPathParameters) {
     return new ErrorResponse({ code: httpStatus.NOT_FOUND, message: 'Not Found' }, { path: request.path, fullPath: request.path })
   }
-  return responseWithBody(nsdResponse.data, type, request.year, accept)
+  return responseWithBody(request.domain, nsdResponse.data, type, request.year, accept)
 }
 
 const handleError = (error, request) => {
