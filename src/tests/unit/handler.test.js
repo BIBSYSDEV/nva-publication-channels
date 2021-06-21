@@ -434,7 +434,7 @@ describe('Handler returns application/ld+json with deployment path as part of id
     hits.forEach(hit => {
       expect(hit.id).to.startsWith(expectedDomainPrefix)
       expect(hit.publisherId).to.startsWith(expectedDomainPrefix)
-      !expect(hit.publisher).to.equal(null)
+      expect(hit.publisher).to.equal('The Society for Academic publishing')
     })
   })
   it(`returns 200 OK and deployment path as part of id for ${testEvent.path} when it does not have publisher `, async () => {
