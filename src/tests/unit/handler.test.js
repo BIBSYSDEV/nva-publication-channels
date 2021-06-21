@@ -27,12 +27,12 @@ const nsdMockReturns = (statusCode, returnValue) => {
     .reply(statusCode, returnValue)
 }
 
-const createTestEvent = (acceptType, httpMethod, path, pathParameters, queryParameters, domainName = 'api.example.org') => {
+const createTestEvent = (acceptType, httpMethod, resource, pathParameters, queryParameters, domainName = 'api.example.org') => {
   return {
-    domainName: domainName,
+    requestContext: { domainName: domainName },
     headers: { Accept: acceptType },
     httpMethod: httpMethod,
-    path: path,
+    resource: resource,
     pathParameters: pathParameters,
     queryStringParameters: queryParameters
   }
@@ -386,7 +386,7 @@ describe('Handler returns status code 406 and problem+json body when accept type
       expect(response.headers['Content-Type']).to.equal('application/problem+json')
       const problem = JSON.parse(response.body)
       expect(problem.title).to.equal('Not Acceptable')
-      expect(problem.instance).to.contain(event.path)
+      expect(problem.instance).to.contain(event.resource)
       expect(problem.type).to.equal('about:blank')
       expect(problem.detail).to.equal(`Your request cannot be processed because the supplied content-type "${contentType}" cannot be understood, acceptable types: application/ld+json, application/json`)
     })
