@@ -30,7 +30,8 @@ const journalProjection = (variable) => [
   variable.WEBSITE,
   variable.LEVEL,
   variable.ACTIVE,
-  variable.PUBLISHER
+  variable.PUBLISHER,
+  variable.PUBLISHER_ID
 ]
 
 const publisherProjection = (variable) => [

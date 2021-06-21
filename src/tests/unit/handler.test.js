@@ -173,7 +173,7 @@ describe('Handler verifies queryStringParameters and returns 200 with empty body
     expect(actual[0].npiDomain).to.equal('Nevrologi')
     expect(actual[0].openAccess).to.equal(null)
     expect(actual[0].language).to.equal(null)
-    expect(actual[0].publisher).to.equal(null)
+    expect(actual[0].publisherId).to.equal(null)
   })
   it('returns 200 OK and a empty body when all parameters set', async function () {
     nsdMockReturns(httpStatus.OK, publisherRemoteResponseData)
@@ -433,14 +433,14 @@ describe('Handler returns application/ld+json with deployment path as part of id
     const hits = JSON.parse(response.body)
     hits.forEach(hit => {
       expect(hit.id).to.startsWith(expectedDomainPrefix)
-      expect(hit.publisher).to.startsWith(expectedDomainPrefix)
+      expect(hit.publisherId).to.startsWith(expectedDomainPrefix)
     })
   })
   it(`returns 200 OK and deployment path as part of id for ${testEvent.path} when it does not have publisher `, async () => {
     const publisherId = [null, undefined, '']
     publisherId.forEach(async (publisherId) => {
       const returnValue = journalRemoteResponseDataWithoutPublisher
-      returnValue.Utgiver = publisherId
+      returnValue['forlag id'] = publisherId
       nsdMockReturns(httpStatus.OK, returnValue)
       const response = await handler.handler(testEvent)
       expect(response.statusCode).to.equal(httpStatus.OK)
@@ -449,6 +449,7 @@ describe('Handler returns application/ld+json with deployment path as part of id
       hits.forEach(hit => {
         expect(hit.id).to.startsWith(expectedDomainPrefix)
         expect(hit.publisher).to.equal(null)
+        expect(hit.publisherId).to.equal(null)
       })
     })
   })
