@@ -32,8 +32,6 @@ const handler = async (event, context) => {
       return returnQueryResponse(request)
     } else if (isPublisherSearch(request)) {
       return returnQueryResponse(request)
-    } else {
-      return new ErrorResponse(createErrorDetails(request), request)
     }
   } catch (clientError) {
     return new ErrorResponse(createErrorDetails(clientError), clientError)

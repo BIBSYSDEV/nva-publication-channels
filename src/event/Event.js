@@ -6,9 +6,13 @@ const NullQueryParameters = require('./NullQueryParameters')
 const NullPathParameters = require('./NullPathParameters')
 const ClientError = require('./ClientError')
 const isString = candidate => typeof candidate === 'string'
-const validatePath = event => 'path' in event && isString(event.path) ? event.path : undefined
+const validatePath = event => 'resource' in event && isString(event.resource) ? event.resource : undefined
 const validateMethod = event => 'httpMethod' in event && isString(event.httpMethod)
   ? event.httpMethod.toUpperCase()
+  : undefined
+
+const validateDomain = event => 'requestContext' in event && 'domainName' in event.requestContext && isString(event.requestContext.domainName)
+  ? event.requestContext.domainName
   : undefined
 
 const isObject = candidate => candidate instanceof Object && !Array.isArray(candidate)
@@ -24,7 +28,7 @@ const validateQueryParameters = event => isValidQueryParameters(event)
 
 class Event {
   constructor (event) {
-    this._domain = event.domainName
+    this._domain = validateDomain(event)
     this._path = validatePath(event)
     this._httpMethod = validateMethod(event)
     this._pathParameters = validatePathParameters(event)
