@@ -12,7 +12,7 @@ const extractHits = (host, year, type, body) => {
   const response = []
   const level = `Nivå ${year}`
   isJournal(type)
-    ? body.forEach(item => response.push(new RemoteJournalResponse(host, item['Tidsskrift id'], year, item['Original tittel'], item.Url, item[level], item.Aktiv, item['Online ISSN'], item['Print ISSN'], item['NPI Fagfelt'], item['Open Access'], item['Språk'], item['Forlag id'], item.Utgiver)))
+    ? body.forEach(item => response.push(new RemoteJournalResponse(host, item['Tidsskrift id'], year, item['Original tittel'], item.Url, item[level], item.Aktiv, item['Online ISSN'], item['Print ISSN'], item['NPI Fagfelt'], item['Open Access'], item['Språk'], item['Forlag id'])))
     : body.forEach(item => response.push(new RemotePublisherResponse(host, item['Forlag id'], year, item['Original tittel'], item.Url, item[level], item.Aktiv)))
   return response
 }
