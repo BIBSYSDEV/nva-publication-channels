@@ -23,7 +23,8 @@ class JournalTitleSearch {
       variable.WEBSITE,
       variable.LEVEL,
       variable.ACTIVE,
-      variable.PUBLISHER
+      variable.PUBLISHER,
+      variable.PUBLISHER_ID
     ]
     return new QueryTemplate(Table.JOURNAL, [filter], projection, [variable.ORIGINAL_TITLE], size)
   }

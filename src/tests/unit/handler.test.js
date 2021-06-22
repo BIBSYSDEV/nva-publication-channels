@@ -426,7 +426,10 @@ describe('Handler returns application/ld+json with deployment path as part of id
   const queryParameters = { query: 'irrelevant', year: '2020' }
   const testEvent = createTestEvent(contentType, 'GET', '/journal', null, queryParameters, domain)
   it(`returns 200 OK and deployment path as part of id for ${testEvent.path} when it has publisher `, async () => {
-    nsdMockReturns(httpStatus.OK, journalRemoteResponseDataWithPublisher)
+    const publisherId = 'publisher-1'
+    const returnValueWithPublisher = JSON.parse(journalRemoteResponseDataWithPublisher)
+    returnValueWithPublisher[0]['Forlag id'] = publisherId
+    nsdMockReturns(httpStatus.OK, JSON.stringify(returnValueWithPublisher))
     const response = await handler.handler(testEvent)
     expect(response.statusCode).to.equal(httpStatus.OK)
     expect(response.headers['Content-Type']).to.equal('application/ld+json')
@@ -434,22 +437,23 @@ describe('Handler returns application/ld+json with deployment path as part of id
     hits.forEach(hit => {
       expect(hit.id).to.startsWith(expectedDomainPrefix)
       expect(hit.publisherId).to.startsWith(expectedDomainPrefix)
+      expect(hit.publisherId).to.contain(publisherId)
     })
   })
   it(`returns 200 OK and deployment path as part of id for ${testEvent.path} when it does not have publisher `, async () => {
-    const publisherId = [null, undefined, '']
-    publisherId.forEach(async (publisherId) => {
-      const returnValue = journalRemoteResponseDataWithoutPublisher
-      returnValue['forlag id'] = publisherId
-      nsdMockReturns(httpStatus.OK, returnValue)
+    const expectedPublisherId = null
+    const inputForlagIds = [null, undefined, '']
+    inputForlagIds.forEach(async (inputForlagId) => {
+      const returnValue = JSON.parse(journalRemoteResponseDataWithoutPublisher)
+      returnValue['forlag id'] = inputForlagId
+      nsdMockReturns(httpStatus.OK, JSON.stringify(returnValue))
       const response = await handler.handler(testEvent)
       expect(response.statusCode).to.equal(httpStatus.OK)
       expect(response.headers['Content-Type']).to.equal('application/ld+json')
       const hits = JSON.parse(response.body)
       hits.forEach(hit => {
         expect(hit.id).to.startsWith(expectedDomainPrefix)
-        expect(hit.publisher).to.equal(null)
-        expect(hit.publisherId).to.equal(null)
+        expect(hit.publisherId).to.equal(expectedPublisherId)
       })
     })
   })
