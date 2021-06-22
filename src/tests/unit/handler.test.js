@@ -441,10 +441,11 @@ describe('Handler returns application/ld+json with deployment path as part of id
     })
   })
   it(`returns 200 OK and deployment path as part of id for ${testEvent.path} when it does not have publisher `, async () => {
-    const publisherId = [null, undefined, '']
-    for (const publisherId1 of publisherId) {
+    const expectedPublisherId = null
+    const inputForlagIds = [null, undefined, '']
+    inputForlagIds.forEach(async (inputForlagId) => {
       const returnValue = JSON.parse(journalRemoteResponseDataWithoutPublisher)
-      returnValue['forlag id'] = publisherId1
+      returnValue['forlag id'] = inputForlagId
       nsdMockReturns(httpStatus.OK, JSON.stringify(returnValue))
       const response = await handler.handler(testEvent)
       expect(response.statusCode).to.equal(httpStatus.OK)
@@ -452,8 +453,8 @@ describe('Handler returns application/ld+json with deployment path as part of id
       const hits = JSON.parse(response.body)
       hits.forEach(hit => {
         expect(hit.id).to.startsWith(expectedDomainPrefix)
-        expect(hit.publisherId).to.equal(null)
+        expect(hit.publisherId).to.equal(expectedPublisherId)
       })
-    }
+    })
   })
 })
