@@ -388,7 +388,7 @@ describe('Handler returns status code 406 and problem+json body when accept type
       expect(problem.title).to.equal('Not Acceptable')
       expect(problem.instance).to.contain(event.resource)
       expect(problem.type).to.equal('about:blank')
-      expect(problem.detail).to.equal(`Your request cannot be processed because the supplied content-type "${contentType}" cannot be understood, acceptable types: application/ld+json, application/json`)
+      expect(problem.detail).to.equal(`Your request cannot be processed because the supplied content-type in the "Accept" header "${contentType}" cannot be understood, acceptable types: application/ld+json, application/json`)
     })
   })
 })
