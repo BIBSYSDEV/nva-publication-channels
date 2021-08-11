@@ -17,7 +17,8 @@ const handler = async (event, context) => {
   if (!acceptTypes.includes(event.headers.Accept)) {
     const response = {
       code: httpStatus.NOT_ACCEPTABLE,
-      message: `Your request cannot be processed because the supplied content-type "${event.headers.Accept}" cannot be understood, acceptable types: application/ld+json, application/json`
+      message: `Your request cannot be processed because the supplied content-type in the "Accept" header "${event.headers.Accept}" cannot be understood, acceptable types: application/ld+json, application/json`
+
     }
     return new ErrorResponse(response, new Event(event))
   }
