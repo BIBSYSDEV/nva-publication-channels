@@ -46,6 +46,10 @@ Resources:
       CodeUri: src/
       Handler: handler.handler
       Runtime: nodejs14.x
+      Environment:
+        Variables:
+          DOMAIN:  !Sub api.${CustomDomain}
+          BASE_PATH: !Ref CustomDomainBasePath
       Events:
         GetJournalEvent:
           Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
