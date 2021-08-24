@@ -10,9 +10,9 @@ Globals:
     Timeout: 10
   Api:
     Cors:
-      AllowMethods: "'GET,OPTIONS'"
-      AllowHeaders: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
-      AllowOrigin: "'*'"
+      AllowMethods: 'GET,OPTIONS'
+      AllowHeaders: 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'
+      AllowOrigin: '*'
 
 Parameters:
   CustomDomain:
