@@ -26,9 +26,9 @@ const handler = async (event, context) => {
   try {
     const request = new Event(event)
     if (isSingleJournalRequest(request)) {
-      return returnQueryResponse(request)
+      return returnSingleGetResponse(request)
     } else if (isSinglePublisherRequest(request)) {
-      return returnQueryResponse(request)
+      return returnSingleGetResponse(request)
     } else if (isJournalSearch(request)) {
       return returnQueryResponse(request)
     } else if (isPublisherSearch(request)) {
@@ -72,6 +72,13 @@ const returnQueryResponse = (event) => {
   const request = new Request(event)
   return nsdClient.performQuery(request, event.acceptType)
 }
+
+const returnSingleGetResponse = (event) => {
+  const request = new Request(event)
+  const queryResponse = nsdClient.performQuery(request, event.acceptType)
+  return  queryResponse[0]
+}
+
 
 const isGetMethod = (httpMethod) => httpMethod === 'GET'
 
