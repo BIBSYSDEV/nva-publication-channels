@@ -22,7 +22,7 @@ const extractHits = (year, type, body) => {
 }
 
 const responseWithBody = (body, type, year, accept) => {
-  const response = (body.length > 0) ? extractHits(year, type, body) : '[]'
+  const response = (body.length > 0) ? extractHits(year, type, body) : []
   return {
     statusCode: httpStatus.OK,
     headers: {
