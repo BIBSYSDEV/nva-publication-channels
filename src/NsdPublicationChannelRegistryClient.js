@@ -26,7 +26,8 @@ const responseWithBody = (body, type, year, accept) => {
   return {
     statusCode: httpStatus.OK,
     headers: {
-      'Content-Type': accept
+      'Content-Type': accept,
+      'Access-Control-Allow-Origin': '*'
     },
     isBase64Encoded: false,
     body: JSON.stringify(response)
