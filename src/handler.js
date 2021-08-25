@@ -73,12 +73,17 @@ const returnQueryResponse = (event) => {
   return nsdClient.performQuery(request, event.acceptType)
 }
 
-const returnSingleGetResponse = (event) => {
+const returnSingleGetResponse = async (event) => {
   const request = new Request(event)
-  const queryResponse = nsdClient.performQuery(request, event.acceptType)
-  return  queryResponse[0]
+  const queryResponse = await nsdClient.performQuery(request, event.acceptType)
+  logger.info('queryResponse=', queryResponse)
+  if (queryResponse.statusCode === 200) {
+    const hits = JSON.parse(queryResponse.body)
+    const firstHit = hits[0]
+    queryResponse.body = JSON.stringify(firstHit)
+  }
+  return queryResponse
 }
-
 
 const isGetMethod = (httpMethod) => httpMethod === 'GET'
 

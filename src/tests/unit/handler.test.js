@@ -81,7 +81,10 @@ describe('Handler expected behavior', function () {
     const calledPath = '/non-existent'
     it(`return 404 when ${calledPath} is called`, async function () {
       const event = createTestEvent(APPLICATION_JSON, 'GET', calledPath, null,
-        { year: '2020', id: '1231' })
+        {
+          year: '2020',
+          id: '1231'
+        })
       const response = await handler.handler(event)
       expect(response.statusCode).to.equal(404)
       const responseBody = JSON.parse(response.body)
@@ -152,7 +155,10 @@ describe('Handler expected behavior', function () {
 
   describe('Handler sets different \'Content-type\' in response headers',
     () => {
-      const queryStringParameters = { query: 'query-whatever', year: '2020' }
+      const queryStringParameters = {
+        query: 'query-whatever',
+        year: '2020'
+      }
       const acceptTypes = [APPLICATION_JSON, 'application/ld+json']
       acceptTypes.map(acceptType => (
         it(`returns 'Content-Type' ${acceptType} when response code is 200`,
@@ -170,7 +176,10 @@ describe('Handler expected behavior', function () {
     })
 
   describe('Handler problem+json irrespective of accecpt type headers ', () => {
-    const queryStringParameters = { query: 'query-whatever', year: '2020' }
+    const queryStringParameters = {
+      query: 'query-whatever',
+      year: '2020'
+    }
     const acceptTypes = [APPLICATION_JSON, 'application/ld+json']
     acceptTypes.map(acceptType => (
       it(
@@ -422,7 +431,10 @@ describe('Handler expected behavior', function () {
       const identifier = 'journal-1'
       nsdMockReturns(httpStatus.OK, singleJournalContent)
       const path = `/journal/${identifier}/${year}`
-      const pathParameters = { id: identifier, year: year }
+      const pathParameters = {
+        id: identifier,
+        year: year
+      }
       const event = createTestEvent(APPLICATION_JSON, 'GET', path,
         pathParameters, null)
       const response = await handler.handler(event)
@@ -433,7 +445,10 @@ describe('Handler expected behavior', function () {
       const identifier = 'publisher-1'
       nsdMockReturns(httpStatus.OK, singlePublisherContent)
       const path = `/publisher/${identifier}/${year}`
-      const pathParameters = { id: identifier, year: year }
+      const pathParameters = {
+        id: identifier,
+        year: year
+      }
       const event = createTestEvent(APPLICATION_JSON, 'GET', path,
         pathParameters, null)
       const response = await handler.handler(event)
@@ -445,7 +460,10 @@ describe('Handler expected behavior', function () {
   describe('Handler returns 200 OK when searching for ISSNs', () => {
     it('returns 200 OK when an ISSN match is found', async () => {
       nsdMockReturns(httpStatus.OK, journalIssnRemoteResponseData)
-      const queryStringParameters = { query: '2328-0700', year: '2020' }
+      const queryStringParameters = {
+        query: '2328-0700',
+        year: '2020'
+      }
       const event = createTestEvent(APPLICATION_JSON, 'GET', '/journal', null,
         queryStringParameters)
 
@@ -459,8 +477,14 @@ describe('Handler expected behavior', function () {
     'Handler returns status code 406 and problem+json body when accept type is not acceptable',
     () => {
       const contentType = 'application/pdf'
-      const queryParameters = { query: 'irrelevant', year: '2020' }
-      const pathParameters = { id: '11111', year: '2020' }
+      const queryParameters = {
+        query: 'irrelevant',
+        year: '2020'
+      }
+      const pathParameters = {
+        id: '11111',
+        year: '2020'
+      }
       const allEvents = [
         createTestEvent(contentType, 'GET', '/journal', null,
           queryParameters),
@@ -492,8 +516,14 @@ describe('Handler expected behavior', function () {
     'Handler returns application/ld+json with deployment path as part of id for responsedata when request is for Publisher',
     () => {
       const contentType = 'application/ld+json'
-      const queryParameters = { query: 'irrelevant', year: '2020' }
-      const pathParameters = { id: '11111', year: '2020' }
+      const queryParameters = {
+        query: 'irrelevant',
+        year: '2020'
+      }
+      const pathParameters = {
+        id: '11111',
+        year: '2020'
+      }
       const allEventsAndResponses = [
         {
           event: createTestEvent(contentType, 'GET', '/publisher', null,
@@ -516,9 +546,13 @@ describe('Handler expected behavior', function () {
             expect(response.headers['Content-Type']).to.equal(
               'application/ld+json')
             const hits = JSON.parse(response.body)
-            hits.forEach(hit => {
-              expect(hit.id).to.startsWith(EXPECTED_DOMAIN_URI)
-            })
+            if (Array.isArray(hits)) {
+              hits.forEach(hit => {
+                expect(hit.id).to.startsWith(EXPECTED_DOMAIN_URI)
+              })
+            } else {
+              expect(hits.id).to.startsWith(EXPECTED_DOMAIN_URI)
+            }
           })
       })
     })
@@ -527,7 +561,10 @@ describe('Handler expected behavior', function () {
     'Handler returns application/ld+json with deployment path as part of id for responsedata for Journal',
     () => {
       const contentType = 'application/ld+json'
-      const queryParameters = { query: 'irrelevant', year: '2020' }
+      const queryParameters = {
+        query: 'irrelevant',
+        year: '2020'
+      }
       const testEvent = createTestEvent(contentType, 'GET', '/journal', null,
         queryParameters)
       it(
@@ -572,4 +609,22 @@ describe('Handler expected behavior', function () {
           })
         })
     })
+
+  describe('Handler returns single result object for GET on Id + YEAR', () => {
+    it('returns 200 OK and single result when match is found', async () => {
+      const identifier = 111111
+      const year = 2020
+      const path = `/journal/${identifier}/${year}`
+      const pathParameters = {
+        id: `${identifier} `,
+        year: `${year}`
+      }
+      nsdMockReturns(httpStatus.OK, singleJournalContent)
+      const event = createTestEvent(APPLICATION_JSON, 'GET', path, pathParameters, null)
+      const response = await handler.handler(event)
+      expect((await response).statusCode).to.equal(httpStatus.OK)
+      const hits = JSON.parse(response.body)
+      expect(Array.isArray(hits)).to.equal(false)
+    })
+  })
 })
