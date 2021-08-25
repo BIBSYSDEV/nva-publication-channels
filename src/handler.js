@@ -76,7 +76,6 @@ const returnQueryResponse = (event) => {
 const returnSingleGetResponse = async (event) => {
   const request = new Request(event)
   const queryResponse = await nsdClient.performQuery(request, event.acceptType)
-  logger.info('queryResponse=', queryResponse)
   if (queryResponse.statusCode === 200) {
     const hits = JSON.parse(queryResponse.body)
     const firstHit = hits[0]
