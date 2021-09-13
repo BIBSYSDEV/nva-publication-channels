@@ -33,7 +33,7 @@ const EXPECTED_DOMAIN_URI = `https://${HOST_DOMAIN}/${HOST_BASEPATH}`
 const nsdMockReturns = (statusCode, returnValue) => {
   httpServerMock.cleanAll()
   httpServerMock(NsdServerAddress,
-    { reqheaders: { 'content-type': 'application/json;charset=utf-8' } })
+    { reqheaders: { 'content-type': 'application/json' } })
     .post(NsdQueryPath, () => {
       return true
     })
