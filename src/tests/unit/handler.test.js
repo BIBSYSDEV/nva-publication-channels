@@ -8,6 +8,7 @@ const expect = chai.expect
 const httpStatus = require('http-status-codes')
 const fs = require('fs')
 const httpServerMock = require('nock')
+const { NO_CONTENT, OK } = require('http-status-codes')
 const journalRemoteResponseData = fs.readFileSync(
   'tests/unit/journal_response.json').toString()
 const journalRemoteResponseDataWithPublisher = fs.readFileSync(
@@ -38,6 +39,16 @@ const nsdMockReturns = (statusCode, returnValue) => {
       return true
     })
     .reply(statusCode, returnValue)
+}
+
+const nsdMockReturnsRequestBodyMatch = (statusCode, returnValue, firstMatch, secondMatch) => {
+  httpServerMock.cleanAll()
+  httpServerMock(NsdServerAddress,
+    { reqheaders: { 'content-type': 'application/json' } })
+    .post(NsdQueryPath, firstMatch)
+    .reply(NO_CONTENT, '')
+    .post(NsdQueryPath, secondMatch)
+    .reply(OK, returnValue)
 }
 
 const createTestEvent = (acceptType, httpMethod, resource, pathParameters, queryParameters, domainName = HOST_DOMAIN) => {
@@ -459,9 +470,11 @@ describe('Handler expected behavior', function () {
 
   describe('Handler returns 200 OK when searching for ISSNs', () => {
     it('returns 200 OK when an ISSN match is found', async () => {
-      nsdMockReturns(httpStatus.OK, journalIssnRemoteResponseData)
+      const issn = '2328-0700'
+      nsdMockReturnsRequestBodyMatch(httpStatus.NO_CONTENT, '', /.*variabel":"Online ISSN.*/g, /.*variabel":"Print ISSN.*/g)
+
       const queryStringParameters = {
-        query: '2328-0700',
+        query: issn,
         year: '2020'
       }
       const event = createTestEvent(APPLICATION_JSON, 'GET', '/journal', null,

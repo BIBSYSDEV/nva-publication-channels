@@ -1,4 +1,4 @@
-const channelRegistryUri = 'https://api.nsd.no/dbhapitjener/Tabeller/hentJSONTabellData'
+const uri = 'https://api.nsd.no/dbhapitjener/Tabeller/hentJSONTabellData'
 const ErrorResponse = require('./response/ErrorResponse')
 const httpStatus = require('http-status-codes')
 
@@ -54,18 +54,24 @@ const extractQueryType = (path) => {
   return path.slice(1, secondIndexOfSlash)
 }
 
+const executeRequest = async (currentRequest, request, type, accept) => await axios.post(uri, currentRequest)
+  .then((nsdResponse) => {
+    return handleRemoteResponse(nsdResponse, request, type, accept)
+  })
+  .catch((error) => {
+    return handleError(error, request.path)
+  })
+
 const performQuery = async (request, accept) => {
   const path = request.path
   const type = extractQueryType(path)
   // TODO: Fix ISSN case where we have two requests
-  const currentRequest = request.requests[0]
-  return await axios.post(channelRegistryUri, currentRequest)
-    .then((nsdResponse) => {
-      return handleRemoteResponse(nsdResponse, request, type, accept)
-    })
-    .catch((error) => {
-      return handleError(error, request)
-    })
+  let response = null
+  for (const item of request.requests) {
+    if (response !== null && response.body !== '[]') { return }
+    response = await executeRequest(item, request, type, accept)
+  }
+  return response
 }
 
 module.exports = {
