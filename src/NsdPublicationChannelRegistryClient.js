@@ -68,7 +68,7 @@ const performQuery = async (request, accept) => {
   // TODO: Fix ISSN case where we have two requests
   let response = null
   for (const item of request.requests) {
-    if (response !== null && response.body !== '[]') { return }
+    if (response !== null && response.body !== '[]') { break }
     response = await executeRequest(item, request, type, accept)
   }
   return response

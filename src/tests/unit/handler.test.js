@@ -471,7 +471,7 @@ describe('Handler expected behavior', function () {
   describe('Handler returns 200 OK when searching for ISSNs', () => {
     it('returns 200 OK when an ISSN match is found', async () => {
       const issn = '2328-0700'
-      nsdMockReturnsRequestBodyMatch(httpStatus.NO_CONTENT, '', /.*variabel":"Online ISSN.*/g, /.*variabel":"Print ISSN.*/g)
+      nsdMockReturnsRequestBodyMatch(httpStatus.NO_CONTENT, journalIssnRemoteResponseData, /.*variabel":"Online ISSN.*/g, /.*variabel":"Print ISSN.*/g)
 
       const queryStringParameters = {
         query: issn,
