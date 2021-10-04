@@ -8,7 +8,7 @@ const Selection = require('./Selection')
 const FilterType = require('./FilterType')
 
 class PublisherTitleSearch {
-  constructor (query, size, year) {
+  constructor (query, year, size) {
     const selection = new Selection(FilterType.LIKE, [wildcardQuery(query)])
     const variable = variableSet(year)
     const filter = new Filter(variable.ORIGINAL_TITLE, selection)
