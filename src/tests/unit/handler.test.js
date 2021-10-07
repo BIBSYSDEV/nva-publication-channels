@@ -240,7 +240,7 @@ describe('Handler expected behavior', function () {
           expect(actual[0].printIssn).to.equal('0893-0341')
           expect(actual[0].npiDomain).to.equal('Nevrologi')
           expect(actual[0].openAccess).to.equal(null)
-          expect(actual[0].language).to.equal(null)
+          expect(actual[0].language).to.equal('http://lexvo.org/id/iso639-3/und')
           expect(actual[0].publisherId).to.equal(null)
         })
       it('returns 200 OK and a empty body when all parameters set',
