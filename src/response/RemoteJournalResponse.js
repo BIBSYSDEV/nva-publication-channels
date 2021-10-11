@@ -1,5 +1,5 @@
 const RemoteResponse = require('./RemoteResponse')
-const NvaLanguage = require('nva-language')
+const { getLanguageByBokmaalName } = require('nva-language')
 
 class RemoteJournalResponse extends RemoteResponse {
   constructor (host, identifier, year, name, website, level, active, onlineIssn, printIssn, npiDomain, openAccess, language, publisherId) {
@@ -8,7 +8,7 @@ class RemoteJournalResponse extends RemoteResponse {
     this.printIssn = printIssn
     this.npiDomain = npiDomain
     this.openAccess = openAccess
-    this.language = NvaLanguage.getLanguageByBokmaalName(language).uri
+    this.language = getLanguageByBokmaalName(language).uri
     this.publisherId = publisherId !== undefined && publisherId !== null && publisherId.trim() !== ''
       ? super.generateId(host, 'Publisher', publisherId, year)
       : null
