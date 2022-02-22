@@ -11,7 +11,7 @@ class Request {
     this._hasPathParameters = event.pathParameters.isValid
     this._path = event.path
     this._year = event.pathParameters.isValid ? event.pathParameters.year : event.queryParameters.year
-    this._nsdrequest = this.createRequest(event)
+    this._dbhrequest = this.createRequest(event)
   }
 
   get domain () {
@@ -19,7 +19,7 @@ class Request {
   }
 
   get requests () {
-    return this._nsdrequest
+    return this._dbhrequest
   }
 
   get hasPathParameters () {

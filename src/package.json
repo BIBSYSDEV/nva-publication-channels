@@ -1,7 +1,7 @@
 {
   "name": "nva-publication-channels",
   "version": "0.0.1",
-  "description": "A thin client to wrap NSD DBH's publication channel databases",
+  "description": "A thin client to wrap HKDir DBH's publication channel databases",
   "main": "handler.js",
   "scripts": {
     "lint": "eslint . --ext .js",

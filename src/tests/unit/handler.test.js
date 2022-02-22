@@ -23,31 +23,31 @@ const singlePublisherContent = fs.readFileSync(
   'tests/unit/single_publisher.json').toString()
 const journalIssnRemoteResponseData = fs.readFileSync(
   'tests/unit/issn_journal_response.json').toString()
-const NsdServerAddress = 'https://dbh.hkdir.no/'
-const NsdQueryPath = '/dbhapiklient/Tabeller/hentJSONTabellData'
+const DbhServerAddress = 'https://dbh.hkdir.no/'
+const DbhQueryPath = '/dbhapiklient/Tabeller/hentJSONTabellData'
 
 const APPLICATION_JSON = 'application/json'
 const HOST_DOMAIN = 'api.nva.dev.aws.unit.no'
 const HOST_BASEPATH = 'publication-channels'
 const EXPECTED_DOMAIN_URI = `https://${HOST_DOMAIN}/${HOST_BASEPATH}`
 
-const nsdMockReturns = (statusCode, returnValue) => {
+const dbhMockReturns = (statusCode, returnValue) => {
   httpServerMock.cleanAll()
-  httpServerMock(NsdServerAddress,
+  httpServerMock(DbhServerAddress,
     { reqheaders: { 'content-type': 'application/json' } })
-    .post(NsdQueryPath, () => {
+    .post(DbhQueryPath, () => {
       return true
     })
     .reply(statusCode, returnValue)
 }
 
-const nsdMockReturnsRequestBodyMatch = (statusCode, returnValue, firstMatch, secondMatch) => {
+const dbhMockReturnsRequestBodyMatch = (statusCode, returnValue, firstMatch, secondMatch) => {
   httpServerMock.cleanAll()
-  httpServerMock(NsdServerAddress,
+  httpServerMock(DbhServerAddress,
     { reqheaders: { 'content-type': 'application/json' } })
-    .post(NsdQueryPath, firstMatch)
+    .post(DbhQueryPath, firstMatch)
     .reply(NO_CONTENT, '')
-    .post(NsdQueryPath, secondMatch)
+    .post(DbhQueryPath, secondMatch)
     .reply(OK, returnValue)
 }
 
@@ -111,7 +111,7 @@ describe('Handler expected behavior', function () {
   describe('Handler verifies GET existing paths', () => {
     ['/journal', '/publisher'].map(calledPath => (
       it(`GET ${calledPath} returns 200 OK`, async function () {
-        nsdMockReturns(httpStatus.OK, journalRemoteResponseData)
+        dbhMockReturns(httpStatus.OK, journalRemoteResponseData)
         const queryStringParameters = {
           query: 'query-whatever',
           year: 2020
@@ -174,7 +174,7 @@ describe('Handler expected behavior', function () {
       acceptTypes.map(acceptType => (
         it(`returns 'Content-Type' ${acceptType} when response code is 200`,
           async function () {
-            nsdMockReturns(httpStatus.OK, journalRemoteResponseData)
+            dbhMockReturns(httpStatus.OK, journalRemoteResponseData)
             const event = createTestEvent(acceptType, 'GET', '/journal',
               null, queryStringParameters)
 
@@ -196,7 +196,7 @@ describe('Handler expected behavior', function () {
       it(
         'returns \'Content-Type\' \'application/problem+json\' when error occurs',
         async function () {
-          nsdMockReturns(httpStatus.NOT_FOUND, journalRemoteResponseData)
+          dbhMockReturns(httpStatus.NOT_FOUND, journalRemoteResponseData)
           const event = createTestEvent(acceptType, 'GET', '/journal', null,
             queryStringParameters)
           const response = await handler.handler(event)
@@ -215,7 +215,7 @@ describe('Handler expected behavior', function () {
       const expectedHost = `https://${HOST_DOMAIN}/${HOST_BASEPATH}`
       it('Returns 200 OK and a empty body when only "query" parameter is set',
         async function () {
-          nsdMockReturns(httpStatus.OK, journalRemoteResponseData)
+          dbhMockReturns(httpStatus.OK, journalRemoteResponseData)
           const queryStringParameters = {
             query: 'query-journal',
             year: queryYear
@@ -245,7 +245,7 @@ describe('Handler expected behavior', function () {
         })
       it('returns 200 OK and a empty body when all parameters set',
         async function () {
-          nsdMockReturns(httpStatus.OK, publisherRemoteResponseData)
+          dbhMockReturns(httpStatus.OK, publisherRemoteResponseData)
           const queryStringParameters = {
             query: 'query-publisher',
             year: queryYear
@@ -269,7 +269,7 @@ describe('Handler expected behavior', function () {
   describe('Handler returns bad request when error in query ', () => {
     it('returns 400 Bad Request when obligatory "query"-parameter is missing',
       async function () {
-        nsdMockReturns(httpStatus.BAD_REQUEST, '')
+        dbhMockReturns(httpStatus.BAD_REQUEST, '')
         const queryStringParameters = {
           year: 2020,
           start: 1
@@ -281,7 +281,7 @@ describe('Handler expected behavior', function () {
       })
     it('returns 400 Bad Request when extra unknown parameter is added',
       async function () {
-        nsdMockReturns(httpStatus.BAD_REQUEST, '')
+        dbhMockReturns(httpStatus.BAD_REQUEST, '')
         const queryStringParameters = {
           query: 'query',
           year: 2020,
@@ -295,7 +295,7 @@ describe('Handler expected behavior', function () {
       })
     it('returns 400 Bad Request when value of query parameter is empty string',
       async function () {
-        nsdMockReturns(httpStatus.BAD_REQUEST, '')
+        dbhMockReturns(httpStatus.BAD_REQUEST, '')
         const queryStringParameters = { query: '' }
         const event = createTestEvent(APPLICATION_JSON, 'GET', '/journal',
           null, queryStringParameters)
@@ -304,7 +304,7 @@ describe('Handler expected behavior', function () {
       })
     it('returns 400 Bad Request when value of query parameter is null',
       async function () {
-        nsdMockReturns(httpStatus.BAD_REQUEST, '')
+        dbhMockReturns(httpStatus.BAD_REQUEST, '')
         const queryStringParameters = { query: null }
         const event = createTestEvent(APPLICATION_JSON, 'GET', '/journal',
           null, queryStringParameters)
@@ -313,7 +313,7 @@ describe('Handler expected behavior', function () {
       })
     it('returns 400 Bad Request when value of query string parameters is null',
       async function () {
-        nsdMockReturns(httpStatus.BAD_REQUEST, '')
+        dbhMockReturns(httpStatus.BAD_REQUEST, '')
         const queryStringParameters = null
         const event = createTestEvent(APPLICATION_JSON, 'GET', '/journal',
           null, queryStringParameters)
@@ -326,7 +326,7 @@ describe('Handler expected behavior', function () {
   describe('Handler returns response 200 OK when called', () => {
     ['/journal', '/publisher'].map(calledPath => (
       it(`returns 200 OK for ${calledPath}`, async function () {
-        nsdMockReturns(httpStatus.OK, journalRemoteResponseData)
+        dbhMockReturns(httpStatus.OK, journalRemoteResponseData)
         const queryStringParameters = {
           query: 'query-whatever',
           year: 2020
@@ -345,7 +345,7 @@ describe('Handler expected behavior', function () {
     () => {
       ['/journal', '/publisher'].map(calledPath => (
         it(`returns 200 OK for ${calledPath}`, async function () {
-          nsdMockReturns(httpStatus.NO_CONTENT, '')
+          dbhMockReturns(httpStatus.NO_CONTENT, '')
           const queryStringParameters = {
             query: 'not-to-be-found',
             year: 2020
@@ -365,7 +365,7 @@ describe('Handler expected behavior', function () {
         '/publisher/not-to-be-found-identifier/1234'].map(
         calledPath => it(`returns 404 Not found for ${calledPath}`,
           async function () {
-            nsdMockReturns(httpStatus.NO_CONTENT, '')
+            dbhMockReturns(httpStatus.NO_CONTENT, '')
             const pathParameters = {
               id: 'not-to-be-found-identifier',
               year: '1234'
@@ -397,7 +397,7 @@ describe('Handler expected behavior', function () {
   describe('Handler returns error when remote call fails', () => {
     it('response 502 when remote server responds with error 502 ',
       async function () {
-        nsdMockReturns(httpStatus.BAD_GATEWAY, '')
+        dbhMockReturns(httpStatus.BAD_GATEWAY, '')
         const queryStringParameters = {
           query: 'throw-remote-error-502',
           year: 2020
@@ -410,7 +410,7 @@ describe('Handler expected behavior', function () {
           'Your request cannot be processed at this time due to an upstream error')
       })
     it('response 504 when remote server timeout', async function () {
-      nsdMockReturns(httpStatus.GATEWAY_TIMEOUT, '')
+      dbhMockReturns(httpStatus.GATEWAY_TIMEOUT, '')
       const queryStringParameters = {
         query: 'throw-remote-error-504',
         year: 2020
@@ -423,7 +423,7 @@ describe('Handler expected behavior', function () {
         'Your request cannot be processed at this time because the upstream server response took too long')
     })
     it('Handler echoes remote error', async function () {
-      nsdMockReturns(httpStatus.INTERNAL_SERVER_ERROR, '')
+      dbhMockReturns(httpStatus.INTERNAL_SERVER_ERROR, '')
       const queryStringParameters = {
         query: 'throw-remote-error-500',
         year: 2020
@@ -440,7 +440,7 @@ describe('Handler expected behavior', function () {
     const year = '2020'
     it('returns 200 OK for /journal', async function () {
       const identifier = 'journal-1'
-      nsdMockReturns(httpStatus.OK, singleJournalContent)
+      dbhMockReturns(httpStatus.OK, singleJournalContent)
       const path = `/journal/${identifier}/${year}`
       const pathParameters = {
         id: identifier,
@@ -454,7 +454,7 @@ describe('Handler expected behavior', function () {
     })
     it('returns 200 OK for /publisher', async function () {
       const identifier = 'publisher-1'
-      nsdMockReturns(httpStatus.OK, singlePublisherContent)
+      dbhMockReturns(httpStatus.OK, singlePublisherContent)
       const path = `/publisher/${identifier}/${year}`
       const pathParameters = {
         id: identifier,
@@ -471,7 +471,7 @@ describe('Handler expected behavior', function () {
   describe('Handler returns 200 OK when searching for ISSNs', () => {
     it('returns 200 OK when an ISSN match is found', async () => {
       const issn = '2328-0700'
-      nsdMockReturnsRequestBodyMatch(httpStatus.NO_CONTENT, journalIssnRemoteResponseData, /.*variabel":"Online ISSN.*/g, /.*variabel":"Print ISSN.*/g)
+      dbhMockReturnsRequestBodyMatch(httpStatus.NO_CONTENT, journalIssnRemoteResponseData, /.*variabel":"Online ISSN.*/g, /.*variabel":"Print ISSN.*/g)
 
       const queryStringParameters = {
         query: issn,
@@ -553,7 +553,7 @@ describe('Handler expected behavior', function () {
         it(
           `returns 200 OK and deployment path as part of id for ${event.event.path} `,
           async () => {
-            nsdMockReturns(httpStatus.OK, event.expectedResponse)
+            dbhMockReturns(httpStatus.OK, event.expectedResponse)
             const response = await handler.handler(event.event)
             expect(response.statusCode).to.equal(httpStatus.OK)
             expect(response.headers['Content-Type']).to.equal(
@@ -587,7 +587,7 @@ describe('Handler expected behavior', function () {
           const returnValueWithPublisher = JSON.parse(
             journalRemoteResponseDataWithPublisher)
           returnValueWithPublisher[0]['Forlag id'] = publisherId
-          nsdMockReturns(httpStatus.OK,
+          dbhMockReturns(httpStatus.OK,
             JSON.stringify(returnValueWithPublisher))
           const response = await handler.handler(testEvent)
           expect(response.statusCode).to.equal(httpStatus.OK)
@@ -609,7 +609,7 @@ describe('Handler expected behavior', function () {
             const returnValue = JSON.parse(
               journalRemoteResponseDataWithoutPublisher)
             returnValue['forlag id'] = inputForlagId
-            nsdMockReturns(httpStatus.OK, JSON.stringify(returnValue))
+            dbhMockReturns(httpStatus.OK, JSON.stringify(returnValue))
             const response = await handler.handler(testEvent)
             expect(response.statusCode).to.equal(httpStatus.OK)
             expect(response.headers['Content-Type']).to.equal(
@@ -632,7 +632,7 @@ describe('Handler expected behavior', function () {
         id: `${identifier} `,
         year: `${year}`
       }
-      nsdMockReturns(httpStatus.OK, singleJournalContent)
+      dbhMockReturns(httpStatus.OK, singleJournalContent)
       const event = createTestEvent(APPLICATION_JSON, 'GET', path, pathParameters, null)
       const response = await handler.handler(event)
       expect((await response).statusCode).to.equal(httpStatus.OK)
@@ -647,7 +647,7 @@ describe('Handler expected behavior', function () {
         id: `${identifier} `,
         year: `${year}`
       }
-      nsdMockReturns(httpStatus.OK, publisherRemoteResponseData)
+      dbhMockReturns(httpStatus.OK, publisherRemoteResponseData)
       const event = createTestEvent(APPLICATION_JSON, 'GET', path, pathParameters, null)
       const response = await handler.handler(event)
       expect((await response).statusCode).to.equal(httpStatus.OK)
@@ -662,7 +662,7 @@ describe('Handler expected behavior', function () {
     it('returns 400 BAD_REQUEST when year is invalid for journal', async () => {
       const path = `/journal/${identifier}/${year}`
       const pathParameters = { id: `${identifier}`, year: `${year}` }
-      nsdMockReturns(httpStatus.OK, singleJournalContent)
+      dbhMockReturns(httpStatus.OK, singleJournalContent)
       const event = createTestEvent(APPLICATION_JSON, 'GET', path, pathParameters, null)
       const response = await handler.handler(event)
       expect((await response).statusCode).to.equal(httpStatus.BAD_REQUEST)
@@ -670,7 +670,7 @@ describe('Handler expected behavior', function () {
     it('returns 400 BAD_REQUEST when year is invalid for publisher', async () => {
       const path = `/publisher/${identifier}/${year}`
       const pathParameters = { id: `${identifier}`, year: `${year}` }
-      nsdMockReturns(httpStatus.OK, publisherRemoteResponseData)
+      dbhMockReturns(httpStatus.OK, publisherRemoteResponseData)
       const event = createTestEvent(APPLICATION_JSON, 'GET', path, pathParameters, null)
       const response = await handler.handler(event)
       expect((await response).statusCode).to.equal(httpStatus.BAD_REQUEST)
