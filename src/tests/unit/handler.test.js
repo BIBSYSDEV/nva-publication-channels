@@ -23,8 +23,8 @@ const singlePublisherContent = fs.readFileSync(
   'tests/unit/single_publisher.json').toString()
 const journalIssnRemoteResponseData = fs.readFileSync(
   'tests/unit/issn_journal_response.json').toString()
-const NsdServerAddress = 'https://api.nsd.no'
-const NsdQueryPath = '/dbhapitjener/Tabeller/hentJSONTabellData'
+const NsdServerAddress = 'https://dbh.hkdir.no/'
+const NsdQueryPath = '/dbhapiklient/Tabeller/hentJSONTabellData'
 
 const APPLICATION_JSON = 'application/json'
 const HOST_DOMAIN = 'api.nva.dev.aws.unit.no'
