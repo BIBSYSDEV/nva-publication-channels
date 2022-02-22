@@ -1,7 +1,7 @@
 const httpStatus = require('http-status-codes')
 const logger = require('pino')({ useLevelLabels: true })
 const Request = require('./Request')
-const nsdClient = require('./NsdPublicationChannelRegistryClient')
+const dbhClient = require('./DbhPublicationChannelRegistryClient')
 const ErrorResponse = require('./response/ErrorResponse')
 const Event = require('./event/Event')
 const NullQueryParameters = require('./event/NullQueryParameters')
@@ -70,12 +70,12 @@ const isPublisherSearch = (request) => {
 
 const returnQueryResponse = (event) => {
   const request = new Request(event)
-  return nsdClient.performQuery(request, event.acceptType)
+  return dbhClient.performQuery(request, event.acceptType)
 }
 
 const returnSingleGetResponse = async (event) => {
   const request = new Request(event)
-  const queryResponse = await nsdClient.performQuery(request, event.acceptType)
+  const queryResponse = await dbhClient.performQuery(request, event.acceptType)
   if (queryResponse.statusCode === 200) {
     const hits = JSON.parse(queryResponse.body)
     const firstHit = hits[0]

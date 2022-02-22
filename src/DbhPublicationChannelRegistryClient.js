@@ -34,11 +34,11 @@ const responseWithBody = (body, type, year, accept) => {
   }
 }
 
-const handleRemoteResponse = (nsdResponse, request, type, accept) => {
-  if (nsdResponse.status === httpStatus.NO_CONTENT && request.hasPathParameters) {
+const handleRemoteResponse = (dbhResponse, request, type, accept) => {
+  if (dbhResponse.status === httpStatus.NO_CONTENT && request.hasPathParameters) {
     return new ErrorResponse({ code: httpStatus.NOT_FOUND, message: 'Not Found' }, { path: request.path, fullPath: request.path })
   }
-  return responseWithBody(nsdResponse.data, type, request.year, accept)
+  return responseWithBody(dbhResponse.data, type, request.year, accept)
 }
 
 const handleError = (error, request) => {
@@ -55,8 +55,8 @@ const extractQueryType = (path) => {
 }
 
 const executeRequest = async (currentRequest, request, type, accept) => await axios.post(uri, currentRequest)
-  .then((nsdResponse) => {
-    return handleRemoteResponse(nsdResponse, request, type, accept)
+  .then((dbhResponse) => {
+    return handleRemoteResponse(dbhResponse, request, type, accept)
   })
   .catch((error) => {
     return handleError(error, request.path)
