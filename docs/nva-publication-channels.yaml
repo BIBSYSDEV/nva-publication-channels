@@ -4,7 +4,7 @@ info:
   description: >
     The NVA Publication Channels API.
 
-      This API provides a facade that allows dereferencing of individual pubulication channels in [NSD DBH](https://dbh.nsd.uib.no/publiseringskanaler/Forside).
+      This API provides a facade that allows dereferencing of individual pubulication channels in [NSD DBH](https://kanalregister.hkdir.no/publiseringskanaler/Forside).
 
       The data is reformatted as JSON-LD with a schema defined in the [search ontology](https://bibsysdev.github.io/src/search-ontology.ttl) and the [publication channel ontology](https://bibsysdev.github.io/src/publication-channel-ontology.ttl).
 

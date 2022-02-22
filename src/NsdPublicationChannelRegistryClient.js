@@ -1,4 +1,4 @@
-const uri = 'https://api.nsd.no/dbhapitjener/Tabeller/hentJSONTabellData'
+const uri = 'https://dbh.hkdir.no/dbhapiklient/Tabeller/hentJSONTabellData'
 const ErrorResponse = require('./response/ErrorResponse')
 const httpStatus = require('http-status-codes')
 
