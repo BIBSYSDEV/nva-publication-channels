@@ -1,6 +1,6 @@
 # nva-publication-channels
 
-A thin client to wrap NSD DBH's publication channel databases.
+A thin client to wrap HKDir DBH's publication channel databases.
 
 [Swagger UI](https://nva-dev-public-api.s3-eu-west-1.amazonaws.com/index.html?urls.primaryName=Publication%20Channels#/default/GetJournalById)
 

@@ -23,8 +23,8 @@ const singlePublisherContent = fs.readFileSync(
   'tests/unit/single_publisher.json').toString()
 const journalIssnRemoteResponseData = fs.readFileSync(
   'tests/unit/issn_journal_response.json').toString()
-const DbhServerAddress = 'https://dbh.hkdir.no/'
-const DbhQueryPath = '/dbhapiklient/Tabeller/hentJSONTabellData'
+const DbhServerAddress = 'https://kanalregister.hkdir.no/'
+const DbhQueryPath = '/api/Tabeller/hentJSONTabellData'
 
 const APPLICATION_JSON = 'application/json'
 const HOST_DOMAIN = 'api.nva.dev.aws.unit.no'
