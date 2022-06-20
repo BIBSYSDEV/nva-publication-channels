@@ -17,7 +17,7 @@ const variableSet = (year) => {
   })
 }
 
-const wildcardQuery = query => `${query}%`.replace('&','%')
+const wildcardQuery = query => `%${query}%`
 
 const journalProjection = (variable) => [
   variable.JOURNAL_ID,
