@@ -17,7 +17,10 @@ const variableSet = (year) => {
   })
 }
 
-const wildcardQuery = query => encodeURIComponent(`%${query}%`)
+const wildcardQuery = query => {
+  let query1 = encodeURIComponent(query)
+  return `${query1}`
+}
 
 const journalProjection = (variable) => [
   variable.JOURNAL_ID,
