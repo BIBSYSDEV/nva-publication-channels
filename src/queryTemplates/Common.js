@@ -17,10 +17,7 @@ const variableSet = (year) => {
   })
 }
 
-const wildcardQuery = query => {
-  let query1 = encodeURIComponent(query)
-  return `${query1}`
-}
+const wildcardQuery = query => `%${query}%`.replace('&','%')
 
 const journalProjection = (variable) => [
   variable.JOURNAL_ID,
