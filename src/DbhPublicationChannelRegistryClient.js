@@ -1,4 +1,4 @@
-const uri = 'https://kanalregister.hkdir.no/api/Tabeller/hentJSONTabellData'
+const uri = 'https://kanalregister.hkdir.no/api/krtabeller/hentJSONTabellData'
 const ErrorResponse = require('./response/ErrorResponse')
 const httpStatus = require('http-status-codes')
 
