@@ -340,7 +340,7 @@ components:
           pattern: '^http(s)?:\/\/example.org/npi-domain/[0-9]+$'
           description: The URI of the NPI academic domain (e.g. computer science, biology) that the Journal covers.
         scientificValue:
-          $ref: '#/components/schemas/ScientificValue'
+          $ref: '#/components/schemas/NpiScientificValue'
     Publisher:
       type: object
       properties:
@@ -367,7 +367,7 @@ components:
         active:
           $ref: '#/components/schemas/Active'
         scientificValue:
-          $ref: '#/components/schemas/ScientificValue'
+          $ref: '#/components/schemas/NpiScientificValue'
     Problem:
       type: object
       description: NVA error reporting object
@@ -413,7 +413,7 @@ components:
     Active:
       type: boolean
       description: The activity status of the Publisher; true if it is currently publishing content, false if it has ceased publishing
-    ScientificValue:
+    NpiScientificValue:
       type: string
       enum: ['LEVEL_0', 'LEVEL_1', 'LEVEL_2']
       nullable: true
