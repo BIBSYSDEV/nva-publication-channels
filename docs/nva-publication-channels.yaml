@@ -1,7 +1,7 @@
 openapi: 3.0.3
 info:
   title: NVA Publication Channels API
-  description: This API provides a facade that allows dereferencing of individual pubulication channels in [NSD DBH](https://kanalregister.hkdir.no/publiseringskanaler/Forside).
+  description: This API provides a facade that allows dereferencing of individual publication channels in [NSD DBH](https://kanalregister.hkdir.no/publiseringskanaler/Forside).
   termsOfService: http://nva.unit.no/terms/
   contact:
     email: nva@unit.no
