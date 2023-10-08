@@ -15,6 +15,10 @@ const axiosConfig = (uri) => {
   }
 }
 
+if (!fs.existsSync('./datafiles')) {
+  fs.mkdirSync('./datafiles')
+}
+
 Object.keys(channels).forEach(key => {
   axios(axiosConfig(channels[key])).then(response => {
     fs.writeFileSync(`./datafiles/${key}.csv`, response.data)
