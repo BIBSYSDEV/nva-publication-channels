@@ -62,7 +62,7 @@ const getIdSourceField = type => type === 'journal' ? ['Tidsskrift id'] : ['Forl
 
 const scanCsvById = async (identifier, year, type, accept, file) => {
   const mappings = type === 'journal' ? './datafiles/journals/identifier/file_mappings.json' : './datafiles/publishers/identifier/file_mappings.json'
-  const m = fs.readFileSync(mappings, { encoding: 'utf8', flag: 'r' })
+  const m = fs.readFileSync(mappings, { encoding: 'utf8' })
   const f = JSON.parse(m).filter(item => identifier - 0 >= item.start - 0 && identifier - 0 <= item.last - 0)
     .map(item => item.filename)[0]
   const source = getIdSourceField(type)
