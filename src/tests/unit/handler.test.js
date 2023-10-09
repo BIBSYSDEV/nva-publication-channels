@@ -51,12 +51,12 @@ const dbhMockReturnsRequestBodyMatch = (statusCode, returnValue, firstMatch, sec
     .reply(OK, returnValue)
 }
 
-const createTestEvent = (acceptType, httpMethod, resource, pathParameters, queryParameters, domainName = HOST_DOMAIN) => {
+const createTestEvent = (acceptType, httpMethod, path, pathParameters, queryParameters, domainName = HOST_DOMAIN) => {
   return {
     requestContext: { domainName: domainName },
     headers: { Accept: acceptType },
     httpMethod: httpMethod,
-    resource: resource,
+    path: path,
     pathParameters: pathParameters,
     queryStringParameters: queryParameters
   }
@@ -517,7 +517,7 @@ describe('Handler expected behavior', function () {
               'application/problem+json')
             const problem = JSON.parse(response.body)
             expect(problem.title).to.equal('Not Acceptable')
-            expect(problem.instance).to.contain(event.resource)
+            expect(problem.instance).to.contain(event.path)
             expect(problem.type).to.equal('about:blank')
             expect(problem.detail).to.equal(
               `Your request cannot be processed because the supplied content-type in the "Accept" header "${contentType}" cannot be understood, acceptable types: application/ld+json, application/json`)

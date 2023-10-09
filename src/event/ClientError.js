@@ -2,7 +2,7 @@
 class ClientError extends Error {
   constructor (request, pathParameters, queryParameters) {
     super()
-    this._path = request.resource
+    this._path = request.path
     this._httpMethod = request.httpMethod
     this._pathParameters = pathParameters
     this._queryParameters = queryParameters
