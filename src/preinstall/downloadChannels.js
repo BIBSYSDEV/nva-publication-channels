@@ -55,6 +55,7 @@ const createIdentifierMappings = (type, data) => {
     const data = JSON.stringify(mappings)
     file.write(data)
     file.end()
+    console.log(`Wrote identifiers for ${type}`)
   }
 
   const write = (filename, batch) => {
