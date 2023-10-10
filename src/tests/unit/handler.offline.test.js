@@ -24,12 +24,12 @@ const dbhMockReturns = (statusCode, returnValue) => {
     .reply(statusCode, returnValue)
 }
 
-const createTestEvent = (acceptType, httpMethod, path, pathParameters, queryParameters, domainName = HOST_DOMAIN) => {
+const createTestEvent = (acceptType, httpMethod, resource, pathParameters, queryParameters, domainName = HOST_DOMAIN) => {
   return {
     requestContext: { domainName: domainName },
     headers: { Accept: acceptType },
     httpMethod: httpMethod,
-    path: path,
+    resource: resource,
     pathParameters: pathParameters,
     queryStringParameters: queryParameters
   }

@@ -13,6 +13,7 @@ const routes = ['/journal', '/publisher']
 const acceptTypes = ['application/json', 'application/ld+json']
 
 const handler = async (event, context) => {
+  logger.warn(JSON.stringify(event))
   if (!acceptTypes.includes(event.headers.Accept)) {
     const response = {
       code: httpStatus.NOT_ACCEPTABLE,
