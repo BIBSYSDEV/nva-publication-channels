@@ -29,7 +29,7 @@ const createTestEvent = (acceptType, httpMethod, resource, pathParameters, query
     requestContext: { domainName: domainName },
     headers: { Accept: acceptType },
     httpMethod: httpMethod,
-    resource: resource,
+    path: resource,
     pathParameters: pathParameters,
     queryStringParameters: queryParameters
   }
