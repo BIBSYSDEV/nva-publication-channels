@@ -28,9 +28,9 @@ const extractQueryType = (path) => {
 }
 
 const executeRequest = (currentRequest, originalRequest) => {
-  return process.env.FROM_CACHE === 'true'
-    ? extractFromCsv(currentRequest, originalRequest)
-    : executeRemoteRequest(currentRequest, originalRequest.request, originalRequest.type, originalRequest.accept)
+  return process.env.FROM_CACHE === undefined || process.env.FROM_CACHE === 'false'
+    ? executeRemoteRequest(currentRequest, originalRequest.request, originalRequest.type, originalRequest.accept)
+    : extractFromCsv(currentRequest, originalRequest)
 }
 
 const executeRemoteRequest = async (currentRequest, request, type, accept) => await axios.post(uri, currentRequest)
