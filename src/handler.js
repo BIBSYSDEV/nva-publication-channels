@@ -1,5 +1,11 @@
 const httpStatus = require('http-status-codes')
-const logger = require('pino')({ useLevelLabels: true })
+const logger = require('pino')({
+  formatters: {
+    level: (label) => {
+      return { level: label }
+    }
+  }
+})
 const dbhClient = require('./DbhPublicationChannelRegistryClient')
 const ErrorResponse = require('./response/ErrorResponse')
 const Event = require('./event/Event')

@@ -3,6 +3,13 @@ const fs = require('fs')
 const { parse } = require('csv-parse')
 const { finished } = require('stream/promises')
 const { responseWithBody } = require('./ResponseWithBody')
+const logger = require('pino')({
+  formatters: {
+    level: (label) => {
+      return { level: label }
+    }
+  }
+})
 
 const extractIdentifier = request => {
   return request.path.split('/')[2]
@@ -17,6 +24,7 @@ const extractQueryParams = queryParams => {
 }
 
 const extractFromCsv = (request, originalRequest) => {
+  logger.info('Extracting data from cache, the data may be stale')
   const file = originalRequest.type === 'journal' ? './datafiles/journals.csv' : './datafiles/publishers.csv'
   if (originalRequest.queryParameters === undefined || originalRequest.queryParameters instanceof NullQueryParameters) {
     const item = scanCsvById(extractIdentifier(originalRequest), extractYear(originalRequest), originalRequest.type, originalRequest.accept, file)
