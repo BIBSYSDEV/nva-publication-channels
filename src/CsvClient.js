@@ -25,12 +25,11 @@ const extractQueryParams = queryParams => {
 
 const extractFromCsv = (request, originalRequest) => {
   logger.info('Extracting data from cache, the data may be stale')
-  const file = originalRequest.type === 'journal' ? './datafiles/journals.csv' : './datafiles/publishers.csv'
   if (originalRequest.queryParameters === undefined || originalRequest.queryParameters instanceof NullQueryParameters) {
-    const item = scanCsvById(extractIdentifier(originalRequest), extractYear(originalRequest), originalRequest.type, originalRequest.accept, file)
+    const item = scanCsvById(extractIdentifier(originalRequest), extractYear(originalRequest), originalRequest.type, originalRequest.accept)
     return Promise.resolve(item)
   } else {
-    const item = scanCsvByIssn(extractQueryParams(originalRequest.queryParameters), originalRequest.type, originalRequest.accept, file)
+    const item = scanCsvByIssn(extractQueryParams(originalRequest.queryParameters), originalRequest.type, originalRequest.accept)
     return Promise.resolve(item)
   }
 }
@@ -47,7 +46,8 @@ const searchInColumn = (source, record, queryParams, result) => {
   }
 }
 
-const scanCsvByIssn = async (queryParams, type, accept, file) => {
+const scanCsvByIssn = async (queryParams, type, accept) => {
+  const file = type === 'journal' ? './datafiles/journals.csv' : './datafiles/publishers.csv'
   const source = getSearchSourceField(type)
   const result = []
   const parser = fs.createReadStream(file, { autoClose: true })
@@ -68,14 +68,20 @@ const getSearchSourceField = type => type === 'journal' ? ['Print ISSN', 'Online
 
 const getIdSourceField = type => type === 'journal' ? ['Tidsskrift id'] : ['Forlag id']
 
-const scanCsvById = async (identifier, year, type, accept, file) => {
-  const mappings = type === 'journal' ? './datafiles/journals/identifier/file_mappings.json' : './datafiles/publishers/identifier/file_mappings.json'
-  const m = fs.readFileSync(mappings, { encoding: 'utf8' })
-  const f = JSON.parse(m).filter(item => identifier - 0 >= item.start - 0 && identifier - 0 <= item.last - 0)
+const getMappings = type => {
+  const mappingFile = type === 'journal' ? './datafiles/journals/identifier/file_mappings.json' : './datafiles/publishers/identifier/file_mappings.json'
+  return fs.readFileSync(mappingFile, { encoding: 'utf8' })
+}
+
+const findMappingFor = identifier => item => identifier - 0 >= item.start - 0 && identifier - 0 <= item.last - 0
+
+const scanCsvById = async (identifier, year, type, accept) => {
+  const mappings = getMappings(type)
+  const filename = JSON.parse(mappings).filter(findMappingFor(identifier))
     .map(item => item.filename)[0]
   const source = getIdSourceField(type)
   const result = []
-  const parser = fs.createReadStream(f, { autoClose: true })
+  const parser = fs.createReadStream(filename, { autoClose: true })
     .pipe(parse({ delimiter: ',', columns: true, relax_quotes: true }))
   parser.on('readable', () => {
     let record
