@@ -1,6 +1,11 @@
 const httpStatus = require('http-status-codes')
-const logger = require('pino')({ useLevelLabels: true })
-const Request = require('./Request')
+const logger = require('pino')({
+  formatters: {
+    level: (label) => {
+      return { level: label }
+    }
+  }
+})
 const dbhClient = require('./DbhPublicationChannelRegistryClient')
 const ErrorResponse = require('./response/ErrorResponse')
 const Event = require('./event/Event')
@@ -69,13 +74,11 @@ const isPublisherSearch = (request) => {
 }
 
 const returnQueryResponse = (event) => {
-  const request = new Request(event)
-  return dbhClient.performQuery(request, event.acceptType)
+  return dbhClient.performQuery(event, event.acceptType)
 }
 
 const returnSingleGetResponse = async (event) => {
-  const request = new Request(event)
-  const queryResponse = await dbhClient.performQuery(request, event.acceptType)
+  const queryResponse = await dbhClient.performQuery(event, event.acceptType)
   if (queryResponse.statusCode === 200) {
     const hits = JSON.parse(queryResponse.body)
     const firstHit = hits[0]

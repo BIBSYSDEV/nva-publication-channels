@@ -375,3 +375,5 @@ $RECYCLE.BIN/
 
 # End of https://www.toptal.com/developers/gitignore/api/node,linux,macos,windows,eclipse,intellij+all,visualstudiocode,sam
 /.aws-sam/*
+
+datafiles/

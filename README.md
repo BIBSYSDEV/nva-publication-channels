@@ -126,3 +126,13 @@ src$ npm run test
 # Create the env variable AWS_SAM_STACK_NAME with the name of the stack we are testing
 src$ AWS_SAM_STACK_NAME=<stack-name> npm run integ-test
 ```
+
+## Cached data
+
+Sometimes, you may wish to resolve many resources (semi-) simultaneously, which DBH will not like. In these cases,
+add the environment variable `FROM_CACHE=true` to the deployed lambda. It may also be wise to increase the configured
+memory allocation and concurrency.
+
+## Refreshing cached data
+
+To refresh the cached data, release a change in Codepipeline.

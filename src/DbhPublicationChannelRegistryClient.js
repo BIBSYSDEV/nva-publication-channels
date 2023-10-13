@@ -3,36 +3,9 @@ const ErrorResponse = require('./response/ErrorResponse')
 const httpStatus = require('http-status-codes')
 
 const axios = require('axios')
-const RemoteJournalResponse = require('./response/RemoteJournalResponse')
-const RemotePublisherResponse = require('./response/RemotePublisherResponse')
-const URI = require('urijs')
-
-const hostUri = () => URI(`https://${process.env.DOMAIN}/${process.env.BASEPATH}`).toString()
-
-const isJournal = (type) => type === 'journal'
-
-const extractHits = (year, type, body) => {
-  const response = []
-  const level = `Nivå ${year}`
-  isJournal(type)
-    ? body.forEach(item => response.push(
-      new RemoteJournalResponse(hostUri(), item['Tidsskrift id'], year, item['Original tittel'], item.Url, item[level], item.Aktiv, item['Online ISSN'], item['Print ISSN'], item['NPI Fagfelt'], item['Open Access'], item['Språk'], item['Forlag id'])))
-    : body.forEach(item => response.push(new RemotePublisherResponse(hostUri(), item['Forlag id'], year, item['Original tittel'], item.Url, item[level], item.Aktiv)))
-  return response
-}
-
-const responseWithBody = (body, type, year, accept) => {
-  const response = (body.length > 0) ? extractHits(year, type, body) : []
-  return {
-    statusCode: httpStatus.OK,
-    headers: {
-      'Content-Type': accept,
-      'Access-Control-Allow-Origin': '*'
-    },
-    isBase64Encoded: false,
-    body: JSON.stringify(response)
-  }
-}
+const { extractFromCsv } = require('./CsvClient')
+const { responseWithBody } = require('./ResponseWithBody')
+const Request = require('./Request')
 
 const handleRemoteResponse = (dbhResponse, request, type, accept) => {
   if (dbhResponse.status === httpStatus.NO_CONTENT && request.hasPathParameters) {
@@ -54,7 +27,13 @@ const extractQueryType = (path) => {
   return path.slice(1, secondIndexOfSlash)
 }
 
-const executeRequest = async (currentRequest, request, type, accept) => await axios.post(uri, currentRequest)
+const executeRequest = (currentRequest, originalRequest) => {
+  return process.env.FROM_CACHE === undefined || process.env.FROM_CACHE === 'false'
+    ? executeRemoteRequest(currentRequest, originalRequest.request, originalRequest.type, originalRequest.accept)
+    : extractFromCsv(currentRequest, originalRequest)
+}
+
+const executeRemoteRequest = async (currentRequest, request, type, accept) => await axios.post(uri, currentRequest)
   .then((dbhResponse) => {
     return handleRemoteResponse(dbhResponse, request, type, accept)
   })
@@ -62,19 +41,24 @@ const executeRequest = async (currentRequest, request, type, accept) => await ax
     return handleError(error, request.path)
   })
 
-const performQuery = async (request, accept) => {
-  const path = request.path
-  const type = extractQueryType(path)
+const performQuery = async (event, accept) => {
+  const request = new Request(event)
+  const originalRequest = {
+    request: request,
+    path: request.path,
+    type: extractQueryType(request.path),
+    queryParameters: event.queryParameters,
+    accept: accept
+  }
   // TODO: Fix ISSN case where we have two requests
   let response = null
   for (const item of request.requests) {
     if (response !== null && response.body !== '[]') { break }
-    response = await executeRequest(item, request, type, accept)
+    response = await executeRequest(item, originalRequest)
   }
   return response
 }
 
 module.exports = {
-  performQuery,
-  responseWithBody
+  performQuery
 }
